@@ -5,7 +5,7 @@ from config.samples import samples
 from config.systematics import systematics
 
 
-def get_event_weigths(year, sample, systematic='nom'):
+def get_event_weigths(year, sample, systematic):
     weightstring = ''
     if 'EventWeights' in samples[sample][year].keys():
         for weight in samples[sample][year]['EventWeights']:

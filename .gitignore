@@ -1,3 +1,5 @@
 
 __pycache__
-log/*
+logs
+*.pdf
+venv_extraction

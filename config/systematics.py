@@ -8,7 +8,6 @@ systematics = {
         'LatexName': 'Nominal',
         'Color': 'KITred100',
         'branchsuffix': '_nominal',
-        'metbranchsuffix': '',
         'years': ['2016', '2017', '2018'],
         'correlation': {
             '20162017': 0,

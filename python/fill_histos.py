@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import sys
 import numpy
 import argparse
 
 from ROOT import TH1, ROOT, TFile
 
 from helpers import get_event_weigths
-from config.general import general, samplepath, histopath, logpath
+from config.general import general, samplepath, histopath
 from config.samples import samples
-from config.histograms import histset
+from config.histograms import histograms
 
 
 TH1.SetDefaultSumw2(True)
@@ -31,7 +30,6 @@ def fillhistos(args):
     sample = args.sample
     region = args.region
     systematic = args.systematic
-    run = args.run
     trigger = args.trigger
     print(trigger)
     cuts = args.cuts
@@ -46,9 +44,8 @@ def fillhistos(args):
         weights = '1'
     print('EventWeights: {}'.format(weights))
 
-    inFileName = samplepath(isMC=samples[sample]['MC'], year=year, run=run, filename=samples[sample][year]['FileName'])
-    outFileName = histopath(isMC=samples[sample]['MC'], year=year, run=run, filename=samples[sample][year]['FileName'],
-                            region=region, systematic=systematic)
+    inFileName = samplepath(isMC=samples[sample]['MC'], year=year, filename=samples[sample][year]['FileName'])
+    outFileName = histopath(isMC=samples[sample]['MC'], year=year, filename=sample, region=region, systematic=systematic)
 
 
     print('\nOPENING INPUT FILE AND CREATING DATAFRAME')
@@ -66,29 +63,29 @@ def fillhistos(args):
 
     print('\nLOOPING OVER HISTOGRAMS')
     histos = {}
-    for histname in histset.keys():
-        if 'Samples' in histset[histname].keys() and sample not in histset[histname]['Samples']:
+    for histname in histograms.keys():
+        if 'Samples' in histograms[histname].keys() and sample not in histograms[histname]['Samples']:
             print('Skipping histogram generation for "{}" (histogram not defined for this sample)'.format(histname))
             continue
 
-        if 'Expression' in histset[histname].keys():
-            print('\nAdding temporary branch "{}" from Expression: {}'.format(histname, histset[histname]['Expression']))
-            df_out = df_out.Define(histname, histset[histname]['Expression'])
+        if 'Expression' in histograms[histname].keys():
+            print('\nAdding temporary branch "{}" from Expression: {}'.format(histname, histograms[histname]['Expression']))
+            df_out = df_out.Define(histograms[histname]['Branch'], histograms[histname]['Expression'])
 
-        if histname in df_out.GetColumnNames():
+        if histograms[histname]['Branch'] in df_out.GetColumnNames():
             histogram = {}
-            if 'Histogram' in histset[histname].keys():
-                histogram = histset[histname]['Histogram']
+            if 'Histogram' in histograms[histname].keys():
+                histogram = histograms[histname]['Histogram']
 
             print('Adding histogram for {} with weights {}'.format(histname, weights))
             if 'varbins' in histogram.keys():
                 histos[histname] = df_out.Histo1D(TM1(histname, histname,
                                                       histogram['nbins'], numpy.array(histogram['varbins'])),
-                                                  histname, 'w')
+                                                  histograms[histname]['Branch'], 'w')
             else:
                 histos[histname] = df_out.Histo1D(TM1(histname, histname,
                                                       histogram['nbins'], histogram['xmin'], histogram['xmax']),
-                                                  histname, 'w')
+                                                  histograms[histname]['Branch'], 'w')
 
         else:
             print('\n\n\tERROR: Branch "{}" defined in config/histogram.py not found!\n'.format(histname))
@@ -141,25 +138,12 @@ if __name__ == '__main__':
     parser.add_argument('--cuts', action='store', default=[], nargs='+',
                         help='cuts to apply')
 
-    parser.add_argument('--run', type=str, default='none',
-                        help='run name')
-
     parser.add_argument('--trigger', type=str, default='none',
                         help='trigger name')
 
 
     args = parser.parse_args()
 
-    logfile = logpath(isMC=samples[args.sample]['MC'],
-                      year=args.year,
-                      run=args.run,
-                      sample=args.sample,
-                      region=args.region,
-                      systematic=args.systematic,
-                      module='fill_histos')
-
-    print('Writing log to {}'.format(logfile))
-    sys.stdout = open(logfile, 'w')
     print('Converting {}'.format(args.sample))
 
     fillhistos(args)

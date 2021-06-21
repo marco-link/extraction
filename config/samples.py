@@ -15,15 +15,15 @@ weights_2018 = []
 
 
 
+signal = {
 
-samples = {
+    #'data': data,
 
-    'WbWbX': {
+    'WbWbX_onshell': {
         'MC': True,
         'Signal': True,
-        'Name': 'Wb x Wb',
+        'Label': 'Wb x Wb onshell',
         'Color': 'C0',
-        #'BranchGroups': ['mconly', 'electrons', 'event', 'jets',  'muons', 'ttonly'],
         'XS': 51.7, #TODO update
         'XSUncertainty': {
             'Up': 5, #TODO update
@@ -31,20 +31,89 @@ samples = {
         },
         'Efficiency': 0.43923, #TODO update
         '2016': {
-            'KFactor': 1.00764138624,
+            'KFactor': 1.00764138624,#TODO update
+            'Entries': 106166400, #TODO update
+            'FileName': 'ST_4f_w_lo_WbWbX',
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_2', 'Reco_Wb_onshell'],
+        },
+    },
+
+    'WbWbX_offshell': {
+        'MC': True,
+        'Signal': True,
+        'Label': 'Wb x Wb offshell',
+        'Color': 'C2',
+        'XS': 51.7, #TODO update
+        'XSUncertainty': {
+            'Up': 5, #TODO update
+            'Down': 5, #TODO update
+        },
+        'Efficiency': 0.43923, #TODO update
+        '2016': {
+            'KFactor': 1.00764138624,#TODO update
+            'Entries': 106166400, #TODO update
+            'FileName': 'ST_4f_w_lo_WbWbX',
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_2', '(1-Reco_Wb_onshell)'],
+        },
+    },
+
+
+
+
+    'WbWbX_2': {
+        'MC': True,
+        'Signal': True,
+        'Label': 'Wb x Wb',
+        'Color': 'C0',
+        'XS': 51.7, #TODO update
+        'XSUncertainty': {
+            'Up': 5, #TODO update
+            'Down': 5, #TODO update
+        },
+        'Efficiency': 0.43923, #TODO update
+        '2016': {
+            'KFactor': 1.00764138624,#TODO update
+            'Entries': 106166400, #TODO update
+            'FileName': 'ST_4f_w_lo_WbWbX',
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_2'],
+        },
+    },
+
+    'WbWbX_3': {
+        'MC': True,
+        'Signal': True,
+        'Label': 'Wb x Wb',
+        'Color': 'C0',
+        'XS': 51.7, #TODO update
+        'XSUncertainty': {
+            'Up': 5, #TODO update
+            'Down': 5, #TODO update
+        },
+        'Efficiency': 0.43923, #TODO update
+        '2016': {
+            'KFactor': 1.00764138624,#TODO update
             'Entries': 106166400, #TODO update
             'FileName': 'ST_4f_w_lo_WbWbX',
             'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_3'],
         },
     },
+}
 
 
-    'TTToSemiLeptonic': {
+
+
+
+
+
+
+
+
+background = {
+    'TT_Semileptonic': {
         'MC': True,
         'Signal': False,
-        'Name': 'tt',
+        'Label': 'tt',
         'Color': 'C1',
-        #'BranchGroups': ['mconly', 'electrons', 'event', 'jets',  'muons', 'ttonly'],
         'XS': 800, #TODO update
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -52,19 +121,12 @@ samples = {
         },
         'Efficiency': 0.43923, #TODO update
         '2016': {
-            'KFactor': 1.00764138624,
+            'KFactor': 1.00764138624,#TODO update
             'Entries': 106166400, #TODO update
             'FileName': 'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_WbWbX',
             'EventWeights': gen_weight + weights + weights_2016,
         },
     },
-
-
-
-
-
-  #'data': data,
-
 
 
 
@@ -1467,3 +1529,5 @@ samples = {
   #},
 
 }
+
+samples = {**signal, **background}
