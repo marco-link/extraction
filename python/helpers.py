@@ -15,9 +15,14 @@ def get_event_weigths(year, sample, systematic):
                 weightstring += '({})'.format(weight)
             else:
                 weightstring += '*({})'.format(weight)
-    if systematic in systematics.keys():
-        if 'EventWeights' in systematics[systematic].keys():
-            for weight in systematics[systematic]['EventWeights']:
+
+
+
+    sys_name = systematic.replace('UP', '').replace('DOWN', '')
+    direction = systematic.replace(sys_name, '')
+    if sys_name in systematics.keys():
+        if 'EventWeights' in systematics[sys_name].keys():
+            for weight in systematics[sys_name]['EventWeights'][direction]:
                 if not weight:
                     continue
                 if not weightstring:

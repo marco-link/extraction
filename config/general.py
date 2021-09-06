@@ -2,7 +2,6 @@
 
 import os
 
-
 general = {
     'MCPath': '/ceph/mlink/Wb/mc/',
     'DataPath': '/ceph/mlink/Wb/data/',
@@ -33,7 +32,7 @@ def histopath(isMC, year=None, filename=None, region=None, systematic=None):
     histodir = ''
 
     if isMC:
-        histodir = f'{general["MCPath"]}/{year}/{region}/{systematic}/'
+        histodir = general['MCPath'] + '/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
 
     else:
         raise Exception('histopath not defined for data yet!')

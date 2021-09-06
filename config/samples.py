@@ -13,6 +13,8 @@ weights_2016 = []
 weights_2017 = []
 weights_2018 = []
 
+weights = [] #TODO implement weights
+
 
 
 signal = {
@@ -29,12 +31,12 @@ signal = {
             'Up': 5, #TODO update
             'Down': 5, #TODO update
         },
-        'Efficiency': 0.43923, #TODO update
+        'Efficiency': 1, #TODO update
         '2016': {
             'KFactor': 1.00764138624,#TODO update
             'Entries': 106166400, #TODO update
             'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_2', 'Reco_Wb_onshell'],
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19', 'partonLevel_top_pt>=0'],
         },
     },
 
@@ -48,22 +50,22 @@ signal = {
             'Up': 5, #TODO update
             'Down': 5, #TODO update
         },
-        'Efficiency': 0.43923, #TODO update
+        'Efficiency': 1, #TODO update
         '2016': {
             'KFactor': 1.00764138624,#TODO update
             'Entries': 106166400, #TODO update
             'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_2', '(1-Reco_Wb_onshell)'],
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19', 'partonLevel_top_pt<0'],
         },
     },
 
 
 
 
-    'WbWbX_2': {
+    'WbWbX_19': {
         'MC': True,
         'Signal': True,
-        'Label': 'Wb x Wb',
+        'Label': r'Wb x Wb $\Gamma_t = 1.322$ GeV',
         'Color': 'C0',
         'XS': 51.7, #TODO update
         'XSUncertainty': {
@@ -75,15 +77,15 @@ signal = {
             'KFactor': 1.00764138624,#TODO update
             'Entries': 106166400, #TODO update
             'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_2'],
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19'],
         },
     },
 
-    'WbWbX_3': {
+    'WbWbX_1': {
         'MC': True,
         'Signal': True,
-        'Label': 'Wb x Wb',
-        'Color': 'C0',
+        'Label': r'Wb x Wb $\Gamma_t = 10$ GeV',
+        'Color': 'C1',
         'XS': 51.7, #TODO update
         'XSUncertainty': {
             'Up': 5, #TODO update
@@ -94,7 +96,7 @@ signal = {
             'KFactor': 1.00764138624,#TODO update
             'Entries': 106166400, #TODO update
             'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_3'],
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_1'],
         },
     },
 }
@@ -1530,4 +1532,6 @@ background = {
 
 }
 
-samples = {**signal, **background}
+
+samples = signal.copy()
+samples.update(background)

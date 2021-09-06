@@ -25,7 +25,8 @@ class BranchPlotTask(BaseTask):
         return [AllHistoTasks(year=self.year)]
 
     def output(self):
-        return [luigi.LocalTarget(self.log())]
+        return [luigi.LocalTarget(f'./plots/{self.year}/{self.region}/{self.systematic}/{self.histogram}.pdf'),
+                luigi.LocalTarget(self.log())]
 
     def run(self):
         self.save_execute(command=f'python python/plot_branch.py --year {self.year} --region {self.region} \
@@ -40,4 +41,12 @@ class AllBranchPlotTasks(luigi.WrapperTask):
         for histogram in histograms.keys():
             for region in regions.keys():
                 for systematic in systematics.keys():
-                    yield BranchPlotTask(year=self.year, region=region, systematic=systematic, histogram=histogram)
+                    if systematics[systematic]['type'] == 'shape':
+                        # TODO check year
+                        # TODO check sample
+                        # TODO up and down
+
+
+
+
+                        yield BranchPlotTask(year=self.year, region=region, systematic=systematic, histogram=histogram)

@@ -1,55 +1,42 @@
 # -*- coding: utf-8 -*-
 systematics = {
 
-    # Nominal case
+    # Nominal
     'nom': {
-        'Name': 'Nominal',
-        'RootPlotName': 'Nominal',
-        'LatexName': 'Nominal',
-        'Color': 'KITred100',
-        'branchsuffix': '_nominal',
+        'type': 'shape',
         'years': ['2016', '2017', '2018'],
-        'correlation': {
-            '20162017': 0,
-            '20162018': 0,
-            '20172018': 0,
-            '201620172018': 0,
-        },
     },
 
 
 
-    'muon_idUp': {
-        'Name': 'Muon ID Up',
-        'RootPlotName': 'Muon Id',
-        'LatexName': 'Muon Id',
-        'Color': 'KITgreen100',
+    #FIXME only test systematics!
+
+
+    'CMS_Muon_id': {
+        'type': 'shape',
+
         'Reweightonly': True,
-        'EventWeights': ['tightMuons_weight_id_up/tightMuons_weight_id_nominal'],
+        'EventWeights': {'UP': ['tightMuons_weight_id_up/tightMuons_weight_id_nominal'],
+                         'DOWN': ['tightMuons_weight_id_down/tightMuons_weight_id_nominal']},
         'years': ['2016', '2017', '2018'],
-        'correlation': {
-            '20162017': 0,
-            '20162018': 0,
-            '20172018': 0,
-            '201620172018': 0,
-        },
     },
 
-    'muon_idDown': {
-        'Name': 'Muon ID Down',
-        'RootPlotName': 'Muon Id',
-        'LatexName': 'Muon Id',
-        'Color': 'KITgreen100',
-        'Reweightonly': True,
-        'EventWeights': ['tightMuons_weight_id_down/tightMuons_weight_id_nominal'],
+
+    'lumi_13TeV': {
+        'type': 'lnN',
+        'value': 1.01, #TODO
         'years': ['2016', '2017', '2018'],
-        'correlation': {
-            '20162017': 0,
-            '20162018': 0,
-            '20172018': 0,
-            '201620172018': 0,
-        },
     },
+
+
+    'QCDscale': {
+        'type': 'lnN',
+        'value': (0.908, 1.058), #TODO
+        'samples': ['TT_Semileptonic'],
+        'years': ['2016', '2017', '2018'],
+    },
+
+
 
     ### REWEIGHTING ONLY SYSTEMATICS
 

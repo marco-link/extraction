@@ -22,11 +22,12 @@ class HistoTask(BaseTask):
         return f'./logs/fill_histos/{self.year}/{self.region}/{self.systematic}/{self.sample}.log'
 
     def output(self):
-        return [luigi.LocalTarget(self.log()), luigi.LocalTarget(histopath(isMC=samples[self.sample]['MC'],
-                                                                           year=self.year,
-                                                                           filename=self.sample,
-                                                                           region=self.region,
-                                                                           systematic=self.systematic))]
+        return [luigi.LocalTarget(self.log()),
+                luigi.LocalTarget(histopath(isMC=samples[self.sample]['MC'],
+                                            year=self.year,
+                                            filename=self.sample,
+                                            region=self.region,
+                                            systematic=self.systematic))]
 
     def run(self):
         self.save_execute(command=f'python python/fill_histos.py --year {self.year} --sample {self.sample} \
@@ -41,4 +42,11 @@ class AllHistoTasks(luigi.WrapperTask):
         for sample in samples.keys():
             for region in regions.keys():
                 for systematic in systematics.keys():
-                    yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic)
+                    if systematics[systematic]['type'] == 'shape':
+
+                        # TODO see BranchPlotTask.py
+                        if systematic == 'nom':
+                            yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic)
+                        else:
+                            yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic + 'UP')
+                            yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic + 'DOWN')
