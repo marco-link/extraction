@@ -3,8 +3,8 @@ __pycache__
 
 *.pdf
 *.pyc
-venv_extraction
-CMSSW_10_2_13
+env
 
 logs
 cards
+plots

@@ -8,6 +8,10 @@ export CMSSW_BASE=CMSSW_10_2_13
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch/
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
+mkdir env
+cd env
+
+
 if [ -r "${CMSSW_BASE}" ];
 then
     echo "${CMSSW_BASE} environment found"
@@ -31,10 +35,11 @@ then
     echo "CombineHarvester git repo found"
 else
     git clone https://github.com/cms-analysis/CombineHarvester.git CombineHarvester
+
+    scram b -j 8
 fi
 
 cmsenv
-scram b -j 10
-cd ../../
+cd ../../../
 
 export PYTHONPATH=$(pwd):$PYTHONPATH

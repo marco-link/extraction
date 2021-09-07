@@ -1,13 +1,16 @@
 #!/bin/bash
 
-export PYTHONPATH=$(pwd):$PYTHONPATH
+pynvname="venv_extraction"
+
+# make sure combine environment is setup
+env -i sh scripts/setup_combine.sh
 
 # Source ROOT working with python 3
 # source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.22.00/x86_64-centos7-gcc48-opt/bin/thisroot.sh
-
 source /work/mlink/myroot/bin/thisroot.sh
 
-pynvname="venv_extraction"
+
+cd env
 
 if [ -r ./${pynvname} ];
 then
@@ -22,3 +25,6 @@ else
 
     pre-commit install
 fi
+
+cd -
+export PYTHONPATH=$(pwd):$PYTHONPATH

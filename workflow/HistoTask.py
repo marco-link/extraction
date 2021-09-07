@@ -13,7 +13,7 @@ from config.systematics import systematics
 
 
 class HistoTask(BaseTask):
-    year = luigi.IntParameter()
+    year = luigi.Parameter()
     sample = luigi.Parameter()
     region = luigi.Parameter()
     systematic = luigi.Parameter()
@@ -36,17 +36,16 @@ class HistoTask(BaseTask):
 
 
 class AllHistoTasks(luigi.WrapperTask):
-    year = luigi.IntParameter()
+    year = luigi.Parameter()
 
     def requires(self):
         for sample in samples.keys():
             for region in regions.keys():
                 for systematic in systematics.keys():
-                    if systematics[systematic]['type'] == 'shape':
-
-                        # TODO see BranchPlotTask.py
-                        if systematic == 'nom':
-                            yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic)
-                        else:
-                            yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic + 'UP')
-                            yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic + 'DOWN')
+                    if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
+                        if 'samples' not in systematics[systematic].keys() or sample in systematics[systematic]['samples']:
+                            if systematic == 'nom':
+                                yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic)
+                            else:
+                                yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic + 'UP')
+                                yield HistoTask(year=self.year, sample=sample, region=region, systematic=systematic + 'DOWN')

@@ -2,7 +2,7 @@
 # extraction
 
 A framework to generate histograms, produce plots and datacards from NanoAOD files.
-Also storage of fitting scipts and other stuff.
+Also storage of fitting scripts and other stuff.
 
 This repository uses [pre-commit](pre-commit.com) hooks!
 

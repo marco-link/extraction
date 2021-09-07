@@ -13,7 +13,7 @@ from config.systematics import systematics
 
 
 class BranchPlotTask(BaseTask):
-    year = luigi.IntParameter()
+    year = luigi.Parameter()
     region = luigi.Parameter()
     systematic = luigi.Parameter()
     histogram = luigi.Parameter()
@@ -35,18 +35,15 @@ class BranchPlotTask(BaseTask):
 
 
 class AllBranchPlotTasks(luigi.WrapperTask):
-    year = luigi.IntParameter()
+    year = luigi.Parameter()
 
     def requires(self):
         for histogram in histograms.keys():
             for region in regions.keys():
                 for systematic in systematics.keys():
-                    if systematics[systematic]['type'] == 'shape':
-                        # TODO check year
-                        # TODO check sample
-                        # TODO up and down
-
-
-
-
-                        yield BranchPlotTask(year=self.year, region=region, systematic=systematic, histogram=histogram)
+                    if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
+                        if systematic == 'nom':
+                            yield BranchPlotTask(year=self.year, region=region, systematic=systematic, histogram=histogram)
+                        else:
+                            yield BranchPlotTask(year=self.year, region=region, systematic=systematic + 'UP', histogram=histogram)
+                            yield BranchPlotTask(year=self.year, region=region, systematic=systematic + 'DOWN', histogram=histogram)

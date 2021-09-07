@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import pandas
+
 #from config.data import data
+
+
+gen_json = pandas.read_json('config/xsecs.json')
+
 
 gen_weight = ['genweight'] #TODO check width weight
 
@@ -14,7 +20,6 @@ weights_2017 = []
 weights_2018 = []
 
 weights = [] #TODO implement weights
-
 
 
 signal = {
@@ -58,55 +63,30 @@ signal = {
             'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19', 'partonLevel_top_pt<0'],
         },
     },
-
-
-
-
-    'WbWbX_19': {
-        'MC': True,
-        'Signal': True,
-        'Label': r'Wb x Wb $\Gamma_t = 1.322$ GeV',
-        'Color': 'C0',
-        'XS': 51.7, #TODO update
-        'XSUncertainty': {
-            'Up': 5, #TODO update
-            'Down': 5, #TODO update
-        },
-        'Efficiency': 0.43923, #TODO update
-        '2016': {
-            'KFactor': 1.00764138624,#TODO update
-            'Entries': 106166400, #TODO update
-            'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19'],
-        },
-    },
-
-    'WbWbX_1': {
-        'MC': True,
-        'Signal': True,
-        'Label': r'Wb x Wb $\Gamma_t = 10$ GeV',
-        'Color': 'C1',
-        'XS': 51.7, #TODO update
-        'XSUncertainty': {
-            'Up': 5, #TODO update
-            'Down': 5, #TODO update
-        },
-        'Efficiency': 0.43923, #TODO update
-        '2016': {
-            'KFactor': 1.00764138624,#TODO update
-            'Entries': 106166400, #TODO update
-            'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_1'],
-        },
-    },
 }
 
 
 
 
-
-
-
+for index in gen_json.keys():
+    signal['WbWbX_{}'.format(index)] = {
+        'MC': True,
+        'Signal': True,
+        'Label': r'Wb x Wb $m_t = {}$ GeV, $\Gamma_t = {}$ GeV'.format(gen_json[index]['mass'], gen_json[index]['width']),
+        'Color': 'C1',
+        'XS': 51.7, #TODO update, which Xs? SM?
+        'XSUncertainty': {
+            'Up': 5, #TODO update
+            'Down': 5, #TODO update
+        },
+        'Efficiency': 0.43923, #TODO update
+        '2016': {
+            'KFactor': 1.00764138624,#TODO update
+            'Entries': 106166400, #TODO update
+            'FileName': 'ST_4f_w_lo_WbWbX',
+            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_{}'.format(index)],
+        },
+    }
 
 
 
