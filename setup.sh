@@ -6,8 +6,7 @@ pynvname="venv_extraction"
 env -i sh scripts/setup_combine.sh
 
 # Source ROOT working with python 3
-# source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.22.00/x86_64-centos7-gcc48-opt/bin/thisroot.sh
-source /work/mlink/myroot/bin/thisroot.sh
+source /cvmfs/sft.cern.ch/lcg/app/releases/ROOT/6.24.06/x86_64-centos7-gcc48-opt/bin/thisroot.sh
 
 
 cd env
