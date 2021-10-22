@@ -7,10 +7,11 @@ import argparse
 
 from ROOT import TH1, ROOT, TFile
 
-from helpers import get_event_weigths
+from helpers import getSystsplit, get_event_weigths
 from config.general import general, samplepath, histopath, lumi
 from config.samples import samples
 from config.histograms import histograms
+from config.systematics import systematics
 
 
 TH1.SetDefaultSumw2(True)
@@ -63,28 +64,45 @@ def fillhistos(args):
     print('\nLOOPING OVER HISTOGRAMS')
     histos = {}
     for histname in histograms.keys():
+        systematic, direction = getSystsplit(systematic)
+        branchname = histograms[histname]['Branch']
+
+        if 'Branch' in systematics[systematic].keys():
+            branchname = systematics[systematic]['Branch'][direction] + '_' + branchname #FIXME
+        else:
+            branchname = 'nominal_' + branchname
+
+        print(f'Reading from branch "{branchname}"...')
+
+
         if 'Samples' in histograms[histname].keys() and sample not in histograms[histname]['Samples']:
             print('Skipping histogram generation for "{}" (histogram not defined for this sample)'.format(histname))
             continue
 
         if 'Expression' in histograms[histname].keys():
             print('\nAdding temporary branch "{}" from Expression: {}'.format(histname, histograms[histname]['Expression']))
-            df_out = df_out.Define(histograms[histname]['Branch'], histograms[histname]['Expression'])
+            df_out = df_out.Define(branchname, histograms[histname]['Expression'])
 
-        if histograms[histname]['Branch'] in df_out.GetColumnNames():
+        if branchname in df_out.GetColumnNames():
             histogram = {}
             if 'Histogram' in histograms[histname].keys():
                 histogram = histograms[histname]['Histogram']
 
             print(f'Adding histogram for {histname} with weights {weights}')
             if 'varbins' in histogram.keys():
-                histos[histname] = df_out.Histo1D(TM1(histname, histname,
-                                                      histogram['nbins'], numpy.array(histogram['varbins'])),
-                                                  histograms[histname]['Branch'], 'w')
+                histos[histname] = df_out.Histo1D(TM1(histname,
+                                                      histname,
+                                                      histogram['nbins'],
+                                                      numpy.array(histogram['varbins'])),
+                                                  branchname, 'w')
             else:
-                histos[histname] = df_out.Histo1D(TM1(histname, histname,
-                                                      histogram['nbins'], histogram['xmin'], histogram['xmax']),
-                                                  histograms[histname]['Branch'], 'w')
+                histos[histname] = df_out.Histo1D(TM1(histname,
+                                                      histname,
+                                                      histogram['nbins'],
+                                                      histogram['xmin'],
+                                                      histogram['xmax']),
+                                                  branchname, 'w')
+
             # apply global scale
             efficiency = histos[histname].GetEntries() / samples[sample][year]['Entries']
             scale = samples[sample]['XS'] * efficiency * samples[sample][year]['KFactor'] * lumi[year] / samples[sample][year]['Entries']
@@ -138,7 +156,7 @@ if __name__ == '__main__':
     parser.add_argument('--sample', type=str, required=True,
                         help='sample to process')
 
-    parser.add_argument('--systematic', type=str, default='nom',
+    parser.add_argument('--systematic', type=str, default='nominal',
                         help='systematic to process')
 
     parser.add_argument('--cuts', action='store', default=[], nargs='+',

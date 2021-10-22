@@ -30,7 +30,7 @@ def buildcard(args):
 
     # fill with shapes
     def setShape(p):
-        f = ROOT.TFile(histopath(isMC=True, year=args.year, filename=p.process(), region=p.bin(), systematic='nom'), 'read')
+        f = ROOT.TFile(histopath(isMC=True, year=args.year, filename=p.process(), region=p.bin(), systematic='nominal'), 'read')
         shape = f.Get(general['Histodir'] + '/' + args.shape)
 
         p.set_shape(shape, True)
@@ -43,7 +43,7 @@ def buildcard(args):
         for syst in systematics:
             systematic = systematics[syst]
 
-            if syst == 'nom' or args.year not in systematic['years']:
+            if syst == 'nominal' or args.year not in systematic['years']:
                 continue
 
             processes = parser.process_set()
@@ -65,9 +65,9 @@ def buildcard(args):
                     s.set_type('shape')
 
                     # fill shapes
-                    f_nom = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
-                                                 region=region, systematic='nom'), 'read')
-                    nominal = f_nom.Get(general['Histodir'] + '/' + args.shape)
+                    f_nominal = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                                                     region=region, systematic='nominal'), 'read')
+                    nominalinal = f_nominal.Get(general['Histodir'] + '/' + args.shape)
 
                     f_up = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
                                                 region=region, systematic=syst + 'UP'), 'read')
@@ -77,7 +77,7 @@ def buildcard(args):
                                                   region=region, systematic=syst + 'DOWN'), 'read')
                     down = f_down.Get(general['Histodir'] + '/' + args.shape)
 
-                    s.set_shapes(up, down, nominal)
+                    s.set_shapes(up, down, nominalinal)
                     parser.InsertSystematic(s)
             elif systematic['type'] == 'lnN':
                 parser.cp().process(processes).AddSyst(parser, syst, 'lnN', ch.SystMap()(systematic['value']))

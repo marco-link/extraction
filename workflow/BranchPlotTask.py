@@ -42,7 +42,7 @@ class AllBranchPlotTasks(luigi.WrapperTask):
             for region in regions.keys():
                 for systematic in systematics.keys():
                     if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
-                        if systematic == 'nom':
+                        if systematic == 'nominal':
                             yield BranchPlotTask(year=self.year, region=region, systematic=systematic, histogram=histogram)
                         else:
                             yield BranchPlotTask(year=self.year, region=region, systematic=systematic + 'UP', histogram=histogram)

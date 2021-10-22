@@ -2,13 +2,13 @@
 
 import pandas
 
-#from config.data import data
+#from config.data import data # TODO
 
 
 gen_json = pandas.read_json('config/xsecs.json')
 
 
-gen_weight = ['genweight'] #TODO check width weight
+gen_weight = [] #TODO check width weight
 
 weights_electron = []
 weights_muon = ['tightMuons_weight_id_nominal', 'tightMuons_weight_iso_nominal']
@@ -22,48 +22,7 @@ weights_2018 = []
 weights = [] #TODO implement weights
 
 
-signal = {
-
-    #'data': data,
-
-    'WbWbX_onshell': {
-        'MC': True,
-        'Signal': True,
-        'Label': 'Wb x Wb onshell',
-        'Color': 'C0',
-        'XS': 51.7, #TODO update
-        'XSUncertainty': {
-            'Up': 5, #TODO update
-            'Down': 5, #TODO update
-        },
-        'Efficiency': 1, #TODO update
-        '2016': {
-            'KFactor': 1.00764138624,#TODO update
-            'Entries': 106166400, #TODO update
-            'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19', 'partonLevel_top_pt>=0'],
-        },
-    },
-
-    'WbWbX_offshell': {
-        'MC': True,
-        'Signal': True,
-        'Label': 'Wb x Wb offshell',
-        'Color': 'C2',
-        'XS': 51.7, #TODO update
-        'XSUncertainty': {
-            'Up': 5, #TODO update
-            'Down': 5, #TODO update
-        },
-        'Efficiency': 1, #TODO update
-        '2016': {
-            'KFactor': 1.00764138624,#TODO update
-            'Entries': 106166400, #TODO update
-            'FileName': 'ST_4f_w_lo_WbWbX',
-            'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_19', 'partonLevel_top_pt<0'],
-        },
-    },
-}
+signal = {}
 
 
 
@@ -74,16 +33,15 @@ for index in gen_json.keys():
         'Signal': True,
         'Label': r'Wb x Wb $m_t = {}$ GeV, $\Gamma_t = {}$ GeV'.format(gen_json[index]['mass'], gen_json[index]['width']),
         'Color': 'C1',
-        'XS': 51.7, #TODO update, which Xs? SM?
+        'XS': gen_json[index]['xsec'],
         'XSUncertainty': {
             'Up': 5, #TODO update
             'Down': 5, #TODO update
         },
-        'Efficiency': 0.43923, #TODO update
         '2016': {
-            'KFactor': 1.00764138624,#TODO update
-            'Entries': 106166400, #TODO update
-            'FileName': 'ST_4f_w_lo_WbWbX',
+            'KFactor': 1.,#TODO update
+            'Entries': 1000, #TODO update
+            'FileName': 'WbjToLNu_4f',
             'EventWeights': gen_weight + weights + weights_2016 + ['LHEWeights_width_{}'.format(index)],
         },
     }
@@ -91,27 +49,60 @@ for index in gen_json.keys():
 
 
 background = {
-    'TT_Semileptonic': {
+    #'TT_Semileptonic': {
+        #'MC': True,
+        #'Signal': False,
+        #'Label': 'tt',
+        #'Color': 'C1',
+        #'XS': 800, #TODO update
+        #'XSUncertainty': {
+            #'Up': 50, #TODO update
+            #'Down': 50, #TODO update
+        #},
+        #'2016': {
+            #'KFactor': 1.00764138624,#TODO update
+            #'Entries': 106166400, #TODO update
+            #'FileName': 'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_WbWbX',
+            #'EventWeights': gen_weight + weights + weights_2016,
+        #},
+    #},
+
+
+    'testbg_1': {
         'MC': True,
         'Signal': False,
-        'Label': 'tt',
+        'Label': 'test1',
         'Color': 'C1',
         'XS': 800, #TODO update
         'XSUncertainty': {
             'Up': 50, #TODO update
             'Down': 50, #TODO update
         },
-        'Efficiency': 0.43923, #TODO update
         '2016': {
-            'KFactor': 1.00764138624,#TODO update
-            'Entries': 106166400, #TODO update
-            'FileName': 'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_WbWbX',
+            'KFactor': 1.,#TODO update
+            'Entries': 1000, #TODO update
+            'FileName': 'DYJetsToLL_M-5',
             'EventWeights': gen_weight + weights + weights_2016,
         },
     },
 
-
-
+    'testbg_2': {
+        'MC': True,
+        'Signal': False,
+        'Label': 'test2',
+        'Color': 'C2',
+        'XS': 900, #TODO update
+        'XSUncertainty': {
+            'Up': 50, #TODO update
+            'Down': 50, #TODO update
+        },
+        '2016': {
+            'KFactor': 1.,#TODO update
+            'Entries': 1000, #TODO update
+            'FileName': 'DYJetsToLL_M-10to50',
+            'EventWeights': gen_weight + weights + weights_2016,
+        },
+    },
 
 
 
@@ -133,7 +124,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -169,7 +159,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -199,7 +188,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -229,7 +217,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -259,7 +246,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -289,7 +275,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -319,7 +304,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -349,7 +333,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.00764138624,
       #'Entries': 106166400,
@@ -380,7 +363,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -413,7 +395,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -443,7 +424,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -473,7 +453,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -503,7 +482,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -533,7 +511,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -563,7 +540,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -593,7 +569,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -623,7 +598,6 @@ background = {
       #'Up': 3.81,
       #'Down': 4.32,
     #},
-    #'Efficiency': 0.43923,
     #'2016': {
       #'KFactor': 1.01929625871,
       #'Entries': 28403407,
@@ -654,7 +628,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.45469,
     #'2016': {
       #'KFactor': 1.00975884395,
       #'Entries': 68302800,
@@ -688,7 +661,6 @@ background = {
       #'Up': 40.24,
       #'Down': 45.62,
     #},
-    #'Efficiency': 0.10608,
     #'2016': {
       #'KFactor': 1.00764633228,
       #'Entries': 67860400,
@@ -722,7 +694,6 @@ background = {
       #'Up': 4.06,
       #'Down': 3.61,
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 17780700,
@@ -756,7 +727,6 @@ background = {
       #'Up': 5.40,
       #'Down': 4.57,
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 31848000,
@@ -790,7 +760,6 @@ background = {
       #'Up': 3.84,
       #'Down': 3.84,
     #},
-    #'Efficiency': 0.5454,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 2712006,
@@ -824,7 +793,6 @@ background = {
       #'Up': 3.84,
       #'Down': 3.84,
     #},
-    #'Efficiency': 0.5454,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 3214709,
@@ -859,7 +827,6 @@ background = {
       #'Up': 288.27, # estimated 5%
       #'Down': 288.27, # estimated 5%
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.51339731918,
       #'Entries': 120777245,
@@ -900,7 +867,6 @@ background = {
       #'Up': 164.91, # estimated 5%
       #'Down': 164.91, # estimated 5%
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 0.000001, #TODO 2016
       #'Entries': 18242254, #TODO 2016
@@ -934,7 +900,6 @@ background = {
       #'Up': 34.48, # estimated 5%
       #'Down': 34.48, # estimated 5%
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 2.69295049675,
       #'Entries': 110844684,
@@ -968,7 +933,6 @@ background = {
       #'Up': 1.22, # estimated 5%
       #'Down': 1.22, # estimated 5%
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 2.67901769448,
       #'Entries': 12022587,
@@ -1002,7 +966,6 @@ background = {
       #'Up': 0.155, # estimated 5%
       #'Down': 0.155, # estimated 5%
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 2.59847093474,
       #'Entries': 1939947,
@@ -1036,7 +999,6 @@ background = {
       #'Up': 0.0234, # estimated 5%
       #'Down': 0.0234, # estimated 5%
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 2.46996699808,
       #'Entries': 1974609,
@@ -1069,7 +1031,6 @@ background = {
       #'Up': 0.5,
       #'Down': 0.5,
     #},
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 35867.060, #Correct Lumi
@@ -1096,7 +1057,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 1556000.0,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 57580393,
@@ -1126,7 +1086,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 323600.0,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 54552852,
@@ -1156,7 +1115,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 29990.0,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 62622029,
@@ -1186,7 +1144,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 6351.0,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 37233786,
@@ -1216,7 +1173,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 1039.0,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 15210939,
@@ -1246,7 +1202,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 99.01,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 11839357,
@@ -1276,7 +1231,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 20.23,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 5804179,
@@ -1306,7 +1260,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 0.55,
-    #'Efficiency': 0.3259,
     #'2016': {
       #'KFactor': 1.92186488942,
       #'Entries': 5280565,
@@ -1336,7 +1289,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 0.55,
-    #'Efficiency': 0.6741,
     #'2016': {
       #'KFactor': 1.93925574801,
       #'Entries': 833298,
@@ -1366,7 +1318,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 0.86,
-    #'Efficiency': 0.301,
     #'2016': {
       #'KFactor': 2.13901593969,
       #'Entries': 13692628,
@@ -1396,7 +1347,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 0.86,
-    #'Efficiency': 0.699,
     #'2016': {
       #'KFactor': 2.11408013765,
       #'Entries': 749400,
@@ -1426,7 +1376,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 118.7,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 7982180,
@@ -1456,7 +1405,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 65.5443,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 6995142,
@@ -1486,7 +1434,6 @@ background = {
     #'Color': 404,
     #'BranchGroups': ['mconly', 'electrons', 'event', 'jets', 'muons'],
     #'XS': 15.8274,
-    #'Efficiency': 1.0,
     #'2016': {
       #'KFactor': 1.0,
       #'Entries': 1988098,

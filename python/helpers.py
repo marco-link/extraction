@@ -5,6 +5,14 @@ from config.samples import samples
 from config.systematics import systematics
 
 
+def getSystsplit(systematic):
+    sys_name = systematic.replace('UP', '').replace('DOWN', '')
+    direction = systematic.replace(sys_name, '')
+
+    return sys_name, direction
+
+
+
 def get_event_weigths(year, sample, systematic):
     weightstring = '1'
 
@@ -17,8 +25,7 @@ def get_event_weigths(year, sample, systematic):
 
 
 
-    sys_name = systematic.replace('UP', '').replace('DOWN', '')
-    direction = systematic.replace(sys_name, '')
+    sys_name, direction = getSystsplit(systematic)
     if sys_name in systematics.keys():
         if 'EventWeights' in systematics[sys_name].keys():
             for weight in systematics[sys_name]['EventWeights'][direction]:

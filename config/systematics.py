@@ -1,31 +1,67 @@
 # -*- coding: utf-8 -*-
+
+"""
+key = systematic name in datacard
+
+type:       'shape' or 'lnN'
+years:      list of years to apply this systematic to
+samples:    (optional) list of samples to apply this systematic to
+
+# for shape systematics (extra histograms are filles)
+
+Branch:     (optional) branch suffixes as dictionary with 'UP' and 'DOWN' keys
+Branch:     (optional) systematic weights to apply as dictionary with 'UP' and 'DOWN' keys
+
+
+# for lnN systematics (only added to datacards)
+
+value:      single value or tuple e.g. (0.908, 1.058)
+
+"""
+
+
+
+
+
+from config.general import allyears
+
+
 systematics = {
 
     # Nominal
-    'nom': {
+    'nominal': {
         'type': 'shape',
-        'years': ['2016', '2017', '2018'],
+        'years': allyears,
     },
+
+
+
 
 
 
     #FIXME only test systematics!
 
+    'CMS_JEC': {
+        'type': 'shape',
+
+        'Branch': {'UP': 'jerUp',
+                   'DOWN': 'jerDown'},
+        'years': allyears,
+    },
 
     'CMS_Muon_id': {
         'type': 'shape',
 
-        'Reweightonly': True,
         'EventWeights': {'UP': ['tightMuons_weight_id_up/tightMuons_weight_id_nominal'],
                          'DOWN': ['tightMuons_weight_id_down/tightMuons_weight_id_nominal']},
-        'years': ['2016', '2017', '2018'],
+        'years': allyears,
     },
 
 
     'lumi_13TeV': {
         'type': 'lnN',
         'value': 1.01, #TODO
-        'years': ['2016', '2017', '2018'],
+        'years': allyears,
     },
 
 
@@ -33,7 +69,7 @@ systematics = {
         'type': 'lnN',
         'value': (0.908, 1.058), #TODO
         'samples': ['TT_Semileptonic'],
-        'years': ['2016', '2017', '2018'],
+        'years': allyears,
     },
 
 
@@ -47,7 +83,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['lepton_sfUp/lepton_sf'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -62,7 +98,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['lepton_sfDown/lepton_sf'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -77,7 +113,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['btag_weight_mediumUp/btag_weight_medium'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -92,7 +128,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['btag_weight_mediumDown/btag_weight_medium'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -107,7 +143,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['toptag_weightUp/toptag_weight'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -122,7 +158,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['toptag_weightDown/toptag_weight'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -161,7 +197,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['puWeightUp/puWeight'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -176,7 +212,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['puWeightDown/puWeight'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -191,7 +227,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['PSWeight[2]'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -206,7 +242,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['PSWeight[0]'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -221,7 +257,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['PSWeight[3]'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -236,7 +272,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['PSWeight[1]'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -251,7 +287,7 @@ systematics = {
         #'Color': 'KITgreen100',
         #'Reweightonly': True,
         #'EventWeights': ['1.025'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -266,7 +302,7 @@ systematics = {
         #'Color': 'KITblue100',
         #'Reweightonly': True,
         #'EventWeights': ['0.975'],
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -284,7 +320,7 @@ systematics = {
         #'LatexName': 'Unclustered Energy',
         #'Color': 'KITgreen100',
         #'metbranchsuffix': '_unclustEnUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -298,7 +334,7 @@ systematics = {
         #'LatexName': 'UE Down',
         #'Color': 'KITblue100',
         #'metbranchsuffix': '_unclustEnDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -313,7 +349,7 @@ systematics = {
         #'LatexName': 'JER',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jerUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -327,7 +363,7 @@ systematics = {
         #'LatexName': 'JER Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jerDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -342,7 +378,7 @@ systematics = {
         #'LatexName': 'JES',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesTotalUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -356,7 +392,7 @@ systematics = {
         #'LatexName': 'JES Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesTotalDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -370,7 +406,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteMPFBias',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesAbsoluteMPFBiasUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -384,7 +420,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteMPFBias Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesAbsoluteMPFBiasDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -398,7 +434,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteSample',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesAbsoluteSampleUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -412,7 +448,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteSample Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesAbsoluteSampleDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -426,7 +462,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteScale',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesAbsoluteScaleUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -440,7 +476,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteScale Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesAbsoluteScaleDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -454,7 +490,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteStat',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesAbsoluteStatUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -468,7 +504,7 @@ systematics = {
         #'LatexName': 'JES AbsoluteStat Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesAbsoluteStatDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -482,7 +518,7 @@ systematics = {
         #'LatexName': 'JES FlavorQCD',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesFlavorQCDUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -496,7 +532,7 @@ systematics = {
         #'LatexName': 'JES FlavorQCD Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesFlavorQCDDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -510,7 +546,7 @@ systematics = {
         #'LatexName': 'JES Fragmentation',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesFragmentationUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -524,7 +560,7 @@ systematics = {
         #'LatexName': 'JES Fragmentation Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesFragmentationDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -538,7 +574,7 @@ systematics = {
         #'LatexName': 'JES PileUpDataMC',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesPileUpDataMCUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -552,7 +588,7 @@ systematics = {
         #'LatexName': 'JES PileUpDataMC Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesPileUpDataMCDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -566,7 +602,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtBB',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesPileUpPtBBUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -580,7 +616,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtBB Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesPileUpPtBBDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -594,7 +630,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtEC1',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesPileUpPtEC1Up',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -608,7 +644,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtEC1 Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesPileUpPtEC1Down',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -622,7 +658,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtEC2',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesPileUpPtEC2Up',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -636,7 +672,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtEC2 Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesPileUpPtEC2Down',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -650,7 +686,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtHF',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesPileUpPtHFUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -664,7 +700,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtHF Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesPileUpPtHFDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -678,7 +714,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtRef',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesPileUpPtRefUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -692,7 +728,7 @@ systematics = {
         #'LatexName': 'JES PileUpPtRef Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesPileUpPtRefDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -706,7 +742,7 @@ systematics = {
         #'LatexName': 'JES RelativeBal',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeBalUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -720,7 +756,7 @@ systematics = {
         #'LatexName': 'JES RelativeBal Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeBalDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -734,7 +770,7 @@ systematics = {
         #'LatexName': 'JES RelativeFSR',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeFSRUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -748,7 +784,7 @@ systematics = {
         #'LatexName': 'JES RelativeFSR Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeFSRDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -762,7 +798,7 @@ systematics = {
         #'LatexName': 'JES RelativeJEREC1',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeJEREC1Up',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -776,7 +812,7 @@ systematics = {
         #'LatexName': 'JES RelativeJEREC1 Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeJEREC1Down',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -790,7 +826,7 @@ systematics = {
         #'LatexName': 'JES RelativeJEREC2',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeJEREC2Up',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -804,7 +840,7 @@ systematics = {
         #'LatexName': 'JES RelativeJEREC2 Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeJEREC2Down',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -818,7 +854,7 @@ systematics = {
         #'LatexName': 'JES RelativeJERHF',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeJERHFUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -832,7 +868,7 @@ systematics = {
         #'LatexName': 'JES RelativeJERHF Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeJERHFDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -846,7 +882,7 @@ systematics = {
         #'LatexName': 'JES RelativePtBB',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativePtBBUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -860,7 +896,7 @@ systematics = {
         #'LatexName': 'JES RelativePtBB Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativePtBBDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -874,7 +910,7 @@ systematics = {
         #'LatexName': 'JES RelativePtEC1',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativePtEC1Up',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -888,7 +924,7 @@ systematics = {
         #'LatexName': 'JES RelativePtEC1 Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativePtEC1Down',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -902,7 +938,7 @@ systematics = {
         #'LatexName': 'JES RelativePtEC2',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativePtEC2Up',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -916,7 +952,7 @@ systematics = {
         #'LatexName': 'JES RelativePtEC2 Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativePtEC2Down',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -930,7 +966,7 @@ systematics = {
         #'LatexName': 'JES RelativePtHF',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativePtHFUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -944,7 +980,7 @@ systematics = {
         #'LatexName': 'JES RelativePtHF Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativePtHFDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -958,7 +994,7 @@ systematics = {
         #'LatexName': 'JES RelativeStatEC',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeStatECUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -972,7 +1008,7 @@ systematics = {
         #'LatexName': 'JES RelativeStatEC Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeStatECDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -986,7 +1022,7 @@ systematics = {
         #'LatexName': 'JES RelativeStatFSR',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeStatFSRUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1000,7 +1036,7 @@ systematics = {
         #'LatexName': 'JES RelativeStatFSR Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeStatFSRDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1014,7 +1050,7 @@ systematics = {
         #'LatexName': 'JES RelativeStatHF',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesRelativeStatHFUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1028,7 +1064,7 @@ systematics = {
         #'LatexName': 'JES RelativeStatHF Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesRelativeStatHFDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1042,7 +1078,7 @@ systematics = {
         #'LatexName': 'JES SinglePionECAL',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesSinglePionECALUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1056,7 +1092,7 @@ systematics = {
         #'LatexName': 'JES SinglePionECAL Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesSinglePionECALDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1070,7 +1106,7 @@ systematics = {
         #'LatexName': 'JES SinglePionHCAL',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesSinglePionHCALUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1084,7 +1120,7 @@ systematics = {
         #'LatexName': 'JES SinglePionHCAL Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesSinglePionHCALDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1098,7 +1134,7 @@ systematics = {
         #'LatexName': 'JES TimePtEta',
         #'Color': 'KITgreen100',
         #'branchsuffix': '_jesTimePtEtaUp',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1112,7 +1148,7 @@ systematics = {
         #'LatexName': 'JES TimePtEta Down',
         #'Color': 'KITblue100',
         #'branchsuffix': '_jesTimePtEtaDown',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1226,7 +1262,7 @@ systematics = {
             #},
         #},
         #},
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1337,7 +1373,7 @@ systematics = {
             #},
         #},
         #},
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1462,7 +1498,7 @@ systematics = {
             #},
         #},
         #},
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1587,7 +1623,7 @@ systematics = {
             #},
         #},
         #},
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1604,7 +1640,7 @@ systematics = {
         #'RootPlotName': '#mu_{R}/#mu_{F} scale',
         #'LatexName': '$\\mur/\\muf$ scale',
         #'Color': 'KITgreen100',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1617,7 +1653,7 @@ systematics = {
         #'RootPlotName': 'ME QCD Scale Down',
         #'LatexName': 'ME QCD Scale Down',
         #'Color': 'KITblue100',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1631,7 +1667,7 @@ systematics = {
         #'RootPlotName': 'PDF+#alpha_{s}',
         #'LatexName': 'PDF+\\as',
         #'Color': 'KITgreen100',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
@@ -1644,7 +1680,7 @@ systematics = {
         #'RootPlotName': 'PDF alpha s Down',
         #'LatexName': 'PDF alpha s Down',
         #'Color': 'KITblue100',
-        #'years': ['2016', '2017', '2018'],
+        #'years': allyears,
         #'correlation': {
         #'20162017': 0,
         #'20162018': 0,
