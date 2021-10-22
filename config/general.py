@@ -18,6 +18,18 @@ general = {
     },
 }
 
+allyears = ['2016_VFP', '2016', '2017', '2018']
+
+
+# taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun2LegacyAnalysis (Oct 2021)
+lumi = {
+    '2016_VFP': 19.52,
+    '2016': 16.81,
+    '2017': 41.48,
+    '2018': 59.83,
+}
+
+
 
 def samplepath(isMC, year=None, filename=None):
     if isMC:

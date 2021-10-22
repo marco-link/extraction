@@ -8,13 +8,9 @@ import argparse
 from ROOT import TH1, ROOT, TFile
 
 from helpers import get_event_weigths
-from config.general import general, samplepath, histopath
+from config.general import general, samplepath, histopath, lumi
 from config.samples import samples
 from config.histograms import histograms
-
-
-#TODO sample size and eff
-
 
 
 TH1.SetDefaultSumw2(True)
@@ -44,8 +40,6 @@ def fillhistos(args):
     print('Systematic: {}'.format(systematic))
 
     weights = get_event_weigths(year, sample, systematic)
-    if not weights:
-        weights = '1'
     print('EventWeights: {}'.format(weights))
 
     inFileName = samplepath(isMC=samples[sample]['MC'], year=year, filename=samples[sample][year]['FileName'])
@@ -54,7 +48,6 @@ def fillhistos(args):
 
     print('\nOPENING INPUT FILE AND CREATING DATAFRAME')
     df_in = RDF(general['Tree'], inFileName)
-
     df_out = df_in
 
     for cut in cuts:
@@ -63,7 +56,9 @@ def fillhistos(args):
             df_out = df_out.Filter(cut, cut)
 
 
+
     df_out = df_out.Define('w', weights)
+
 
     print('\nLOOPING OVER HISTOGRAMS')
     histos = {}
@@ -81,7 +76,7 @@ def fillhistos(args):
             if 'Histogram' in histograms[histname].keys():
                 histogram = histograms[histname]['Histogram']
 
-            print('Adding histogram for {} with weights {}'.format(histname, weights))
+            print(f'Adding histogram for {histname} with weights {weights}')
             if 'varbins' in histogram.keys():
                 histos[histname] = df_out.Histo1D(TM1(histname, histname,
                                                       histogram['nbins'], numpy.array(histogram['varbins'])),
@@ -90,6 +85,13 @@ def fillhistos(args):
                 histos[histname] = df_out.Histo1D(TM1(histname, histname,
                                                       histogram['nbins'], histogram['xmin'], histogram['xmax']),
                                                   histograms[histname]['Branch'], 'w')
+            # apply global scale
+            efficiency = histos[histname].GetEntries() / samples[sample][year]['Entries']
+            scale = samples[sample]['XS'] * efficiency * samples[sample][year]['KFactor'] * lumi[year] / samples[sample][year]['Entries']
+            histos[histname].Scale(scale)
+
+            print(f"scaled with {scale:.3g} = {samples[sample]['XS']:.1f}(XS) * {efficiency}(efficiency) \
+* {samples[sample][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {samples[sample][year]['Entries']}(Entries)")
 
         else:
             print('\n\n\tERROR: Branch "{}" defined in config/histogram.py not found!\n'.format(histname))

@@ -6,13 +6,12 @@ from config.systematics import systematics
 
 
 def get_event_weigths(year, sample, systematic):
-    weightstring = ''
+    weightstring = '1'
+
     if 'EventWeights' in samples[sample][year].keys():
         for weight in samples[sample][year]['EventWeights']:
             if not weight:
                 continue
-            if not weightstring:
-                weightstring += '({})'.format(weight)
             else:
                 weightstring += '*({})'.format(weight)
 
@@ -25,8 +24,6 @@ def get_event_weigths(year, sample, systematic):
             for weight in systematics[sys_name]['EventWeights'][direction]:
                 if not weight:
                     continue
-                if not weightstring:
-                    weightstring += '({})'.format(weight)
                 else:
                     weightstring += '*({})'.format(weight)
 
