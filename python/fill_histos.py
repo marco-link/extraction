@@ -10,6 +10,7 @@ from ROOT import TH1, ROOT, TFile
 from helpers import getSystsplit, get_event_weigths
 from config.general import general, samplepath, histopath, lumi
 from config.samples import samples
+from config.regions import regions
 from config.histograms import histograms
 from config.systematics import systematics
 
@@ -56,6 +57,9 @@ def fillhistos(args):
             print('Applying additional cut: {}'.format(cut))
             df_out = df_out.Filter(cut, cut)
 
+    if 'Filter' in regions[region].keys():
+        print(f'Applying region filter: {regions[region]["Filter"]}')
+        df_out = df_out.Filter(regions[region]['Filter'], region)
 
 
     df_out = df_out.Define('w', weights)
