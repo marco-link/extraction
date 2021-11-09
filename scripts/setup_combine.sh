@@ -8,7 +8,7 @@ export CMSSW_BASE=CMSSW_10_2_13
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch/
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
-mkdir env
+mkdir -p env
 cd env
 
 

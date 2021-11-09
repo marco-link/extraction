@@ -7,7 +7,6 @@ import CombineHarvester.CombineTools.ch as ch
 # see https://cms-analysis.github.io/CombineHarvester/python-interface.html
 
 from config.general import general, histopath
-from config.regions import regions
 from config.samples import background
 from config.systematics import systematics
 
@@ -15,9 +14,7 @@ era = '13TeV'
 
 
 def buildcard(args):
-    bins = []
-    for i, region in enumerate(regions.keys()):
-        bins.append((i, region))
+    bins = [(0, args.region)]
 
     parser = ch.CombineHarvester()
 
@@ -113,6 +110,9 @@ if __name__ == '__main__':
 
     argparser.add_argument('--year', type=str, default='2016',
                            help='year of the datacard')
+
+    argparser.add_argument('--region', type=str, default='muon',
+                           help='region of the datacard')
 
     argparser.add_argument('--shape', type=str, default='Reco_Wb',
                            help='shape name')
