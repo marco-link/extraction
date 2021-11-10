@@ -7,6 +7,7 @@ import luigi
 from workflow.BaseTask import BaseTask
 from workflow.HistoTask import AllHistoTasks
 
+from config.general import general
 from config.histograms import histograms
 from config.regions import regions
 from config.systematics import systematics
@@ -19,7 +20,7 @@ class BranchPlotTask(BaseTask):
     histogram = luigi.Parameter()
 
     def log(self):
-        return f'./logs/branch_plot/{self.year}/{self.region}/{self.systematic}/{self.histogram}.log'
+        return f'{general["LogPath"]}/branch_plot/{self.year}/{self.region}/{self.systematic}/{self.histogram}.log'
 
     def requires(self):
         return [AllHistoTasks(year=self.year)]

@@ -7,6 +7,7 @@ import luigi
 from workflow.BaseTask import BaseTask
 from workflow.HistoTask import AllHistoTasks
 
+from config.general import general
 from config.samples import gen_json
 from config.regions import regions
 
@@ -18,7 +19,7 @@ class DatacardTask(BaseTask):
     signal = luigi.Parameter()
 
     def log(self):
-        return f'./logs/datacard/{self.year}/{self.region}/{self.histogram}/{self.signal}.log'
+        return f'{general["LogPath"]}/datacard/{self.year}/{self.region}/{self.histogram}/{self.signal}.log'
 
     def requires(self):
         return [AllHistoTasks(year=self.year)]

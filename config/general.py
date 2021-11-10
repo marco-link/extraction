@@ -5,6 +5,9 @@ import os
 general = {
     'MCPath': '/ceph/mlink/Wb/mc/',
     'DataPath': '/ceph/mlink/Wb/data/',
+    'CardPath': './cards/',
+    'FitPath': './fits/',
+    'LogPath': './logs/',
     'Suffix': '.root',
     'Tree': 'Friends',
     'Histodir': 'Histograms',
@@ -18,7 +21,12 @@ general = {
     },
 }
 
-allyears = ['2016_VFP', '2016', '2017', '2018']
+allyears = [
+    #'2016_VFP',
+    '2016',
+    #'2017',
+    #'2018',
+]
 
 
 # taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun2LegacyAnalysis (Oct 2021)

@@ -6,7 +6,7 @@ import luigi
 
 from workflow.BaseTask import BaseTask
 
-from config.general import histopath
+from config.general import general, histopath
 from config.samples import samples
 from config.regions import regions
 from config.systematics import systematics
@@ -19,7 +19,7 @@ class HistoTask(BaseTask):
     systematic = luigi.Parameter()
 
     def log(self):
-        return f'./logs/fill_histos/{self.year}/{self.region}/{self.systematic}/{self.sample}.log'
+        return f'{general["LogPath"]}/fill_histos/{self.year}/{self.region}/{self.systematic}/{self.sample}.log'
 
     def output(self):
         return [luigi.LocalTarget(self.log()),

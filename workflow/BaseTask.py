@@ -22,3 +22,12 @@ class BaseTask(luigi.Task):
             print('\n\033[1;31mAttention, attention!\033[0;0m')
             print(e)
             print('\n\n')
+
+
+    def execute(self, command):
+        try:
+            subprocess.check_output(command, shell=True)
+        except subprocess.CalledProcessError as e:
+            print('\n\033[1;31mAttention, attention!\033[0;0m')
+            print(e)
+            print('\n\n')
