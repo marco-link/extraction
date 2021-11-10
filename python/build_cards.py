@@ -14,12 +14,13 @@ era = '13TeV'
 
 
 def buildcard(args):
-    bins = [(0, args.region)]
+    bins = [(0, args.region + '_' + args.year)]
+    region = args.region
 
     parser = ch.CombineHarvester()
 
     # add observation
-    parser.AddObservations(era=[era], bin=bins)
+    #parser.AddObservations(era=[era], bin=bins) FIXME uncomment when obs shape is added
 
     # add MC
     parser.AddProcesses(procs=[args.signalprocess], era=[era], bin=bins, signal=True)
@@ -27,7 +28,7 @@ def buildcard(args):
 
     # fill with shapes
     def setShape(p):
-        f = ROOT.TFile(histopath(isMC=True, year=args.year, filename=p.process(), region=p.bin(), systematic='nominal'), 'read')
+        f = ROOT.TFile(histopath(isMC=True, year=args.year, filename=p.process(), region=region, systematic='nominal'), 'read')
         shape = f.Get(general['Histodir'] + '/' + args.shape)
 
         p.set_shape(shape, True)
@@ -36,50 +37,49 @@ def buildcard(args):
 
 
     # add systematics
-    for region in parser.bin_set():
-        for syst in systematics:
-            systematic = systematics[syst]
+    for syst in systematics:
+        systematic = systematics[syst]
 
-            if syst == 'nominal' or args.year not in systematic['years']:
-                continue
+        if syst == 'nominal' or args.year not in systematic['years']:
+            continue
 
-            processes = parser.process_set()
-            if 'samples' in systematic.keys():
-                processes = systematic['samples']
+        processes = parser.process_set()
+        if 'samples' in systematic.keys():
+            processes = systematic['samples']
 
-            if systematic['type'] == 'shape':
-                for process in processes:
-                    print('adding systematic: ', process, syst)
+        if systematic['type'] == 'shape':
+            for process in processes:
+                print('adding systematic: ', process, syst)
 
-                    s = ch.Systematic()
-                    s.set_bin(region)
-                    s.set_process(process)
-                    s.set_era(era)
-                    if process == args.signalprocess:
-                        s.set_signal(True)
+                s = ch.Systematic()
+                s.set_bin(bins[0][1])
+                s.set_process(process)
+                s.set_era(era)
+                if process == args.signalprocess:
+                    s.set_signal(True)
 
-                    s.set_name(syst)
-                    s.set_type('shape')
+                s.set_name(syst)
+                s.set_type('shape')
 
-                    # fill shapes
-                    f_nominal = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
-                                                     region=region, systematic='nominal'), 'read')
-                    nominalinal = f_nominal.Get(general['Histodir'] + '/' + args.shape)
+                # fill shapes
+                f_nominal = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                                                 region=region, systematic='nominal'), 'read')
+                nominalinal = f_nominal.Get(general['Histodir'] + '/' + args.shape)
 
-                    f_up = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
-                                                region=region, systematic=syst + 'UP'), 'read')
-                    up = f_up.Get(general['Histodir'] + '/' + args.shape)
+                f_up = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                                            region=region, systematic=syst + 'UP'), 'read')
+                up = f_up.Get(general['Histodir'] + '/' + args.shape)
 
-                    f_down = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
-                                                  region=region, systematic=syst + 'DOWN'), 'read')
-                    down = f_down.Get(general['Histodir'] + '/' + args.shape)
+                f_down = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                                              region=region, systematic=syst + 'DOWN'), 'read')
+                down = f_down.Get(general['Histodir'] + '/' + args.shape)
 
-                    s.set_shapes(up, down, nominalinal)
-                    parser.InsertSystematic(s)
-            elif systematic['type'] == 'lnN':
-                parser.cp().process(processes).AddSyst(parser, syst, 'lnN', ch.SystMap()(systematic['value']))
-            else:
-                raise Exception('Unkown systematics type "{}"'.format(syst['type']))
+                s.set_shapes(up, down, nominalinal)
+                parser.InsertSystematic(s)
+        elif systematic['type'] == 'lnN':
+            parser.cp().process(processes).AddSyst(parser, syst, 'lnN', ch.SystMap()(systematic['value']))
+        else:
+            raise Exception('Unkown systematics type "{}"'.format(syst['type']))
 
 
 
