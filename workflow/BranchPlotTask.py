@@ -26,7 +26,7 @@ class BranchPlotTask(BaseTask):
         return [AllHistoTasks(year=self.year)]
 
     def output(self):
-        return [luigi.LocalTarget(f'./plots/{self.year}/{self.region}/{self.systematic}/{self.histogram}.pdf'),
+        return [luigi.LocalTarget(f'{general["PlotPath"]}/{self.year}/{self.region}/{self.systematic}/{self.histogram}.pdf'),
                 luigi.LocalTarget(self.log())]
 
     def run(self):

@@ -7,6 +7,7 @@ general = {
     'DataPath': '/ceph/mlink/Wb/data/',
     'CardPath': './cards/',
     'FitPath': './fits/',
+    'PlotPath': './plots/',
     'LogPath': './logs/',
     'Suffix': '.root',
     'Tree': 'Friends',
@@ -35,6 +36,7 @@ lumi = {
     '2016': 16.81,
     '2017': 41.48,
     '2018': 59.83,
+    'total': 137.64, # sum of the above
 }
 
 

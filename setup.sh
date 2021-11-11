@@ -20,7 +20,7 @@ else
     source ./${pynvname}/bin/activate
 
     pip install --upgrade pip
-    pip install --upgrade --force-reinstall --no-cache numpy scipy matplotlib mplhep pandas uproot luigi pre-commit
+    pip install --upgrade --force-reinstall --no-cache numpy scipy matplotlib mplhep pandas uproot awkward luigi pre-commit
 
     pre-commit install
 fi
