@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
+"""
+huhu
+"""
+import os
 import pandas
 
 #from config.data import data # TODO
 
-
-gen_json = pandas.read_json('config/xsecs.json')
-
-
+gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs.json')
 gen_weight = [] #TODO check width weight
 
 weights_electron = []
@@ -23,10 +24,6 @@ weights = [] #TODO implement weights
 
 
 signal = {}
-
-
-
-
 for index in gen_json.keys():
     signal['WbWbX_{}'.format(index)] = {
         'MC': True,

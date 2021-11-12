@@ -12,3 +12,6 @@ plots
 fits
 
 combine_logger.out
+
+doc/source
+doc/_build
