@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
 
 """
-key = Branchname (or nonexistent Branch if 'Expression' is used)
 
-Title:      Title shown in plot
-Xlabel:     x axis label shown in plot
-Plot:       plotoptions (as list)
-            'logX', 'logY',
-            'nolegend'
-            'nostack'
-            'density'
-            'step' or 'errorbar'
-Branch:     TODO
-Histogram:  binning of histogram e.g. {'nbins': 50, 'xmin': -300, 'xmax': 300}
-Expression: (optional) expression to calculate values from other branches
-Samples:    (optional) list of samples to limit histogram calculation to
+Defines properties of histograms to produce in the ``histograms`` dict of dicts:
+
+* dict key:         histogram name
+* ``Branch``:       name of the branch (use ``Expression`` to definen non-existent branches)
+* ``Title``:        Title shown in plot
+* ``Xlabel``:       x axis label shown in plot
+* ``Plot``:         list of plotoptions (available options: 'logX', 'logY', 'nolegend' 'nostack' 'density' 'step'/'errorbar')
+* ``Histogram``:    binning of histogram e.g. {'nbins': 50, 'xmin': -300, 'xmax': 300}
+* ``Expression``:   (optional) expression to calculate values from other branches
+* ``Samples``:      (optional) list of samples to limit histogram calculation to
 """
 
-#TODO test varbins
+# TODO test varbins
 
 
 from config.samples import background

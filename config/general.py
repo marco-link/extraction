@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
 
+"""
+Contains global configuration options e.g. paths:
+
+* general: several config definitions
+* allyears: list with str for all years
+* lumi: dict with luminosities for different epochs, keys are included in allyears and 'total'
+"""
+
+
+
 import os
 
 general = {
@@ -13,13 +23,7 @@ general = {
     'Tree': 'Friends',
     'Histodir': 'Histograms',
     'GlobalDefaultValue': -999,
-    'Pi': 3.141,
     'DeltaR': 0.4,
-    'Lumi': {
-        '2016': 35.9,
-        '2017': -1,
-        '2018': -1,
-    },
 }
 
 allyears = [
@@ -41,7 +45,16 @@ lumi = {
 
 
 
-def samplepath(isMC, year=None, filename=None):
+def samplepath(isMC, year, filename):
+    """
+    Generates path of the sample using the given parameters.
+
+    :param isMC: set to True if the requested sample is MC
+    :param year: year of the sample
+    :param filename: filename of the sample
+    :returns: path to data/MC sample
+    :raises: Exception: samplepath not defined for data yet! (if isMC=False, data not implementded yet)
+    """
     if isMC:
         return general['MCPath'] + year + '/' + filename + general['Suffix']
 
@@ -50,12 +63,23 @@ def samplepath(isMC, year=None, filename=None):
         #return general['DataPath'] + year + '/' + run + '/'
 
 
-def histopath(isMC, year=None, filename=None, region=None, systematic=None):
+def histopath(isMC, year, filename, region, systematic):
+    """
+    Generates path of the histogram file using the given parameters.
+    If the path doesn't exist it is generated.
+
+    :param isMC: set to True if the requested histogram is from MC
+    :param year: year of the histogram
+    :param filename: filename of the histogram
+    :param region: filename of the histogram
+    :param systematic: systematic of the histogram
+    :returns: path to root file for the histograms
+    :raises: Exception: histopath not defined for data yet! (if isMC=False, data not implementded yet)
+    """
     histodir = ''
 
     if isMC:
         histodir = general['MCPath'] + '/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
-
     else:
         raise Exception('histopath not defined for data yet!')
         #return general['DataPath'] + year + '/' + run + '/'

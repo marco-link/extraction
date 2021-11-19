@@ -1,6 +1,8 @@
 config
 ======
 
+configuration files used to define samples, systematics, regions and histograms.
+
 .. toctree::
    :maxdepth: 4
 

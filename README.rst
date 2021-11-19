@@ -45,25 +45,7 @@ Just check the configs and run `lazy.sh`.
 4. Perform fit & plot results
 
 Logs, plots and datacards can be found in the corresponding folder.
-
-
-Configuration
-#############
-
-The configuration files can be found in `config` folder.
-The files are:
-
-**general.py**: Defines ome global definitions, mainly paths.
-
-**data.py**: Defines the names and properties of the datasamples.
-
-**samples.py**: Defines the names and properties of the MC samples.
-
-**regions.py**: Defines different analysis regions.
-
-**systematics.py**: Defines properties of systematics.
-
-**histograms.py**: Defines properties of histograms to produce.
+Configuration is done in the ``config`` folder.
 
 
 Folder structure
@@ -71,6 +53,7 @@ Folder structure
 
 for data (WIP!):
 ::
+
     <data folder (as definded in config/general)>
     │
     |-- 2016
@@ -86,8 +69,10 @@ for data (WIP!):
         |-- ...
 
 
+
 and for MC:
 ::
+
     <mc folder (as definded in config/general)>
     │
     |-- 2016

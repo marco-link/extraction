@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
+"""
+Defines different analysis regions in ``regions`` dict of dicts:
+
+* dict key: region name
+* ``Name``:     long name of the region
+* ``Filter``:   region defining filter
+"""
+
 
 regions = {
     'muon': {
         'Name': 'SingleMuon region',
-        'Label': {
-            'X': 0.2,
-            'Y': 0.83,
-            'Font': 42,
-            'Size': 0.05,
-            'Text': 'region'
-        },
         'Filter': 'ntightMuons == 1',
     },
 
@@ -18,13 +19,6 @@ regions = {
 
     'electron': {
         'Name': 'SingleElectron region',
-        'Label': {
-            'X': 0.2,
-            'Y': 0.83,
-            'Font': 42,
-            'Size': 0.05,
-            'Text': 'region'
-        },
         'Filter': 'ntightElectrons == 1',
     },
 
