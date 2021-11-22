@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+main file run the `luigi <https://luigi.readthedocs.io/en/stable/>`_ workflow.
+Tasks, number of workers and plotoptions can be modified.
+"""
+
 import luigi
 
 from workflow.BranchPlotTask import AllBranchPlotTasks
