@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+Script to plot the result of the NLL fit.
+View arguments with ``python python/plot_NLL.py -h``.
+"""
+
 import os
 import argparse
 import numpy
@@ -23,21 +28,13 @@ matplotlib.pyplot.style.use(mplhep.style.CMS)
 sigma = [1, 2, 3, 4, 5]
 
 
-def getPrbfromStdev(x):
-    if x < 0:
-        raise ValueError('ERROR: standard deviation cannot be smaller than zero!')
-
-    return scipy.stats.norm.cdf(x) - scipy.stats.norm.cdf(-x)
-
-
-def getStdevfromPrb(x):
-    if x < 0 or x >= 1:
-        raise ValueError('ERROR: probability < 0 or >=1! Cannot calculate standard deviation.')
-
-    return scipy.stats.norm.interval(x)[1]
-
-
 def getNLL(infile):
+    """
+    read NLL from root output of fit
+
+    :param infile: file path to the fit output
+    :returns: NLL from root file (``nll0+nll``)
+    """
     with uproot.open(infile + ':limit') as tree:
         nll0 = tree['nll0'].array()[-1]
         nll = tree['nll'].array()[-1]
@@ -48,6 +45,14 @@ def getNLL(infile):
 
 
 def bestfit(p, xdata, data):
+    """
+    determines best fit value and sigma intervals by interpolating given data.
+    The result is added to the plot.
+
+    :param p: subplot
+    :param xdata: x values
+    :param data: y values (should be NLL)
+    """
     if numpy.max(data) < 1.5:
         print('\n\nNO sensitivity! skipping best fit...\n')
         return False
@@ -125,91 +130,92 @@ def bestfit(p, xdata, data):
 
 
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', '-i', type=str, default='./fits/all/{i}/NLLfit.root',
+                        help='input files with NLL values')
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--input', '-i', type=str, default='./fits/all/{i}/NLLfit.root',
-                    help='input files with NLL values')
+    parser.add_argument('--output', '-o', type=str, default='./NLL.pdf',
+                        help='output name for plot')
 
-parser.add_argument('--output', '-o', type=str, default='./NLL.pdf',
-                    help='output name for plot')
+    parser.add_argument('--nologo', action='store_true',
+                        help='remove CMS logo')
 
-parser.add_argument('--nologo', action='store_true',
-                    help='remove CMS logo')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help='increase verbosity')
 
-parser.add_argument('--verbose', '-v', action='store_true',
-                    help='increase verbosity')
+    parser.add_argument('--data', action='store_true',
+                        help='plots contain data')
 
-parser.add_argument('--data', action='store_true',
-                    help='plots contain data')
+    parser.add_argument('--paper', action='store_true',
+                        help='plots is for paper')
 
-parser.add_argument('--paper', action='store_true',
-                    help='plots is for paper')
+    parser.add_argument('--supplementary', action='store_true',
+                        help='plots supplementary')
 
-parser.add_argument('--supplementary', action='store_true',
-                    help='plots supplementary')
+    parser.add_argument('--lumi', type=float, default=-1,
+                        help='luminosity')
 
-parser.add_argument('--lumi', type=float, default=-1,
-                    help='luminosity')
+    parser.add_argument('--text', type=str, default='',
+                        help='text put into the plot')
 
-parser.add_argument('--text', type=str, default='',
-                    help='text put into the plot')
-
-parser.add_argument('--ymax', type=float, default=30,
-                    help='y axis upper limit')
-
-
-
-args = parser.parse_args()
-print(args)
-print()
-debug = args.verbose
-ymax = args.ymax
-
-os.makedirs(os.path.dirname(args.output), exist_ok=True)
-
-
-x, NLL = [], []
-for index in gen_json.keys():
-    x.append(gen_json[index]['width'])
-    NLL.append(2 * getNLL(args.input.format(i=index)))
-
-x = numpy.array(x)
-NLL = numpy.array(NLL)
-NLL = NLL - NLL.min()
-
-idx = numpy.argsort(x)
-x, NLL = x[idx], NLL[idx]
+    parser.add_argument('--ymax', type=float, default=30,
+                        help='y axis upper limit')
 
 
 
+    args = parser.parse_args()
+    print(args)
+    print()
 
-fig = matplotlib.pyplot.figure()
-p1 = fig.add_subplot(111)
+    debug = args.verbose
+    ymax = args.ymax
 
-
-p1.plot(x, NLL, 'b:', label='expected')
-bestfit(p1, x, NLL)
-
-if debug:
-    p1.plot(x, NLL, 'g.', label='points')
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
 
 
+    x, NLL = [], []
+    for index in gen_json.keys():
+        x.append(gen_json[index]['width'])
+        NLL.append(2 * getNLL(args.input.format(i=index)))
 
-p1.set_xlim(x.min(), x.max())
-p1.set_ylim(0, ymax)
-for s in sigma:
-    p1.plot([x.min(), x.max()], [s**2, s**2], 'k-', lw=0.6, alpha=0.3)
-    if s**2 < ymax:
-        p1.text(x.max(), s**2, r' ${}\sigma$'.format(s), verticalalignment='center', horizontalalignment='left', size=18, alpha=0.5)
+    x = numpy.array(x)
+    NLL = numpy.array(NLL)
+    NLL = NLL - NLL.min()
 
-p1.legend(loc=1, frameon=True, edgecolor='w')
-p1.set_xlabel(r'$\Gamma_t$ in GeV', horizontalalignment='right', x=1.0)
-p1.set_ylabel(r'$-2\,\Delta\log(\mathcal{L})$', horizontalalignment='right', y=1.0)
+    idx = numpy.argsort(x)
+    x, NLL = x[idx], NLL[idx]
 
-p1.text(0.02, 0.98, args.text, fontsize=20, transform=p1.transAxes, va='top', ha='left')
 
-if not args.nologo:
-    mplhep.cms.label(ax=p1, data=args.data, paper=args.paper, supplementary=args.supplementary, lumi=args.lumi)
 
-fig.tight_layout()
-fig.savefig(args.output, dpi=300, transparent=False)
+
+    fig = matplotlib.pyplot.figure()
+    p1 = fig.add_subplot(111)
+
+
+    p1.plot(x, NLL, 'b:', label='expected')
+    bestfit(p1, x, NLL)
+
+    if debug:
+        p1.plot(x, NLL, 'g.', label='points')
+
+
+
+    p1.set_xlim(x.min(), x.max())
+    p1.set_ylim(0, ymax)
+    for s in sigma:
+        p1.plot([x.min(), x.max()], [s**2, s**2], 'k-', lw=0.6, alpha=0.3)
+        if s**2 < ymax:
+            p1.text(x.max(), s**2, r' ${}\sigma$'.format(s), verticalalignment='center', horizontalalignment='left', size=18, alpha=0.5)
+
+    p1.legend(loc=1, frameon=True, edgecolor='w')
+    p1.set_xlabel(r'$\Gamma_t$ in GeV', horizontalalignment='right', x=1.0)
+    p1.set_ylabel(r'$-2\,\Delta\log(\mathcal{L})$', horizontalalignment='right', y=1.0)
+
+    p1.text(0.02, 0.98, args.text, fontsize=20, transform=p1.transAxes, va='top', ha='left')
+
+    if not args.nologo:
+        mplhep.cms.label(ax=p1, data=args.data, paper=args.paper, supplementary=args.supplementary, lumi=args.lumi)
+
+    fig.tight_layout()
+    fig.savefig(args.output, dpi=300, transparent=False)

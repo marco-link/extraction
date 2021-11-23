@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+Script using :mod:`Root.RDataFrame` to produce histograms.
+View arguments with ``python python/fill_histos.py -h``.
+"""
+
 import datetime
 import numpy
 import argparse
@@ -24,22 +29,23 @@ RDF = ROOT.RDataFrame
 TM1 = ROOT.RDF.TH1DModel
 
 
-def fillhistos(args):
+def fillhistos(year, region, sample, systematic, cuts):
+    """
+    fill histograms
+
+    :param year: year
+    :param region: region name
+    :param sample: sample name
+    :param systematic: systematic name
+    :param cuts: cuts to apply
+    """
     starttime = datetime.datetime.now()
-    print('\nSTARTING AT {}'.format(str(starttime)))
+    print(f'\nSTARTING AT {str(starttime)}')
 
-    year = args.year
-    sample = args.sample
-    region = args.region
-    systematic = args.systematic
-    trigger = args.trigger
-    print(trigger)
-    cuts = args.cuts
-
-    print('Year: {}'.format(year))
-    print('Sample: {}'.format(sample))
-    print('Region: {}'.format(region))
-    print('Systematic: {}'.format(systematic))
+    print(f'Year: {year}')
+    print(f'Sample: {sample}')
+    print(f'Region: {region}')
+    print(f'Systematic: {systematic}')
 
     weights = get_event_weigths(year, sample, systematic)
     print('EventWeights: {}'.format(weights))
@@ -54,7 +60,7 @@ def fillhistos(args):
 
     for cut in cuts:
         if cut != 'none':
-            print('Applying additional cut: {}'.format(cut))
+            print(f'Applying additional cut: {cut}')
             df_out = df_out.Filter(cut, cut)
 
     if 'Filter' in regions[region].keys():
@@ -80,11 +86,11 @@ def fillhistos(args):
 
 
         if 'Samples' in histograms[histname].keys() and sample not in histograms[histname]['Samples']:
-            print('Skipping histogram generation for "{}" (histogram not defined for this sample)'.format(histname))
+            print(f'Skipping histogram generation for "{histname}" (histogram not defined for this sample)')
             continue
 
         if 'Expression' in histograms[histname].keys():
-            print('\nAdding temporary branch "{}" from Expression: {}'.format(histname, histograms[histname]['Expression']))
+            print(f'\nAdding temporary branch "{histname}" from Expression: {histograms[histname]["Expression"]}')
             df_out = df_out.Define(branchname, histograms[histname]['Expression'])
 
         if branchname in df_out.GetColumnNames():
@@ -116,7 +122,7 @@ def fillhistos(args):
 * {samples[sample][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {samples[sample][year]['Entries']}(Entries)")
 
         else:
-            print('\n\n\tERROR: Branch "{}" defined in config/histogram.py not found!\n'.format(histname))
+            print(f'\n\n\tERROR: Branch "{histname}" defined in config/histogram.py not found!\n')
 
 
     print('\n\n==============Config Summary===============')
@@ -166,12 +172,9 @@ if __name__ == '__main__':
     parser.add_argument('--cuts', action='store', default=[], nargs='+',
                         help='cuts to apply')
 
-    parser.add_argument('--trigger', type=str, default='none',
-                        help='trigger name')
-
 
     args = parser.parse_args()
 
-    print('Converting {}'.format(args.sample))
+    print(f'Converting {args.sample}')
 
-    fillhistos(args)
+    fillhistos(year=args.year, region=args.region, sample=args.sample, systematic=args.systematic, cuts=args.cuts)

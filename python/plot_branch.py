@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+Script to plot a single histogram.
+View arguments with ``python python/plot_branch.py -h``.
+"""
+
 import os
 import argparse
 import uproot
@@ -7,7 +12,7 @@ import matplotlib
 import matplotlib.pyplot
 import mplhep
 
-from config.general import general, histopath
+from config.general import general, lumi, histopath
 from config.samples import samples
 from config.histograms import histograms
 
@@ -15,8 +20,16 @@ matplotlib.use('Agg')
 matplotlib.pyplot.style.use(mplhep.style.CMS)
 
 
-def plot(args):
-    histo = histograms[args.histo]
+def plot(year, region, systematic, histo):
+    """
+    plot a histogram for a specific year, region and systematic.
+
+    :param year: year
+    :param region: region name
+    :param systematic: systematic name
+    :param histo: histo name
+    """
+    histogram = histograms[histo]
 
     fig = matplotlib.pyplot.figure()
     plot = fig.add_subplot(111)
@@ -28,69 +41,69 @@ def plot(args):
     samplelist = list(samples.keys())
     samplelist.reverse()
     for sample in samplelist:
-        if 'Samples' in histo.keys() and sample not in histo['Samples']:
-            print('Skipping histogram plotting for "{}" (histogram not defined for "{}" sample)'.format(args.histo, sample))
+        if 'Samples' in histogram.keys() and sample not in histogram['Samples']:
+            print('Skipping histogram plotting for "{}" (histogram not defined for "{}" sample)'.format(histo, sample))
             continue
 
         with uproot.open(histopath(isMC=samples[sample]['MC'],
-                                   year=args.year,
+                                   year=year,
                                    filename=sample,
-                                   region=args.region,
-                                   systematic=args.systematic)) as infile:
+                                   region=region,
+                                   systematic=systematic)) as infile:
 
-            histos.append(infile[general['Histodir']][args.histo])
+            histos.append(infile[general['Histodir']][histo])
             labels.append(samples[sample]['Label'])
             colors.append(samples[sample]['Color'])
 
 
     histtype = 'fill'
-    if 'step' in histo['Plot']:
+    if 'step' in histogram['Plot']:
         histtype = 'step'
-    elif 'errorbar' in histo['Plot']:
+    elif 'errorbar' in histogram['Plot']:
         histtype = 'errorbar'
 
     mplhep.histplot(histos,
                     ax=plot,
-                    stack='nostack' not in histo['Plot'],
+                    stack='nostack' not in histogram['Plot'],
                     histtype=histtype,
                     color=colors,
                     label=labels,
-                    density='density' in histo['Plot'])
-    mplhep.cms.label(ax=plot, data=False, paper=False, lumi=general['Lumi'][args.year])
+                    density='density' in histogram['Plot'])
+    mplhep.cms.label(ax=plot, data=False, paper=False, lumi=lumi[year])
 
-    if 'Title' in histo.keys():
-        plot.set_title(histo['Title'])
+    if 'Title' in histogram.keys():
+        plot.set_title(histogram['Title'])
     else:
-        plot.set_title(args.histo)
+        plot.set_title(histo)
 
-    if 'Xlabel' in histo.keys():
-        plot.set_xlabel(histo['Xlabel'], x=1.0, ha='right')
+    if 'Xlabel' in histogram.keys():
+        plot.set_xlabel(histogram['Xlabel'], x=1.0, ha='right')
     else:
-        plot.set_xlabel(args.histo, x=1.0, ha='right')
+        plot.set_xlabel(histo, x=1.0, ha='right')
 
-    if 'density' in histo['Plot']:
+    if 'density' in histogram['Plot']:
         plot.set_ylabel('density', verticalalignment='bottom', y=1.0)
     else:
         plot.set_ylabel('entries', verticalalignment='bottom', y=1.0)
 
-    if 'xmin' in histo['Histogram'].keys():
-        plot.set_xlim(histo['Histogram']['xmin'], histo['Histogram']['xmax'])
+    if 'xmin' in histogram['Histogram'].keys():
+        plot.set_xlim(histogram['Histogram']['xmin'], histogram['Histogram']['xmax'])
 
-    if 'nolegend' not in histo['Plot']:
+    if 'nolegend' not in histogram['Plot']:
         plot.legend()
 
-    if 'logX' in histo['Plot']:
+    if 'logX' in histogram['Plot']:
         plot.set_xscale('log')
 
-    if 'logY' in histo['Plot']:
+    if 'logY' in histogram['Plot']:
         plot.set_yscale('log')
 
 
-    path = f'./plots/{args.year}/{args.region}/{args.systematic}/'
+    path = f'./plots/{year}/{region}/{systematic}/'
     os.makedirs(path, exist_ok=True)
 
     fig.tight_layout()
-    fig.savefig(path + f'{args.histo}.pdf', dpi=300)
+    fig.savefig(path + f'{histo}.pdf', dpi=300)
     #matplotlib.pyplot.show()
     matplotlib.pyplot.close()
 
@@ -117,4 +130,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    plot(args)
+    plot(year=args.year, region=args.region, systematic=args.sytematic, histo=args.histo)

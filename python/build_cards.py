@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+"""
+Run as script to produce datacards, requires environment with
+`CombineHarvester <https://cms-analysis.github.io/CombineHarvester/python-interface.html>`_.
+View arguments with ``python2 python/build_cards.py -h``.
+"""
+
 import argparse
 
 import ROOT
@@ -13,9 +19,17 @@ from config.systematics import systematics
 era = '13TeV'
 
 
-def buildcard(args):
-    bins = [(0, args.region + '_' + args.year)]
-    region = args.region
+def buildcard(outpath, signalprocess, year, region, shape):
+    """
+    builds datacard
+
+    :param outpath: output path for datacard
+    :param signalprocess: name of the signalprocess
+    :param year: year to build card for
+    :param region: region to build card for
+    :param shape: shape to build card for
+    """
+    bins = [(0, region + '_' + year)]
 
     parser = ch.CombineHarvester()
 
@@ -23,15 +37,15 @@ def buildcard(args):
     #parser.AddObservations(era=[era], bin=bins) FIXME uncomment when obs shape is added
 
     # add MC
-    parser.AddProcesses(procs=[args.signalprocess], era=[era], bin=bins, signal=True)
+    parser.AddProcesses(procs=[signalprocess], era=[era], bin=bins, signal=True)
     parser.AddProcesses(procs=background.keys(), era=[era], bin=bins, signal=False)
 
     # fill with shapes
     def setShape(p):
-        f = ROOT.TFile(histopath(isMC=True, year=args.year, filename=p.process(), region=region, systematic='nominal'), 'read')
-        shape = f.Get(general['Histodir'] + '/' + args.shape)
+        f = ROOT.TFile(histopath(isMC=True, year=year, filename=p.process(), region=region, systematic='nominal'), 'read')
+        s = f.Get(general['Histodir'] + '/' + shape)
 
-        p.set_shape(shape, True)
+        p.set_shape(s, True)
 
     parser.ForEachProc(setShape)
 
@@ -40,7 +54,7 @@ def buildcard(args):
     for syst in systematics:
         systematic = systematics[syst]
 
-        if syst == 'nominal' or args.year not in systematic['years']:
+        if syst == 'nominal' or year not in systematic['years']:
             continue
 
         processes = parser.process_set()
@@ -55,24 +69,24 @@ def buildcard(args):
                 s.set_bin(bins[0][1])
                 s.set_process(process)
                 s.set_era(era)
-                if process == args.signalprocess:
+                if process == signalprocess:
                     s.set_signal(True)
 
                 s.set_name(syst)
                 s.set_type('shape')
 
                 # fill shapes
-                f_nominal = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                f_nominal = ROOT.TFile(histopath(isMC=True, year=year, filename=process,
                                                  region=region, systematic='nominal'), 'read')
-                nominalinal = f_nominal.Get(general['Histodir'] + '/' + args.shape)
+                nominalinal = f_nominal.Get(general['Histodir'] + '/' + shape)
 
-                f_up = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                f_up = ROOT.TFile(histopath(isMC=True, year=year, filename=process,
                                             region=region, systematic=syst + 'UP'), 'read')
-                up = f_up.Get(general['Histodir'] + '/' + args.shape)
+                up = f_up.Get(general['Histodir'] + '/' + shape)
 
-                f_down = ROOT.TFile(histopath(isMC=True, year=args.year, filename=process,
+                f_down = ROOT.TFile(histopath(isMC=True, year=year, filename=process,
                                               region=region, systematic=syst + 'DOWN'), 'read')
-                down = f_down.Get(general['Histodir'] + '/' + args.shape)
+                down = f_down.Get(general['Histodir'] + '/' + shape)
 
                 s.set_shapes(up, down, nominalinal)
                 parser.InsertSystematic(s)
@@ -91,10 +105,7 @@ def buildcard(args):
     # TODO fill observation
 
     parser.PrintAll()
-    ch.CardWriter(args.outpath, args.outpath.replace('.txt', '.root')).CreateDirectories(True).WriteCards('none', parser)
-
-
-
+    ch.CardWriter(outpath, outpath.replace('.txt', '.root')).CreateDirectories(True).WriteCards('none', parser)
 
 
 
@@ -121,4 +132,8 @@ if __name__ == '__main__':
     args = argparser.parse_args()
     print(args)
 
-    buildcard(args)
+    buildcard(outpath=args.outpath,
+              signalprocess=args.signalprocess,
+              year=args.year,
+              region=args.region,
+              shape=args.shape)
