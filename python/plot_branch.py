@@ -130,4 +130,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    plot(year=args.year, region=args.region, systematic=args.sytematic, histo=args.histo)
+    plot(year=args.year, region=args.region, systematic=args.systematic, histo=args.histo)
