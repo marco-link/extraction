@@ -7,6 +7,11 @@ from workflow.FitTask import AllFitTasks
 
 from config.general import general
 
+#TODO update documentation
+
+
+
+
 
 class NLLPlotTask(BaseTask):
     """
@@ -40,12 +45,19 @@ class NLLPlotTask(BaseTask):
         tasks outputs a logfile and the plot inside the plotpath
         """
         return [luigi.LocalTarget(f'{general["PlotPath"]}/{self.fitname}.pdf'),
-                luigi.LocalTarget(self.log())]
+                luigi.LocalTarget(f'{general["PlotPath"]}/{self.fitname}_profiled.pdf'),
+                luigi.LocalTarget(self.log()),
+                luigi.LocalTarget(self.log().replace('.log', '_profiled.log'))]
 
     def run(self):
         """
         tasks runs :mod:`python/plot_NLL.py` and produces a logfile
         """
         self.save_execute(command=f'python python/plot_NLL.py {self.options} \
-                                    --input {general["FitPath"]}/{self.fitname}/' + '{i}' + f'/NLLfit.root \
+                                    --input {general["FitPath"]}/{self.fitname}/fit.root \
                                     --output {general["PlotPath"]}/{self.fitname}.pdf', log=self.log())
+
+        self.save_execute(command=f'python python/plot_NLL.py {self.options} --variables gamma_t -v \
+                                    --input {general["FitPath"]}/{self.fitname}/fit_profiled.root \
+                                    --output {general["PlotPath"]}/{self.fitname}_profiled.pdf',
+                          log=self.log().replace('.log', '_profiled.log'))

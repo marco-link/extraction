@@ -17,8 +17,6 @@ import matplotlib
 import matplotlib.pyplot
 import mplhep
 
-from config.samples import gen_json
-
 matplotlib.use('Agg')
 matplotlib.pyplot.style.use(mplhep.style.CMS)
 
@@ -132,29 +130,38 @@ def bestfit(p, xdata, data):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', '-i', type=str, default='./fits/all/{i}/NLLfit.root',
+    parser.add_argument('--input', '-i', type=str, default='grid.root',
                         help='input files with NLL values')
 
-    parser.add_argument('--output', '-o', type=str, default='./NLL.pdf',
-                        help='output name for plot')
+    parser.add_argument('--output', '-o', type=str, default='plots',
+                        help='output folder for plots')
 
     parser.add_argument('--nologo', action='store_true',
                         help='remove CMS logo')
 
-    parser.add_argument('--verbose', '-v', action='store_true',
+    parser.add_argument('-verbose', '-v', action='store_true',
                         help='increase verbosity')
 
     parser.add_argument('--data', action='store_true',
                         help='plots contain data')
 
     parser.add_argument('--paper', action='store_true',
-                        help='plots is for paper')
+                        help='plot is for paper')
 
     parser.add_argument('--supplementary', action='store_true',
-                        help='plots supplementary')
+                        help='for supplementary plots')
 
-    parser.add_argument('--lumi', type=float, default=-1,
+    parser.add_argument('--lumi', '-l', type=float, default=-1,
                         help='luminosity')
+
+    parser.add_argument('--SM', action='store', default=[1.322, 172.5], type=float, nargs='+',
+                        help='SM point')
+
+    parser.add_argument('--variables', action='store', default=['gamma_t', 'm_top'], nargs='+',
+                        help='x/y variable names')
+
+    parser.add_argument('--labels', action='store', default=[r'$\Gamma_t$', '$m_t$'], nargs='+',
+                        help='x/y variable labels')
 
     parser.add_argument('--text', type=str, default='',
                         help='text put into the plot')
@@ -167,55 +174,143 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
     print()
-
     debug = args.verbose
     ymax = args.ymax
 
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
 
 
-    x, NLL = [], []
-    for index in gen_json.keys():
-        x.append(gen_json[index]['width'])
-        NLL.append(2 * getNLL(args.input.format(i=index)))
-
-    x = numpy.array(x)
-    NLL = numpy.array(NLL)
-    NLL = NLL - NLL.min()
-
-    idx = numpy.argsort(x)
-    x, NLL = x[idx], NLL[idx]
-
-
-
-
-    fig = matplotlib.pyplot.figure()
-    p1 = fig.add_subplot(111)
-
-
-    p1.plot(x, NLL, 'b:', label='expected')
-    bestfit(p1, x, NLL)
-
+    tree = uproot.open(args.input + ':limit')
     if debug:
-        p1.plot(x, NLL, 'g.', label='points')
+        tree.show()
 
 
 
-    p1.set_xlim(x.min(), x.max())
-    p1.set_ylim(0, ymax)
-    for s in sigma:
-        p1.plot([x.min(), x.max()], [s**2, s**2], 'k-', lw=0.6, alpha=0.3)
-        if s**2 < ymax:
-            p1.text(x.max(), s**2, r' ${}\sigma$'.format(s), verticalalignment='center', horizontalalignment='left', size=18, alpha=0.5)
 
-    p1.legend(loc=1, frameon=True, edgecolor='w')
-    p1.set_xlabel(r'$\Gamma_t$ in GeV', horizontalalignment='right', x=1.0)
-    p1.set_ylabel(r'$-2\,\Delta\log(\mathcal{L})$', horizontalalignment='right', y=1.0)
+    if len(args.variables) == 1:
+        print('plotting 1D...\n\n')
 
-    p1.text(0.02, 0.98, args.text, fontsize=20, transform=p1.transAxes, va='top', ha='left')
+        # remove duplicate points
+        x, NLL = numpy.array([]), numpy.array([])
+        for X, Y in zip(numpy.array(tree[args.variables[0]].array()), numpy.array(tree['deltaNLL'].array())):
+            if X in x:
+                pass
+            else:
+                x = numpy.append(x, [X])
+                NLL = numpy.append(NLL, [2 * Y])
 
-    if not args.nologo:
-        mplhep.cms.label(ax=p1, data=args.data, paper=args.paper, supplementary=args.supplementary, lumi=args.lumi)
+        idx = numpy.argsort(x)
+        x, NLL = x[idx], NLL[idx]
 
-    fig.tight_layout()
-    fig.savefig(args.output, dpi=300, transparent=False)
+
+        fig = matplotlib.pyplot.figure()
+        p1 = fig.add_subplot(111)
+
+        p1.plot(x, NLL, 'b:', label='expected')
+        bestfit(p1, x, NLL)
+
+        if debug:
+            p1.plot(x, NLL, 'g.', label='points')
+
+
+
+        p1.set_xlim(x.min(), x.max())
+        p1.set_ylim(0, ymax)
+        for s in sigma:
+            p1.plot([x.min(), x.max()], [s**2, s**2], 'k-', lw=0.6, alpha=0.3)
+            if s**2 < ymax:
+                p1.text(x.max(), s**2, r' ${}\sigma$'.format(s),
+                        verticalalignment='center', horizontalalignment='left', size=18, alpha=0.5)
+
+        #stamp_process(p1, inline=True)
+        p1.legend(loc=1, frameon=True, edgecolor='w')
+        p1.set_xlabel(args.labels[0], horizontalalignment='right', x=1.0)
+        p1.set_ylabel(r'$-2\,\Delta\log(\mathcal{L})$', horizontalalignment='right', y=1.0)
+
+        p1.text(0.98, 0.97, args.text, fontsize=20, transform=p1.transAxes, va='top', ha='right')
+
+
+        if not args.nologo:
+            mplhep.cms.label(ax=p1, data=args.data, paper=args.paper, lumi=args.lumi)
+
+
+        fig.tight_layout()
+        fig.savefig(args.output, dpi=300, transparent=False)
+
+
+
+    elif len(args.variables) == 2:
+        print('plotting 2D...\n\n')
+        # remove duplicate points
+        X, Y, NLL = numpy.array([]), numpy.array([]), numpy.array([])
+        for x, y, z in zip(numpy.array(tree[args.variables[0]].array()),
+                           numpy.array(tree[args.variables[1]].array()),
+                           numpy.array(tree['deltaNLL'].array())):
+            if x in X[Y == y]:
+                pass
+            else:
+                X = numpy.append(X, [x])
+                Y = numpy.append(Y, [y])
+                NLL = numpy.append(NLL, [2 * z])
+
+
+
+        NLLinterpolator = matplotlib.tri.LinearTriInterpolator(matplotlib.tri.Triangulation(X, Y), NLL)
+        NLLinterpolator2 = matplotlib.tri.CubicTriInterpolator(matplotlib.tri.Triangulation(X, Y), NLL)
+
+        xi = numpy.linspace(numpy.min(X), numpy.max(X), 500)
+        yi = numpy.linspace(numpy.min(Y), numpy.max(Y), 500)
+        zi = NLLinterpolator2(*numpy.meshgrid(xi, yi))
+
+
+        if debug:
+            for i in range(len(NLL)):
+                print('{:.3f}, {:.3f}, {:.3f}'.format(X[i], Y[i], NLL[i]))
+
+
+
+
+        fig = matplotlib.pyplot.figure(figsize=(11, 11))
+
+        p1 = fig.add_subplot(111)
+
+
+
+        levels = []
+        fmt = {}
+        for s in [1, 2, 3]:
+            levels.append(s**2)
+            fmt[s**2] = r'{:.0f}$\sigma$'.format(s)
+
+        p1.contourf(xi, yi, zi, levels=[1, 4, 9, 16, 25, 36, 49, 1E9], cmap='YlOrRd', alpha=0.4, vmin=-1, vmax=49)
+        p1.clabel(p1.contour(xi, yi, zi, levels, colors='k', linestyles=['-', '--', ':'], linewidths=1), fmt=fmt, fontsize=12, inline=True)
+        p1.plot(args.SM[0], args.SM[1], 'bo', label='SM')
+
+        p1.text(0.98, 0.97, args.text, fontsize=20, transform=p1.transAxes, va='top', ha='right')
+
+
+        # find X0 from grid
+        X0 = [X[NLL == numpy.min(NLL)][0], Y[NLL == numpy.min(NLL)][0]]
+
+        res = scipy.optimize.minimize(lambda x: NLLinterpolator(*x), x0=X0, tol=1e-6, method='Nelder-Mead')
+        print(res)
+
+        if res.success:
+            p1.plot(*res.x, 'r+', label='best fit\n${}={:.2f}$, ${}={:.2f}$'.format(args.labels[0].replace('$', ''),
+                                                                                    res.x[0],
+                                                                                    args.labels[1].replace('$', ''),
+                                                                                    res.x[1]))
+
+        if debug:
+            p1.plot(X, Y, 'g,', label='grid points')
+
+        #stamp_process(p1)
+        p1.legend(loc=1, frameon=True, edgecolor='w')
+        p1.set_xlabel(args.labels[0], horizontalalignment='right', x=1.0)
+        p1.set_ylabel(args.labels[1], horizontalalignment='right', y=1.0)
+
+        if not args.nologo:
+            mplhep.cms.label(ax=p1, data=args.data, paper=args.paper, lumi=args.lumi)
+
+        fig.tight_layout()
+        fig.savefig(args.output, dpi=300, transparent=False)

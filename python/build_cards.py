@@ -13,18 +13,17 @@ import CombineHarvester.CombineTools.ch as ch
 # see https://cms-analysis.github.io/CombineHarvester/python-interface.html
 
 from config.general import general, histopath
-from config.samples import background
+from config.samples import signal, background
 from config.systematics import systematics
 
 era = '13TeV'
 
 
-def buildcard(outpath, signalprocess, year, region, shape):
+def buildcard(outpath, year, region, shape):
     """
     builds datacard
 
     :param outpath: output path for datacard
-    :param signalprocess: name of the signalprocess
     :param year: year to build card for
     :param region: region to build card for
     :param shape: shape to build card for
@@ -37,7 +36,7 @@ def buildcard(outpath, signalprocess, year, region, shape):
     #parser.AddObservations(era=[era], bin=bins) FIXME uncomment when obs shape is added
 
     # add MC
-    parser.AddProcesses(procs=[signalprocess], era=[era], bin=bins, signal=True)
+    parser.AddProcesses(procs=signal.keys(), era=[era], bin=bins, signal=True)
     parser.AddProcesses(procs=background.keys(), era=[era], bin=bins, signal=False)
 
     # fill with shapes
@@ -69,7 +68,7 @@ def buildcard(outpath, signalprocess, year, region, shape):
                 s.set_bin(bins[0][1])
                 s.set_process(process)
                 s.set_era(era)
-                if process == signalprocess:
+                if process in signal.keys():
                     s.set_signal(True)
 
                 s.set_name(syst)
@@ -116,9 +115,6 @@ if __name__ == '__main__':
     argparser.add_argument('--outpath', type=str, default='./cards/datacard.txt',
                            help='output path of datacard')
 
-    argparser.add_argument('--signalprocess', '-s', type=str, default='WbWbX_19',
-                           help='signal process name')
-
     argparser.add_argument('--year', type=str, default='2016',
                            help='year of the datacard')
 
@@ -133,7 +129,6 @@ if __name__ == '__main__':
     print(args)
 
     buildcard(outpath=args.outpath,
-              signalprocess=args.signalprocess,
               year=args.year,
               region=args.region,
               shape=args.shape)

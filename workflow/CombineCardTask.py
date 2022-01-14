@@ -14,8 +14,7 @@ class CombineCardTask(BaseTask):
     """
     A luigi task to combine datacards from different years/regions
 
-    :param cardmask: cardmask to select specific cards e.g. ``cards/<year or *>/<region or *>/<histogram>_{i}.txt``.
-        The str ``{i}`` is replaced by the signal number.
+    :param cardmask: cardmask to select specific cards e.g. ``cards/<year or *>/<region or *>/<histogram>.txt``.
     :param cardoutput: output path for the combined card
     :param histogram: histogram to used for card production
     """

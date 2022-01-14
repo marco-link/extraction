@@ -22,20 +22,20 @@ if __name__ == '__main__':
 
     # all combined
     tasks.append(NLLPlotTask(fitname='all', histogram='binCategory',
-                             cardmask='cards/*/*/binCategory_WbWbX_{i}.txt',
+                             cardmask='cards/*/*/binCategory.txt',
                              options=NLLoptions + f' --lumi {lumi["total"]}'))
 
     # regions
     for region in regions.keys():
         tasks.append(NLLPlotTask(fitname=region, histogram='binCategory',
-                                 cardmask='cards/*/' + region + '/binCategory_WbWbX_{i}.txt',
+                                 cardmask='cards/*/' + region + '/binCategory.txt',
                                  options=NLLoptions + f' --lumi {lumi["total"]}'))
 
     # years
     for year in allyears:
         tasks.append(AllBranchPlotTasks(year=year))
         tasks.append(NLLPlotTask(fitname=year, histogram='binCategory',
-                                 cardmask='cards/' + year + '/*/binCategory_WbWbX_{i}.txt',
+                                 cardmask='cards/' + year + '/*/binCategory.txt',
                                  options=NLLoptions + f' --lumi {lumi[year]}'))
 
 

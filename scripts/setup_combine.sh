@@ -27,6 +27,9 @@ then
 else
     git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
     cd HiggsAnalysis/CombinedLimit; git fetch origin; git checkout v8.2.0; cd -
+
+    # link custom combine model
+    ln -s ../../../../../../python/WbWbXModel.py HiggsAnalysis/CombinedLimit/python/WbWbXModel.py
 fi
 
 

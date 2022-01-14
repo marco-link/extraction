@@ -6,29 +6,26 @@ from workflow.BaseTask import BaseTask
 from workflow.HistoTask import AllHistoTasks
 
 from config.general import general
-from config.samples import gen_json
 from config.regions import regions
 
 
 class DatacardTask(BaseTask):
     """
-    A luigi task to combine datacards from different years/regions
+    A luigi task to produce datacards for different years/regions
 
     :param year: year for which to produce the plots
     :param region: region for which to produce the plots
     :param histogram: histogram for which to produce the plots
-    :param signal: systematic for which to produce the plots
     """
     year = luigi.Parameter()
     region = luigi.Parameter()
     histogram = luigi.Parameter()
-    signal = luigi.Parameter()
 
     def log(self):
         """
         defines output path for task logs in general log folder under ``datacard``
         """
-        return f'{general["LogPath"]}/datacard/{self.year}/{self.region}/{self.histogram}/{self.signal}.log'
+        return f'{general["LogPath"]}/datacard/{self.year}/{self.region}/{self.histogram}.log'
 
     def requires(self):
         """
@@ -40,8 +37,8 @@ class DatacardTask(BaseTask):
         """
         tasks outputs a logfile and the datacard (.txt and .root file)
         """
-        return [luigi.LocalTarget(f'./cards/{self.year}/{self.region}/{self.histogram}_{self.signal}.txt'),
-                luigi.LocalTarget(f'./cards/{self.year}/{self.region}/{self.histogram}_{self.signal}.root'),
+        return [luigi.LocalTarget(f'./cards/{self.year}/{self.region}/{self.histogram}.txt'),
+                luigi.LocalTarget(f'./cards/{self.year}/{self.region}/{self.histogram}.root'),
                 luigi.LocalTarget(self.log())]
 
     def run(self):
@@ -52,8 +49,7 @@ class DatacardTask(BaseTask):
             --year {self.year}\
             --region {self.region} \
             --shape {self.histogram} \
-            --signalprocess {self.signal} \
-            --outpath ./cards/{self.year}/{self.region}/{self.histogram}_{self.signal}.txt"', log=self.log())
+            --outpath ./cards/{self.year}/{self.region}/{self.histogram}.txt"', log=self.log())
 
 
 class AllDatacardTasks(luigi.WrapperTask):
@@ -69,5 +65,4 @@ class AllDatacardTasks(luigi.WrapperTask):
         defines required DatacardTasks
         """
         for region in regions.keys():
-            for index in gen_json.keys():
-                yield DatacardTask(year=self.year, region=region, histogram=self.histogram, signal='WbWbX_{}'.format(index))
+            yield DatacardTask(year=self.year, region=region, histogram=self.histogram)
