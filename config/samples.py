@@ -49,7 +49,7 @@ for index in gen_json.keys():
         'MC': True,
         'Signal': True,
         'Label': r'Wb x Wb $m_t = {}$ GeV, $\Gamma_t = {}$ GeV'.format(gen_json[index]['mass'], gen_json[index]['width']),
-        'Color': 'C1',
+        'Color': 'C0',
         'XS': gen_json[index]['xsec'],
         'XSUncertainty': {
             'Up': 5, #TODO update

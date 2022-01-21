@@ -98,8 +98,7 @@ def plot(year, region, systematic, histo):
     if 'logY' in histogram['Plot']:
         plot.set_yscale('log')
 
-
-    path = f'./plots/{year}/{region}/{systematic}/'
+    path = general['PlotPath'] + f'/{year}/{region}/{systematic}/'
     os.makedirs(path, exist_ok=True)
 
     fig.tight_layout()

@@ -13,13 +13,13 @@ Contains global configuration options e.g. paths:
 import os
 
 general = {
-    'MCPath': '/ceph/mlink/Wb/mc/',
-    'DataPath': '/ceph/mlink/Wb/data/',
-    'CardPath': './cards/',
-    'FitPath': './fits/',
-    'PlotPath': './plots/',
-    'LogPath': './logs/',
-    'Suffix': '.root',
+    'MCPath': '/eos/cms/store/cmst3/group/top/WbWb/friends/testing/mc/',
+    'DataPath': '/eos/cms/store/cmst3/group/top/WbWb/friends/testing/data/',
+    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/testing/',
+    'CardPath': './output/cards/',
+    'FitPath': './output/fits/',
+    'PlotPath': './output/plots/',
+    'LogPath': './output/logs/',
     'Tree': 'Friends',
     'Histodir': 'Histograms',
     'GlobalDefaultValue': -999,
@@ -56,8 +56,7 @@ def samplepath(isMC, year, filename):
     :raises: Exception: samplepath not defined for data yet! (if isMC=False, data not implementded yet)
     """
     if isMC:
-        return general['MCPath'] + year + '/' + filename + general['Suffix']
-
+        return general['MCPath'] + year + '/' + filename + '.root'
     else:
         raise Exception('samplepath not defined for data yet!')
         #return general['DataPath'] + year + '/' + run + '/'
@@ -79,7 +78,7 @@ def histopath(isMC, year, filename, region, systematic):
     histodir = ''
 
     if isMC:
-        histodir = general['MCPath'] + '/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
+        histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
     else:
         raise Exception('histopath not defined for data yet!')
         #return general['DataPath'] + year + '/' + run + '/'
@@ -87,4 +86,4 @@ def histopath(isMC, year, filename, region, systematic):
     if not os.path.exists(histodir):
         os.makedirs(histodir)
 
-    return histodir + filename + general['Suffix']
+    return histodir + filename + '.root'

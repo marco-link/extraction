@@ -49,5 +49,6 @@ histograms = {
         'Plot': plotoptions,
         'Branch': 'binCategory',
         'Histogram': {'nbins': 16, 'xmin': 0, 'xmax': 16},
+        'Samples': ['WbWbX_19'] + background,
     },
 }

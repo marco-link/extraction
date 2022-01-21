@@ -1,6 +1,5 @@
-now=$(date +"%Y-%m-%d_%H_%M_%S")
 
-# export PYTHONPATH=$(pwd):$PYTHONPATH
+law index --verbose
 
-mkdir -p logs
-nice -n 5 python workflow/execute.py |& tee logs/${now}_workflow.log
+# law run AllBranchPlotTasks --year 2016 --print-status -1
+nice -n 5 law run AllBranchPlotTasks --year 2016 --workers 4 # --HistoTask-workflow local

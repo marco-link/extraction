@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import luigi
+import law
 
 from workflow.BaseTask import BaseTask
 from workflow.HistoTask import AllHistoTasks
@@ -13,7 +14,7 @@ from config.systematics import systematics
 
 class BranchPlotTask(BaseTask):
     """
-    A luigi task to plot histograms
+    A task to plot histograms
 
     :param year: year for which to produce the plots
     :param region: region for which to produce the plots
@@ -41,8 +42,8 @@ class BranchPlotTask(BaseTask):
         """
         tasks outputs a logfile and the plot in the plotfolder
         """
-        return [luigi.LocalTarget(f'{general["PlotPath"]}/{self.year}/{self.region}/{self.systematic}/{self.histogram}.pdf'),
-                luigi.LocalTarget(self.log())]
+        return [law.LocalFileTarget(f'{general["PlotPath"]}/{self.year}/{self.region}/{self.systematic}/{self.histogram}.pdf'),
+                law.LocalFileTarget(self.log())]
 
     def run(self):
         """
@@ -53,9 +54,9 @@ class BranchPlotTask(BaseTask):
 
 
 
-class AllBranchPlotTasks(luigi.WrapperTask):
+class AllBranchPlotTasks(law.WrapperTask):
     """
-    A luigi wrapper task to plot all histograms for all regions and systematic variations of a specific year
+    A wrapper task to plot all histograms for all regions and systematic variations of a specific year
 
     :param year: year for which to produce the plots
     """
