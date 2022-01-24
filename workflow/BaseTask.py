@@ -2,6 +2,7 @@
 
 import os
 import law
+import luigi
 import subprocess
 
 law.contrib.load('htcondor')
@@ -52,9 +53,16 @@ class BaseTask(law.Task):
 
 
 class HTCondorBaseTask(law.htcondor.HTCondorWorkflow, law.LocalWorkflow, BaseTask):
-    transfer_logs = True
+    """
+    law.Task with functions to execute commands with subprocess and log them if needed.
+    Used as base for all other tasks in this project.
+
+    :param transfer_logs: transfer job logs
+    :param max_runtime: maximum job runtime
+    """
+    transfer_logs = luigi.BoolParameter(default=False)
     max_runtime = law.DurationParameter(default=2.0, unit='h', significant=False,
-                                        description='maximum runtime, default unit is hours, default: 2')
+                                        description='maximum job runtime, default unit is hours, default: 2')
 
     def htcondor_output_directory(self):
         # the directory where submission meta data should be stored
@@ -73,8 +81,3 @@ class HTCondorBaseTask(law.htcondor.HTCondorWorkflow, law.LocalWorkflow, BaseTas
         # if you are interested in the logs of the batch system itself, set a meaningful value here
         config.custom_content.append(('log', '/dev/null'))
         return config
-
-
-#TODO
-#ERROR: Failed to commit job submission into the queue.
-#ERROR: The MaxRuntime value must be a valid possitive integer greather than 0. It cannot be quoted. Ex: +MaxRuntime = 3200

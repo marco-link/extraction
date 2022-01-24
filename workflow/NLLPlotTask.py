@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import law
 import luigi
 
 from workflow.BaseTask import BaseTask
@@ -44,10 +45,10 @@ class NLLPlotTask(BaseTask):
         """
         tasks outputs a logfile and the plot inside the plotpath
         """
-        return [luigi.LocalTarget(f'{general["PlotPath"]}/{self.fitname}.pdf'),
-                luigi.LocalTarget(f'{general["PlotPath"]}/{self.fitname}_profiled.pdf'),
-                luigi.LocalTarget(self.log()),
-                luigi.LocalTarget(self.log().replace('.log', '_profiled.log'))]
+        return [law.LocalFileTarget(f'{general["PlotPath"]}/{self.fitname}.pdf'),
+                law.LocalFileTarget(f'{general["PlotPath"]}/{self.fitname}_profiled.pdf'),
+                law.LocalFileTarget(self.log()),
+                law.LocalFileTarget(self.log().replace('.log', '_profiled.log'))]
 
     def run(self):
         """

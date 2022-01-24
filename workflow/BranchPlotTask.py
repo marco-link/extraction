@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import luigi
 import law
+import luigi
 
 from workflow.BaseTask import BaseTask
 from workflow.HistoTask import AllHistoTasks

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import law
 import luigi
 
 from workflow.BaseTask import BaseTask
@@ -37,9 +38,9 @@ class DatacardTask(BaseTask):
         """
         tasks outputs a logfile and the datacard (.txt and .root file)
         """
-        return [luigi.LocalTarget(f'./cards/{self.year}/{self.region}/{self.histogram}.txt'),
-                luigi.LocalTarget(f'./cards/{self.year}/{self.region}/{self.histogram}.root'),
-                luigi.LocalTarget(self.log())]
+        return [law.LocalFileTarget(f'{general["CardPath"]}/{self.year}/{self.region}/{self.histogram}.txt'),
+                law.LocalFileTarget(f'{general["CardPath"]}/{self.year}/{self.region}/{self.histogram}.root'),
+                law.LocalFileTarget(self.log())]
 
     def run(self):
         """
@@ -49,12 +50,12 @@ class DatacardTask(BaseTask):
             --year {self.year}\
             --region {self.region} \
             --shape {self.histogram} \
-            --outpath ./cards/{self.year}/{self.region}/{self.histogram}.txt"', log=self.log())
+            --outpath {general["CardPath"]}/{self.year}/{self.region}/{self.histogram}.txt"', log=self.log())
 
 
-class AllDatacardTasks(luigi.WrapperTask):
+class AllDatacardTasks(law.WrapperTask):
     """
-    A luigi task to combine datacards from different years/regions
+    A wrapper task to combine datacards from different years/regions
     """
 
     year = luigi.Parameter()

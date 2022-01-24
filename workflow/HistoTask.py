@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import luigi
 import law
+import luigi
 
 from workflow.BaseTask import HTCondorBaseTask
 
@@ -74,7 +74,7 @@ class HistoTask(HTCondorBaseTask):
 
 class AllHistoTasks(law.WrapperTask):
     """
-    A luigi wrapper task to produce all histograms of a year
+    A wrapper task task to produce all histograms of a year
 
     :param year: year for which to produce the histograms
     """

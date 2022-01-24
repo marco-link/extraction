@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import law
 import luigi
 
 from workflow.BaseTask import BaseTask
 from workflow.CombineCardTask import CombineCardTask
 
 from config.general import general
-
-
-#TODO update documentation
-
 
 
 class WorkspaceTask(BaseTask):
@@ -43,8 +40,8 @@ class WorkspaceTask(BaseTask):
         """
         tasks outputs a logfile and the workspace inside the fit folder named ``workspace.root``
         """
-        return [luigi.LocalTarget(self.log().replace('.log', '.root')),
-                luigi.LocalTarget(self.log())]
+        return [law.LocalFileTarget(self.log().replace('.log', '.root')),
+                law.LocalFileTarget(self.log())]
 
     def run(self):
         """
@@ -86,8 +83,8 @@ class ToyTask(BaseTask):
         """
         tasks outputs a logfile and the toy inside the fit folder named ``toy.root``
         """
-        return [luigi.LocalTarget(f'{general["FitPath"]}/{self.fitname}/toy.root'),
-                luigi.LocalTarget(self.log())]
+        return [law.LocalFileTarget(f'{general["FitPath"]}/{self.fitname}/toy.root'),
+                law.LocalFileTarget(self.log())]
 
     def run(self):
         """
@@ -111,7 +108,8 @@ class FitTask(BaseTask):
     :param fitname: unique name of the fit
     :param histogram: histogram for which to produce the workspace
     :param cardmask: cardmask to select specific cards e.g. ``cards/<year or *>/<region or *>/<histogram>_{i}.txt``.
-    TODO
+    :param profiled: profile the top mass
+    :param points: number of poibnts to fit
     """
     fitname = luigi.Parameter()
     histogram = luigi.Parameter()
@@ -141,11 +139,11 @@ class FitTask(BaseTask):
         tasks outputs a logfile and the NLL fit inside the fit folder named ``fit.root`` or ``fit_profiled.root``
         """
         if self.profiled:
-            return [luigi.LocalTarget(f'{general["FitPath"]}/{self.fitname}/fit_profiled.root'),
-                    luigi.LocalTarget(self.log())]
+            return [law.LocalFileTarget(f'{general["FitPath"]}/{self.fitname}/fit_profiled.root'),
+                    law.LocalFileTarget(self.log())]
         else:
-            return [luigi.LocalTarget(f'{general["FitPath"]}/{self.fitname}/fit.root'),
-                    luigi.LocalTarget(self.log())]
+            return [law.LocalFileTarget(f'{general["FitPath"]}/{self.fitname}/fit.root'),
+                    law.LocalFileTarget(self.log())]
 
     def run(self):
         """
@@ -175,9 +173,9 @@ class FitTask(BaseTask):
 
 
 
-class AllFitTasks(luigi.WrapperTask):
+class AllFitTasks(law.WrapperTask):
     """
-    A luigi wrapper task handle all fit related tasks from workspace and toy generation to the final fit.
+    A wrapper task task handle all fit related tasks from workspace and toy generation to the final fit.
 
     :param fitname: unique name of the fit
     :param histogram: histogram for which to produce the workspace

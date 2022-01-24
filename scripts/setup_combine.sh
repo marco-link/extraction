@@ -8,9 +8,11 @@ export CMSSW_BASE=CMSSW_10_2_13
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch/
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
+source scripts/setup_analysisenv.sh
+cd $ANALYSIS_PATH
+
 mkdir -p env
 cd env
-
 
 if [ -r "${CMSSW_BASE}" ];
 then

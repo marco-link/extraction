@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-
-import luigi
-import glob
 import os
+import glob
+import law
+import luigi
+
 
 from workflow.BaseTask import BaseTask
 from workflow.DatacardTask import AllDatacardTasks
@@ -12,7 +13,7 @@ from config.general import general, allyears
 
 class CombineCardTask(BaseTask):
     """
-    A luigi task to combine datacards from different years/regions
+    A wrapper task to combine datacards from different years/regions
 
     :param cardmask: cardmask to select specific cards e.g. ``cards/<year or *>/<region or *>/<histogram>.txt``.
     :param cardoutput: output path for the combined card
@@ -39,13 +40,13 @@ class CombineCardTask(BaseTask):
         """
         tasks outputs a logfile and the combined card
         """
-        return [luigi.LocalTarget(self.cardoutput),
-                luigi.LocalTarget(self.log())]
+        return [law.LocalFileTarget(self.cardoutput),
+                law.LocalFileTarget(self.log())]
 
     def run(self):
         """
         tasks runs ``scripts/combineCards.sh`` script to combine cards and produces a logfile
         """
         os.makedirs(os.path.dirname(self.cardoutput), exist_ok=True)
-        files = ' '.join([f'.={f}' for f in glob.glob(self.cardmask, recursive=True)])
+        files = ' '.join([f'.={f}' for f in glob.glob(general['CardPath'] + self.cardmask, recursive=True)])
         self.save_execute(command=f'env -i sh scripts/combineCards.sh "{files}" {self.cardoutput}', log=self.log())
