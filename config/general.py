@@ -11,6 +11,7 @@ Contains global configuration options e.g. paths:
 
 
 import os
+import ROOT
 
 general = {
     'MCPath': '/eos/cms/store/cmst3/group/top/WbWb/friends/testing/mc/',
@@ -20,7 +21,7 @@ general = {
     'FitPath': './output/fits/',
     'PlotPath': './output/plots/',
     'LogPath': './output/logs/',
-    'Tree': 'Friends',
+    'Tree': 'Events',
     'Histodir': 'Histograms',
     'GlobalDefaultValue': -999,
     'DeltaR': 0.4,
@@ -87,3 +88,17 @@ def histopath(isMC, year, filename, region, systematic):
         os.makedirs(histodir)
 
     return histodir + filename + '.root'
+
+
+def getDatasetSize(inFileName):
+    inFile = ROOT.TFile.Open(inFileName, 'READ')
+    tree = inFile.Get(general['Tree'])
+
+    if not (tree.GetUserInfo().At(0) and 'efficiency:' in tree.GetUserInfo().At(0).GetName()):
+        raise Exception('Userinfo cannot be processed! preskim efficiency not found')
+
+    preskim_efficiency = float(tree.GetUserInfo().At(0).GetName().replace('efficiency:', ''))
+    dataset_size = int(round(tree.GetEntries() / preskim_efficiency))
+    inFile.Close()
+
+    return dataset_size

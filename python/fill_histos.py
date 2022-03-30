@@ -13,7 +13,7 @@ import argparse
 from ROOT import TH1, ROOT, TFile
 
 from helpers import getSystsplit, get_event_weigths
-from config.general import general, samplepath, histopath, lumi
+from config.general import general, samplepath, histopath, lumi, getDatasetSize
 from config.samples import samples
 from config.regions import regions
 from config.histograms import histograms
@@ -50,13 +50,17 @@ def fillhistos(year, region, sample, systematic, cuts):
     weights = get_event_weigths(year, sample, systematic)
     print('EventWeights: {}'.format(weights))
 
-    inFileName = samplepath(isMC=samples[sample]['MC'], year=year, filename=samples[sample][year]['FileName'])
+    inFileName = samplepath(isMC=samples[sample]['MC'], year=year, filename=samples[sample]['FileName'])
     outFileName = histopath(isMC=samples[sample]['MC'], year=year, filename=sample, region=region, systematic=systematic)
 
+    # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
+    dataset_size = getDatasetSize(inFileName)
 
     print('\nOPENING INPUT FILE AND CREATING DATAFRAME')
     df_in = RDF(general['Tree'], inFileName)
     df_out = df_in
+
+
 
     for cut in cuts:
         if cut != 'none':
@@ -78,9 +82,7 @@ def fillhistos(year, region, sample, systematic, cuts):
         branchname = histograms[histname]['Branch']
 
         if 'Branch' in systematics[systematic].keys():
-            branchname = systematics[systematic]['Branch'][direction] + '_' + branchname #FIXME
-        else:
-            branchname = 'nominal_' + branchname
+            branchname = branchname.replace('nominal', systematics[systematic]['Branch'][direction])
 
         print(f'Reading from branch "{branchname}"...')
 
@@ -114,15 +116,15 @@ def fillhistos(year, region, sample, systematic, cuts):
                                                   branchname, 'w')
 
             # apply global scale
-            efficiency = histos[histname].GetEntries() / samples[sample][year]['Entries']
-            scale = samples[sample]['XS'] * efficiency * samples[sample][year]['KFactor'] * lumi[year] / samples[sample][year]['Entries']
+            efficiency = histos[histname].GetEntries() / dataset_size
+            scale = samples[sample]['XS'] * efficiency * samples[sample][year]['KFactor'] * lumi[year] / dataset_size
             histos[histname].Scale(scale)
 
             print(f"scaled with {scale:.3g} = {samples[sample]['XS']:.1f}(XS) * {efficiency}(efficiency) \
-* {samples[sample][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {samples[sample][year]['Entries']}(Entries)")
+            * {samples[sample][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {dataset_size}(Entries)")
 
         else:
-            print(f'\n\n\tERROR: Branch "{histname}" defined in config/histogram.py not found!\n')
+            print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
 
 
     print('\n\n==============Config Summary===============')
