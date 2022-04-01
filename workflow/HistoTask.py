@@ -20,6 +20,7 @@ class HistoTask(HTCondorBaseTask):
     """
     year = luigi.Parameter()
     region = luigi.Parameter()
+    max_runtime = 24 #hours
 
     def create_branch_map(self):
         """

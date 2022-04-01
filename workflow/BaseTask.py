@@ -77,6 +77,9 @@ class HTCondorBaseTask(law.htcondor.HTCondorWorkflow, law.LocalWorkflow, BaseTas
         config.custom_content.append(('+MaxRuntime', int(self.max_runtime * 3600)))
         # copy the entire environment
         config.custom_content.append(('getenv', 'true'))
+        # transfer proxy
+        config.custom_content.append(('use_x509userproxy', 'true'))
+        config.custom_content.append(('x509userproxy', os.getenv('X509_USER_PROXY')))
         # the CERN htcondor setup requires a "log" config, but we can safely set it to /dev/null
         # if you are interested in the logs of the batch system itself, set a meaningful value here
         config.custom_content.append(('log', '/dev/null'))

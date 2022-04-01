@@ -14,7 +14,7 @@ import os
 import ROOT
 
 general = {
-    'MCPath': '/eos/cms/store/cmst3/group/top/WbWb/friends/testing/mc/',
+    'MCPath': 'root://cmsxrootd-redirectors.gridka.de//store/user/mlink/WbNanoAODTools/',
     'DataPath': '/eos/cms/store/cmst3/group/top/WbWb/friends/testing/data/',
     'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/testing/',
     'CardPath': './output/cards/',
@@ -29,8 +29,8 @@ general = {
 
 allyears = [
     #'2016_VFP',
-    '2016',
-    #'2017',
+    #'2016',
+    '2017',
     #'2018',
 ]
 
