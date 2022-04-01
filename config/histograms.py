@@ -11,13 +11,14 @@ Defines properties of histograms to produce in the ``histograms`` dict of dicts:
 * ``Plot``:         list of plotoptions (available options: 'logX', 'logY', 'nolegend' 'nostack' 'density' 'step'/'errorbar')
 * ``Histogram``:    binning of histogram e.g. {'nbins': 50, 'xmin': -300, 'xmax': 300}
 * ``Expression``:   (optional) expression to calculate values from other branches
-* ``Samples``:      (optional) list of samples to limit histogram calculation to
+* ``datasets``:      (optional) list of datasets to limit histogram calculation to
 """
 
 # TODO test varbins
 
 
-from config.samples import background
+from config.datasets import signal, background
+signal = list(signal.keys())
 background = list(background.keys())
 
 
@@ -26,14 +27,13 @@ plotoptions = ['logY']
 
 
 histograms = {
-    #'Wb_diff': {
-        #'Branch': 'Wb_diff',
-        #'Expression': 'Reco_Wb_mass - Gen_Wb_mass',
-        #'Histogram': {'nbins': 50, 'xmin': -300, 'xmax': 300},
-        #'Samples': ['WbWbX_19'],
-        #'Title': '',
-        #'Xlabel': 'Reco_Wb - Gen_Wb in GeV',
-    #},
+    'parton_top_mass': {
+        'Branch': 'partonLevel_top_mass',
+        'Histogram': {'nbins': 35, 'xmin': 0, 'xmax': 350},
+        'datasets': signal,
+        'Title': '',
+        'Xlabel': 'partonLevel top mass',
+    },
 
     #'Reco_Wb': {
         #'Title': '',
@@ -43,12 +43,19 @@ histograms = {
         #'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
     #},
 
-    'binCategory': {
+    'top_mass': {
         'Title': '',
-        'Xlabel': 'Category',
+        'Xlabel': 'm_{t}',
         'Plot': plotoptions,
-        'Branch': 'binCategory',
-        'Histogram': {'nbins': 16, 'xmin': 0, 'xmax': 16},
-        'Samples': ['WbWbX_19'] + background,
+        'Branch': 'top_mass_nominal',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
+    },
+
+    'met': {
+        'Title': '',
+        'Xlabel': 'MET',
+        'Plot': plotoptions,
+        'Branch': 'met_nominal',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
     },
 }

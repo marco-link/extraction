@@ -1,14 +1,14 @@
 config
 ======
 
-configuration files used to define samples, systematics, regions and histograms.
+configuration files used to define datasets, systematics, regions and histograms.
 
 .. toctree::
    :maxdepth: 4
 
    data
+   datasets
    general
    histograms
    regions
-   samples
    systematics

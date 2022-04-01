@@ -13,8 +13,8 @@ import argparse
 from ROOT import TH1, ROOT, TFile
 
 from helpers import getSystsplit, get_event_weigths
-from config.general import general, samplepath, histopath, lumi, getDatasetSize
-from config.samples import samples
+from config.general import general, datasetpath, histopath, lumi, getDatasetSize
+from config.datasets import datasets
 from config.regions import regions
 from config.histograms import histograms
 from config.systematics import systematics
@@ -29,13 +29,13 @@ RDF = ROOT.RDataFrame
 TM1 = ROOT.RDF.TH1DModel
 
 
-def fillhistos(year, region, sample, systematic, cuts):
+def fillhistos(year, region, dataset, systematic, cuts):
     """
     fill histograms
 
     :param year: year
     :param region: region name
-    :param sample: sample name
+    :param dataset: dataset name
     :param systematic: systematic name
     :param cuts: cuts to apply
     """
@@ -43,15 +43,15 @@ def fillhistos(year, region, sample, systematic, cuts):
     print(f'\nSTARTING AT {str(starttime)}')
 
     print(f'Year: {year}')
-    print(f'Sample: {sample}')
+    print(f'dataset: {dataset}')
     print(f'Region: {region}')
     print(f'Systematic: {systematic}')
 
-    weights = get_event_weigths(year, sample, systematic)
+    weights = get_event_weigths(year, dataset, systematic)
     print('EventWeights: {}'.format(weights))
 
-    inFileName = samplepath(isMC=samples[sample]['MC'], year=year, filename=samples[sample]['FileName'])
-    outFileName = histopath(isMC=samples[sample]['MC'], year=year, filename=sample, region=region, systematic=systematic)
+    inFileName = datasetpath(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])
+    outFileName = histopath(isMC=datasets[dataset]['MC'], year=year, filename=dataset, region=region, systematic=systematic)
 
     # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
     dataset_size = getDatasetSize(inFileName)
@@ -87,8 +87,8 @@ def fillhistos(year, region, sample, systematic, cuts):
         print(f'Reading from branch "{branchname}"...')
 
 
-        if 'Samples' in histograms[histname].keys() and sample not in histograms[histname]['Samples']:
-            print(f'Skipping histogram generation for "{histname}" (histogram not defined for this sample)')
+        if 'datasets' in histograms[histname].keys() and dataset not in histograms[histname]['datasets']:
+            print(f'Skipping histogram generation for "{histname}" (histogram not defined for this dataset)')
             continue
 
         if 'Expression' in histograms[histname].keys():
@@ -117,11 +117,11 @@ def fillhistos(year, region, sample, systematic, cuts):
 
             # apply global scale
             efficiency = histos[histname].GetEntries() / dataset_size
-            scale = samples[sample]['XS'] * efficiency * samples[sample][year]['KFactor'] * lumi[year] / dataset_size
+            scale = datasets[dataset]['XS'] * efficiency * datasets[dataset][year]['KFactor'] * lumi[year] / dataset_size
             histos[histname].Scale(scale)
 
-            print(f"scaled with {scale:.3g} = {samples[sample]['XS']:.1f}(XS) * {efficiency}(efficiency) \
-            * {samples[sample][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {dataset_size}(Entries)")
+            print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) * {efficiency}(efficiency) \
+            * {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {dataset_size}(Entries)")
 
         else:
             print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
@@ -165,8 +165,8 @@ if __name__ == '__main__':
     parser.add_argument('--region', type=str, required=True,
                         help='region to process')
 
-    parser.add_argument('--sample', type=str, required=True,
-                        help='sample to process')
+    parser.add_argument('--dataset', type=str, required=True,
+                        help='dataset to process')
 
     parser.add_argument('--systematic', type=str, default='nominal',
                         help='systematic to process')
@@ -177,6 +177,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print(f'Converting {args.sample}')
+    print(f'Converting {args.dataset}')
 
-    fillhistos(year=args.year, region=args.region, sample=args.sample, systematic=args.systematic, cuts=args.cuts)
+    fillhistos(year=args.year, region=args.region, dataset=args.dataset, systematic=args.systematic, cuts=args.cuts)

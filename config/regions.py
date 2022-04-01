@@ -9,13 +9,18 @@ Defines different analysis regions in ``regions`` dict of dicts:
 """
 
 
+# TODO btag regions
+# 0: Bneg
+# 1: B0bar
+# 2: B0
+# 3: Bpos
+
+
 regions = {
     'muon': {
         'Name': 'SingleMuon region',
         'Filter': 'ntightMuons == 1',
     },
-
-
 
     'electron': {
         'Name': 'SingleElectron region',

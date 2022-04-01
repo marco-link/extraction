@@ -13,7 +13,7 @@ import CombineHarvester.CombineTools.ch as ch
 # see https://cms-analysis.github.io/CombineHarvester/python-interface.html
 
 from config.general import general, histopath
-from config.samples import signal, background
+from config.datasets import signal, background
 from config.systematics import systematics
 
 era = '13TeV'
@@ -57,8 +57,8 @@ def buildcard(outpath, year, region, shape):
             continue
 
         processes = parser.process_set()
-        if 'samples' in systematic.keys():
-            processes = systematic['samples']
+        if 'datasets' in systematic.keys():
+            processes = systematic['datasets']
 
         if systematic['type'] == 'shape':
             for process in processes:

@@ -6,7 +6,7 @@ import luigi
 from workflow.BaseTask import HTCondorBaseTask
 
 from config.general import histopath
-from config.samples import samples
+from config.datasets import datasets
 from config.regions import regions
 from config.systematics import systematics
 
@@ -27,17 +27,17 @@ class HistoTask(HTCondorBaseTask):
         creates branchmap with an entry for each applied systematic
         """
         branches = []
-        for sample in samples.keys():
+        for dataset in datasets.keys():
             for systematic in systematics.keys():
                 # is shape systematic and applied in this year
                 if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
-                    # systematic is applied for this sample
-                    if 'samples' not in systematics[systematic].keys() or sample in systematics[systematic]['samples']:
+                    # systematic is applied for this dataset
+                    if 'datasets' not in systematics[systematic].keys() or dataset in systematics[systematic]['datasets']:
                         if systematic == 'nominal':
-                            branches.append([sample, systematic])
+                            branches.append([dataset, systematic])
                         else:
-                            branches.append([sample, systematic + 'UP'])
-                            branches.append([sample, systematic + 'DOWN'])
+                            branches.append([dataset, systematic + 'UP'])
+                            branches.append([dataset, systematic + 'DOWN'])
 
         return dict(enumerate(branches))
 
@@ -51,7 +51,7 @@ class HistoTask(HTCondorBaseTask):
         """
         defines output path for task logs under the path from :func:`config.general.histopath`
         """
-        return histopath(isMC=samples[self.branch_data[0]]['MC'],
+        return histopath(isMC=datasets[self.branch_data[0]]['MC'],
                          year=self.year,
                          filename=self.branch_data[0],
                          region=self.region,
@@ -68,7 +68,7 @@ class HistoTask(HTCondorBaseTask):
         """
         tasks runs :mod:`python/fill_histos.py` and produces a logfile
         """
-        self.save_execute(command=f'python python/fill_histos.py --year {self.year} --sample {self.branch_data[0]} \
+        self.save_execute(command=f'python python/fill_histos.py --year {self.year} --dataset {self.branch_data[0]} \
                                     --region {self.region} --systematic {self.branch_data[1]}', log=self.log())
 
 

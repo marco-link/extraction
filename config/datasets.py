@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
 """
-Defines the names and properties of the MC samples in signal, background and samples dicts of dicts:
+Defines the names and properties of the MC datasets in signal, background and datasets dicts of dicts:
 
-* dict key:         sample name
+* dict key:         dataset name
 * ``MC``:           bool, True for MC
 * ``Signal``:       bool, True for signal
-* ``FileName``: root filename of sample
+* ``FileName``:     root filename of dataset
 * ``Label``:        plotlabel
 * ``Color``:        plotcolor
 * ``XS``:           cross section in pb
 * ``XSUncertainty``: dict with ``Up`` and ``Down`` cross section uncertainty
 * year name: dict containing year specific information:
     * ``KFactor``: correction factor
-    * ``EventWeights``: event weights to apply in this sample
+    * ``EventWeights``: event weights to apply for this dataset
 """
 
 #cross section sources:
@@ -327,5 +327,5 @@ background = {
 }
 
 
-samples = signal.copy()
-samples.update(background)
+datasets = signal.copy()
+datasets.update(background)

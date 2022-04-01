@@ -46,20 +46,20 @@ lumi = {
 
 
 
-def samplepath(isMC, year, filename):
+def datasetpath(isMC, year, filename):
     """
-    Generates path of the sample using the given parameters.
+    Generates path of the dataset using the given parameters.
 
-    :param isMC: set to True if the requested sample is MC
-    :param year: year of the sample
-    :param filename: filename of the sample
-    :returns: path to data/MC sample
-    :raises: Exception: samplepath not defined for data yet! (if isMC=False, data not implementded yet)
+    :param isMC: set to True if the requested dataset is MC
+    :param year: year of the dataset
+    :param filename: filename of the dataset
+    :returns: path to data/MC dataset
+    :raises: Exception: datasetpath not defined for data yet! (if isMC=False, data not implementded yet)
     """
     if isMC:
         return general['MCPath'] + year + '/' + filename + '.root'
     else:
-        raise Exception('samplepath not defined for data yet!')
+        raise Exception('datasetpath not defined for data yet!')
         #return general['DataPath'] + year + '/' + run + '/'
 
 

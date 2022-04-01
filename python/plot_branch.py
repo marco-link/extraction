@@ -13,7 +13,7 @@ import matplotlib.pyplot
 import mplhep
 
 from config.general import general, lumi, histopath
-from config.samples import samples
+from config.datasets import datasets
 from config.histograms import histograms
 
 matplotlib.use('Agg')
@@ -38,22 +38,22 @@ def plot(year, region, systematic, histo):
     labels = []
     colors = []
 
-    samplelist = list(samples.keys())
-    samplelist.reverse()
-    for sample in samplelist:
-        if 'Samples' in histogram.keys() and sample not in histogram['Samples']:
-            print('Skipping histogram plotting for "{}" (histogram not defined for "{}" sample)'.format(histo, sample))
+    datasetlist = list(datasets.keys())
+    datasetlist.reverse()
+    for dataset in datasetlist:
+        if 'datasets' in histogram.keys() and dataset not in histogram['datasets']:
+            print('Skipping histogram plotting for "{}" (histogram not defined for "{}" dataset)'.format(histo, dataset))
             continue
 
-        with uproot.open(histopath(isMC=samples[sample]['MC'],
+        with uproot.open(histopath(isMC=datasets[dataset]['MC'],
                                    year=year,
-                                   filename=sample,
+                                   filename=dataset,
                                    region=region,
                                    systematic=systematic)) as infile:
 
             histos.append(infile[general['Histodir']][histo])
-            labels.append(samples[sample]['Label'])
-            colors.append(samples[sample]['Color'])
+            labels.append(datasets[dataset]['Label'])
+            colors.append(datasets[dataset]['Color'])
 
 
     histtype = 'fill'

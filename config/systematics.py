@@ -11,7 +11,7 @@ Defines the names and properties of systematics in the systematics dict of dicts
 * dict key:     systematic name in datacard
 * ``type``:     systematics type ('shape' or 'lnN')
 * ``years``:    list of years to apply this systematic to
-* ``samples``:  (optional) list of samples to apply this systematic to
+* ``datasets``:  (optional) list of datasets to apply this systematic to
 
 for shape systematics (extra histograms produced)
 
@@ -38,41 +38,37 @@ systematics = {
     },
 
 
-
-
-
-
     #FIXME only test systematics!
 
-    'CMS_JEC': {
-        'type': 'shape',
+    #'CMS_JEC': {
+        #'type': 'shape',
 
-        'Branch': {'UP': 'jerUp',
-                   'DOWN': 'jerDown'},
-        'years': allyears,
-    },
+        #'Branch': {'UP': 'jerUp',
+                   #'DOWN': 'jerDown'},
+        #'years': allyears,
+    #},
 
-    'CMS_Muon_id': {
-        'type': 'shape',
+    #'CMS_Muon_id': {
+        #'type': 'shape',
 
-        'EventWeights': {'UP': ['tightMuons_weight_id_up/tightMuons_weight_id_nominal'],
-                         'DOWN': ['tightMuons_weight_id_down/tightMuons_weight_id_nominal']},
-        'years': allyears,
-    },
-
-
-    'lumi_13TeV': {
-        'type': 'lnN',
-        'value': 1.01, #TODO
-        'years': allyears,
-    },
+        #'EventWeights': {'UP': ['tightMuons_weight_id_up/tightMuons_weight_id_nominal'],
+                         #'DOWN': ['tightMuons_weight_id_down/tightMuons_weight_id_nominal']},
+        #'years': allyears,
+    #},
 
 
-    'QCDscale': {
-        'type': 'lnN',
-        'value': (0.908, 1.058), #TODO
-        'samples': ['TT_Semileptonic'],
-        'years': allyears,
-    },
+    #'lumi_13TeV': {
+        #'type': 'lnN',
+        #'value': 1.01, #TODO
+        #'years': allyears,
+    #},
+
+
+    #'QCDscale': {
+        #'type': 'lnN',
+        #'value': (0.908, 1.058), #TODO
+        #'datasets': ['TT_Semileptonic'],
+        #'years': allyears,
+    #},
 
 }

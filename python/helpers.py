@@ -5,7 +5,7 @@
 Defines some general helper functions
 """
 
-from config.samples import samples
+from config.datasets import datasets
 from config.systematics import systematics
 
 
@@ -23,19 +23,19 @@ def getSystsplit(systematic):
 
 
 
-def get_event_weigths(year, sample, systematic):
+def get_event_weigths(year, dataset, systematic):
     """
-    generates weightstring from sample and systematic name
+    generates weightstring from dataset and systematic name
 
     :param year: year
-    :param sample: sample name
+    :param dataset: dataset name
     :param systematic: systematic sting (name and variation direction)
     :returns: weightstring
     """
     weightstring = '1'
 
-    if 'EventWeights' in samples[sample][year].keys():
-        for weight in samples[sample][year]['EventWeights']:
+    if 'EventWeights' in datasets[dataset][year].keys():
+        for weight in datasets[dataset][year]['EventWeights']:
             if not weight:
                 continue
             else:
