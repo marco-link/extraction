@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # script to merge the datasets from NanoAODTools output
-# only works on ETP infrastructure (sorry -_o_-)
+# only works on ETP infrastructure (sorry \_O_/)
 
 
-SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/2022-03-25_v2"
-OUTDIR="/ceph/mlink/WbNanoAODTools/2022-03-25_v2/"
+SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/2022-04-01_v3"
+OUTDIR="/ceph/mlink/WbNanoAODTools/2022-04-01_v3/"
 
 
 mkdir -p $OUTDIR
