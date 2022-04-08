@@ -13,7 +13,7 @@ import argparse
 from ROOT import TH1, ROOT, TFile
 
 from helpers import getSystsplit, get_event_weigths
-from config.general import general, datasetpath, histopath, lumi, getDatasetSize
+from config.general import general, getGridpaths, histopath, lumi, getDatasetSize
 from config.datasets import datasets
 from config.regions import regions
 from config.histograms import histograms
@@ -29,7 +29,8 @@ RDF = ROOT.RDataFrame
 TM1 = ROOT.RDF.TH1DModel
 
 
-def fillhistos(year, region, dataset, systematic, cuts):
+
+def fillhistos(year, region, dataset, systematic, number, cuts):
     """
     fill histograms
 
@@ -37,6 +38,7 @@ def fillhistos(year, region, dataset, systematic, cuts):
     :param region: region name
     :param dataset: dataset name
     :param systematic: systematic name
+    :param number: file number
     :param cuts: cuts to apply
     """
     starttime = datetime.datetime.now()
@@ -50,8 +52,8 @@ def fillhistos(year, region, dataset, systematic, cuts):
     weights = get_event_weigths(year, dataset, systematic)
     print('EventWeights: {}'.format(weights))
 
-    inFileName = datasetpath(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])
-    outFileName = histopath(isMC=datasets[dataset]['MC'], year=year, filename=dataset, region=region, systematic=systematic)
+    inFileName = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])[number]
+    outFileName = histopath(isMC=datasets[dataset]['MC'], year=year, filename=dataset, region=region, systematic=systematic, number=number)
 
     # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
     dataset_size = getDatasetSize(inFileName)
@@ -171,6 +173,9 @@ if __name__ == '__main__':
     parser.add_argument('--systematic', type=str, default='nominal',
                         help='systematic to process')
 
+    parser.add_argument('--number', type=int, required=True,
+                        help='number of input file')
+
     parser.add_argument('--cuts', action='store', default=[], nargs='+',
                         help='cuts to apply')
 
@@ -179,4 +184,9 @@ if __name__ == '__main__':
 
     print(f'Converting {args.dataset}')
 
-    fillhistos(year=args.year, region=args.region, dataset=args.dataset, systematic=args.systematic, cuts=args.cuts)
+    fillhistos(year=args.year,
+               region=args.region,
+               dataset=args.dataset,
+               systematic=args.systematic,
+               number=args.number,
+               cuts=args.cuts)

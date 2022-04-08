@@ -5,7 +5,7 @@ import luigi
 
 from workflow.BaseTask import HTCondorBaseTask
 
-from config.general import histopath
+from config.general import histopath, getGridpaths
 from config.datasets import datasets
 from config.regions import regions
 from config.systematics import systematics
@@ -33,11 +33,15 @@ class HistoTask(HTCondorBaseTask):
                 if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
                     # systematic is applied for this dataset
                     if 'datasets' not in systematics[systematic].keys() or dataset in systematics[systematic]['datasets']:
-                        if systematic == 'nominal':
-                            branches.append([dataset, systematic])
-                        else:
-                            branches.append([dataset, systematic + 'UP'])
-                            branches.append([dataset, systematic + 'DOWN'])
+                        # loop over single input files
+                        for i in range(len(getGridpaths(isMC=datasets[dataset]['MC'],
+                                                        year=self.year,
+                                                        filename=datasets[dataset]['FileName']))):
+                            if systematic == 'nominal':
+                                branches.append([dataset, systematic, i])
+                            else:
+                                branches.append([dataset, systematic + 'UP', i])
+                                branches.append([dataset, systematic + 'DOWN', i])
 
         return dict(enumerate(branches))
 
@@ -55,7 +59,8 @@ class HistoTask(HTCondorBaseTask):
                          year=self.year,
                          filename=self.branch_data[0],
                          region=self.region,
-                         systematic=self.branch_data[1]).replace('.root', '.log')
+                         systematic=self.branch_data[1],
+                         number=self.branch_data[2]).replace('.root', '.log')
 
     def output(self):
         """
@@ -68,8 +73,11 @@ class HistoTask(HTCondorBaseTask):
         """
         tasks runs :mod:`python/fill_histos.py` and produces a logfile
         """
-        self.save_execute(command=f'python python/fill_histos.py --year {self.year} --dataset {self.branch_data[0]} \
-                                    --region {self.region} --systematic {self.branch_data[1]}', log=self.log())
+        self.save_execute(command=f'python -u python/fill_histos.py --year {self.year} \
+                                                                    --dataset {self.branch_data[0]} \
+                                                                    --region {self.region} \
+                                                                    --systematic {self.branch_data[1]} \
+                                                                    --number {self.branch_data[2]}', log=self.log())
 
 
 

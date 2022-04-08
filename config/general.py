@@ -14,8 +14,8 @@ import os
 import ROOT
 
 general = {
-    'MCPath': 'root://cmsxrootd-redirectors.gridka.de//store/user/mlink/WbNanoAODTools/',
-    'DataPath': '/eos/cms/store/cmst3/group/top/WbWb/friends/testing/data/',
+    'MCPath': './config/mc/',
+    'DataPath': './config/mc/',
     'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/testing/',
     'CardPath': './output/cards/',
     'FitPath': './output/fits/',
@@ -45,25 +45,32 @@ lumi = {
 }
 
 
-
-def datasetpath(isMC, year, filename):
+def getGridpaths(isMC, year, filename):
     """
-    Generates path of the dataset using the given parameters.
+    Reads paths to NanoAOD files on the grid from the config files.
 
     :param isMC: set to True if the requested dataset is MC
     :param year: year of the dataset
     :param filename: filename of the dataset
-    :returns: path to data/MC dataset
+    :returns: paths to files as list
     :raises: Exception: datasetpath not defined for data yet! (if isMC=False, data not implementded yet)
     """
+    filepath = ''
     if isMC:
-        return general['MCPath'] + year + '/' + filename + '.root'
+        filepath = general['MCPath'] + year + '/' + filename + '.txt'
     else:
         raise Exception('datasetpath not defined for data yet!')
-        #return general['DataPath'] + year + '/' + run + '/'
+
+    filelist = []
+    with open(filepath, 'r') as files:
+        for f in files:
+            filelist.append(f.strip())
+
+    return filelist
 
 
-def histopath(isMC, year, filename, region, systematic):
+
+def histopath(isMC, year, filename, region, systematic, number=None):
     """
     Generates path of the histogram file using the given parameters.
     If the path doesn't exist it is generated.
@@ -73,6 +80,7 @@ def histopath(isMC, year, filename, region, systematic):
     :param filename: filename of the histogram
     :param region: filename of the histogram
     :param systematic: systematic of the histogram
+    :param number: file number, `None` for merged file
     :returns: path to root file for the histograms
     :raises: Exception: histopath not defined for data yet! (if isMC=False, data not implementded yet)
     """
@@ -87,18 +95,38 @@ def histopath(isMC, year, filename, region, systematic):
     if not os.path.exists(histodir):
         os.makedirs(histodir)
 
-    return histodir + filename + '.root'
+    if number is None:
+        return histodir + filename + '.root'
+    else:
+        return histodir + filename + '_{}'.format(number) + '.root'
 
 
 def getDatasetSize(inFileName):
-    inFile = ROOT.TFile.Open(inFileName, 'READ')
-    tree = inFile.Get(general['Tree'])
+    """
+    Reads the number of events before skim from given file.
 
-    if not (tree.GetUserInfo().At(0) and 'efficiency:' in tree.GetUserInfo().At(0).GetName()):
-        raise Exception('Userinfo cannot be processed! preskim efficiency not found')
+    :param inFileName: set to True if the requested histogram is from MC
+    :returns: number of events before preskim
+    :raises: Exception: Cannot run on data!
+    """
+    ifile = ROOT.TFile(inFileName, 'READ')
 
-    preskim_efficiency = float(tree.GetUserInfo().At(0).GetName().replace('efficiency:', ''))
-    dataset_size = int(round(tree.GetEntries() / preskim_efficiency))
-    inFile.Close()
+    itree_evt = ifile.Get('Events')
+    itree_run = ifile.Get('Runs')
 
-    return dataset_size
+    itree_run.GetEntry()
+
+    # skip data
+    if int(itree_run.run) != 1:
+        raise Exception('Cannot run on data!')
+
+    n_i_selected = int(itree_evt.GetEntries())
+    n_i_total = int(itree_run.genEventCount)
+    ifile.Close()
+
+    if n_i_selected != n_i_total:
+        print('--- selected events: {}, initial events: {} ---> preskim efficiency: {:.3f}'.format(n_i_selected,
+                                                                                                   n_i_total,
+                                                                                                   n_i_selected / n_i_total))
+
+    return n_i_total

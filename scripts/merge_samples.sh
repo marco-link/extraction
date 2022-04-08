@@ -16,7 +16,7 @@ do
 
     if [ ! -f $OUTDIR/$sample.txt ];
     then
-        python2 python/merge.py $sample $SAMPLEPATH/$sample $OUTDIR/$sample.root &> $OUTDIR/$sample.txt
+        python2 -u python/merge.py $sample $SAMPLEPATH/$sample $OUTDIR/$sample.root &> $OUTDIR/$sample.txt
     else
         echo "Already processed!"
     fi
