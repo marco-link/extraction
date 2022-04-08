@@ -109,7 +109,8 @@ def getDatasetSize(inFileName):
     :returns: number of events before preskim
     :raises: Exception: Cannot run on data!
     """
-    ifile = ROOT.TFile(inFileName, 'READ')
+    ifile = ROOT.TFile()
+    ifile = ifile.Open(inFileName, 'READ')
 
     itree_evt = ifile.Get('Events')
     itree_run = ifile.Get('Runs')
