@@ -70,8 +70,9 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
             df_out = df_out.Filter(cut, cut)
 
     if 'Filter' in regions[region].keys():
-        print(f'Applying region filter: {regions[region]["Filter"]}')
-        df_out = df_out.Filter(regions[region]['Filter'], region)
+        mask = regions[region]['Filter'].replace('nominal', systematic)
+        print(f'Applying region filter: {mask}')
+        df_out = df_out.Filter(mask, region)
 
 
     df_out = df_out.Define('w', weights)
@@ -81,7 +82,7 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     histos = {}
     for histname in histograms.keys():
         systematic, direction = getSystsplit(systematic)
-        branchname = histograms[histname]['Branch']
+        branchname = histograms[histname]['Branch'].replace('nominal', systematic)
 
         if 'Branch' in systematics[systematic].keys():
             branchname = branchname.replace('nominal', systematics[systematic]['Branch'][direction])
@@ -94,8 +95,9 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
             continue
 
         if 'Expression' in histograms[histname].keys():
-            print(f'\nAdding temporary branch "{histname}" from Expression: {histograms[histname]["Expression"]}')
-            df_out = df_out.Define(branchname, histograms[histname]['Expression'])
+            expression = histograms[histname]['Expression'].replace('nominal', systematic)
+            print(f'\nAdding temporary branch "{histname}" from Expression: {expression}')
+            df_out = df_out.Define(branchname, expression)
 
         if branchname in df_out.GetColumnNames():
             histogram = {}
