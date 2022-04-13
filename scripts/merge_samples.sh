@@ -14,10 +14,16 @@ do
     sample=${sample//$SAMPLEPATH/}
     echo $sample
 
-    if [ ! -f $OUTDIR/$sample.txt ];
-    then
-        python2 -u python/merge.py $sample $SAMPLEPATH/$sample $OUTDIR/$sample.root &> $OUTDIR/$sample.txt
-    else
-        echo "Already processed!"
-    fi
+    for shard in $SAMPLEPATH/$sample/*/*/*
+    do
+        echo $(basename $shard)
+        logfile=$OUTDIR/${sample}_$(basename $shard).txt
+
+        if [ ! -f $logfile ];
+        then
+            python2 -u python/merge.py ${sample} $shard $OUTDIR/${sample}_$(basename $shard).root &> $logfile
+        else
+            echo "Already processed!"
+        fi
+    done
 done
