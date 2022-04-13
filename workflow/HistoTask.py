@@ -20,28 +20,28 @@ class HistoTask(HTCondorBaseTask):
     """
     year = luigi.Parameter()
     region = luigi.Parameter()
-    max_runtime = 24 #hours
+    dataset = luigi.Parameter()
+    systematic = luigi.Parameter()
+    max_runtime = 4 #hours
 
     def create_branch_map(self):
         """
-        creates branchmap with an entry for each applied systematic
+        creates branchmap with an entry for input file
         """
         branches = []
-        for dataset in datasets.keys():
-            for systematic in systematics.keys():
-                # is shape systematic and applied in this year
-                if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
-                    # systematic is applied for this dataset
-                    if 'datasets' not in systematics[systematic].keys() or dataset in systematics[systematic]['datasets']:
-                        # loop over single input files
-                        for i in range(len(getGridpaths(isMC=datasets[dataset]['MC'],
-                                                        year=self.year,
-                                                        filename=datasets[dataset]['FileName']))):
-                            if systematic == 'nominal':
-                                branches.append([dataset, systematic, i])
-                            else:
-                                branches.append([dataset, systematic + 'UP', i])
-                                branches.append([dataset, systematic + 'DOWN', i])
+        # is shape systematic and applied in this year
+        if systematics[self.systematic]['type'] == 'shape' and self.year in systematics[self.systematic]['years']:
+            # systematic is applied for this dataset
+            if 'datasets' not in systematics[self.systematic].keys() or self.dataset in systematics[self.systematic]['datasets']:
+                # loop over single input files
+                for i in range(len(getGridpaths(isMC=datasets[self.dataset]['MC'],
+                                                year=self.year,
+                                                filename=datasets[self.dataset]['FileName']))):
+                    if self.systematic == 'nominal':
+                        branches.append([self.dataset, self.systematic, i])
+                    else:
+                        branches.append([self.dataset, self.systematic + 'UP', i])
+                        branches.append([self.dataset, self.systematic + 'DOWN', i])
 
         return dict(enumerate(branches))
 
@@ -94,4 +94,9 @@ class AllHistoTasks(law.WrapperTask):
         defines required HistoTasks
         """
         for region in regions.keys():
-            yield HistoTask(year=self.year, region=region)
+            for dataset in datasets.keys():
+                for systematic in systematics.keys():
+                    yield HistoTask(year=self.year,
+                                    region=region,
+                                    dataset=dataset,
+                                    systematic=systematic)

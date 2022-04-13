@@ -105,29 +105,18 @@ def getDatasetSize(inFileName):
     """
     Reads the number of events before skim from given file.
 
-    :param inFileName: set to True if the requested histogram is from MC
+    :param inFileName: path of the file to read from
     :returns: number of events before preskim
-    :raises: Exception: Cannot run on data!
+    :raises: Exception: Userinfo cannot be processed! preskim efficiency not found
     """
-    ifile = ROOT.TFile()
-    ifile = ifile.Open(inFileName, 'READ')
+    inFile = ROOT.TFile.Open(inFileName, 'READ')
+    tree = inFile.Get(general['Tree'])
 
-    itree_evt = ifile.Get('Events')
-    itree_run = ifile.Get('Runs')
+    if not (tree.GetUserInfo().At(0) and 'efficiency:' in tree.GetUserInfo().At(0).GetName()):
+        raise Exception('Userinfo cannot be processed! preskim efficiency not found')
 
-    itree_run.GetEntry()
+    preskim_efficiency = float(tree.GetUserInfo().At(0).GetName().replace('efficiency:', ''))
+    dataset_size = int(round(tree.GetEntries() / preskim_efficiency))
+    inFile.Close()
 
-    # skip data
-    if int(itree_run.run) != 1:
-        raise Exception('Cannot run on data!')
-
-    n_i_selected = int(itree_evt.GetEntries())
-    n_i_total = int(itree_run.genEventCount)
-    ifile.Close()
-
-    if n_i_selected != n_i_total:
-        print('--- selected events: {}, initial events: {} ---> preskim efficiency: {:.3f}'.format(n_i_selected,
-                                                                                                   n_i_total,
-                                                                                                   n_i_selected / n_i_total))
-
-    return n_i_total
+    return dataset_size
