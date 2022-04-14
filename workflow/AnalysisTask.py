@@ -23,21 +23,21 @@ class AnalysisTask(law.WrapperTask):
         defines required analysis tasks
         """
         yield NLLPlotTask(fitname='all',
-                          histogram='binCategory',
-                          cardmask='/*/*/binCategory.txt',
+                          histogram='fitcategories',
+                          cardmask='/*/*/fitcategories.txt',
                           options=self.NLLoptions + f' --lumi {lumi["total"]}')
 
         # years
         for year in allyears:
             yield AllBranchPlotTasks(year=year)
             yield NLLPlotTask(fitname=year,
-                              histogram='binCategory',
-                              cardmask='/' + year + '/*/binCategory.txt',
+                              histogram='fitcategories',
+                              cardmask='/' + year + '/*/fitcategories.txt',
                               options=self.NLLoptions + f' --lumi {lumi[year]}')
 
         # regions
         for region in regions.keys():
             yield NLLPlotTask(fitname=region,
-                              histogram='binCategory',
-                              cardmask='/*/' + region + '/binCategory.txt',
+                              histogram='fitcategories',
+                              cardmask='/*/' + region + '/fitcategories.txt',
                               options=self.NLLoptions + f' --lumi {lumi["total"]}')

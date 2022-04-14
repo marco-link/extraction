@@ -19,29 +19,29 @@ class HistoTask(HTCondorBaseTask):
     :param region: region for which to produce the histograms
     """
     year = luigi.Parameter()
-    region = luigi.Parameter()
     dataset = luigi.Parameter()
-    systematic = luigi.Parameter()
-    max_runtime = 4 #hours
+    max_runtime = 8 #hours
 
     def create_branch_map(self):
         """
         creates branchmap with an entry for input file
         """
         branches = []
-        # is shape systematic and applied in this year
-        if systematics[self.systematic]['type'] == 'shape' and self.year in systematics[self.systematic]['years']:
-            # systematic is applied for this dataset
-            if 'datasets' not in systematics[self.systematic].keys() or self.dataset in systematics[self.systematic]['datasets']:
-                # loop over single input files
-                for i in range(len(getGridpaths(isMC=datasets[self.dataset]['MC'],
-                                                year=self.year,
-                                                filename=datasets[self.dataset]['FileName']))):
-                    if self.systematic == 'nominal':
-                        branches.append([self.dataset, self.systematic, i])
-                    else:
-                        branches.append([self.dataset, self.systematic + 'UP', i])
-                        branches.append([self.dataset, self.systematic + 'DOWN', i])
+        for region in regions.keys():
+            for systematic in systematics.keys():
+                # is shape systematic and applied in this year
+                if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
+                    # systematic is applied for this dataset
+                    if 'datasets' not in systematics[systematic].keys() or self.dataset in systematics[systematic]['datasets']:
+                        # loop over single input files
+                        for i in range(len(getGridpaths(isMC=datasets[self.dataset]['MC'],
+                                                        year=self.year,
+                                                        filename=datasets[self.dataset]['FileName']))):
+                            if systematic == 'nominal':
+                                branches.append([region, systematic, i])
+                            else:
+                                branches.append([region, systematic + 'UP', i])
+                                branches.append([region, systematic + 'DOWN', i])
 
         return dict(enumerate(branches))
 
@@ -55,10 +55,10 @@ class HistoTask(HTCondorBaseTask):
         """
         defines output path for task logs under the path from :func:`config.general.histopath`
         """
-        return histopath(isMC=datasets[self.branch_data[0]]['MC'],
+        return histopath(isMC=datasets[self.dataset]['MC'],
                          year=self.year,
-                         filename=self.branch_data[0],
-                         region=self.region,
+                         filename=self.dataset,
+                         region=self.branch_data[0],
                          systematic=self.branch_data[1],
                          number=self.branch_data[2]).replace('.root', '.log')
 
@@ -74,8 +74,8 @@ class HistoTask(HTCondorBaseTask):
         tasks runs :mod:`python/fill_histos.py` and produces a logfile
         """
         self.save_execute(command=f'python -u python/fill_histos.py --year {self.year} \
-                                                                    --dataset {self.branch_data[0]} \
-                                                                    --region {self.region} \
+                                                                    --dataset {self.dataset} \
+                                                                    --region {self.branch_data[0]} \
                                                                     --systematic {self.branch_data[1]} \
                                                                     --number {self.branch_data[2]}', log=self.log())
 
@@ -93,10 +93,5 @@ class AllHistoTasks(law.WrapperTask):
         """
         defines required HistoTasks
         """
-        for region in regions.keys():
-            for dataset in datasets.keys():
-                for systematic in systematics.keys():
-                    yield HistoTask(year=self.year,
-                                    region=region,
-                                    dataset=dataset,
-                                    systematic=systematic)
+        for dataset in datasets.keys():
+            yield HistoTask(year=self.year, dataset=dataset)

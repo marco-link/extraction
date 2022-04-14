@@ -9,22 +9,35 @@ Defines different analysis regions in ``regions`` dict of dicts:
 """
 
 
-# TODO btag regions
-# 0: Bneg
-# 1: B0bar
-# 2: B0
-# 3: Bpos
+bChargeCategories = [
+    ['Bneg', 'top_bjet_bChargeTag_highestScoreIndex_nominal == 0'],
+    ['B0bar', 'top_bjet_bChargeTag_highestScoreIndex_nominal == 1'],
+    ['B0', 'top_bjet_bChargeTag_highestScoreIndex_nominal == 2'],
+    ['Bpos', 'top_bjet_bChargeTag_highestScoreIndex_nominal == 3'],
+]
 
-
-regions = {
-    'muon': {
+templateRegions = {
+    # signal regions
+    'signal_muon': {
         'Name': 'SingleMuon region',
-        'Filter': 'ntightMuons == 1',
+        'Filter': '(ntightMuons == 1 && nselectedBJets_nominal == 1)',
     },
 
-    'electron': {
+    'signal_electron': {
         'Name': 'SingleElectron region',
-        'Filter': 'ntightElectrons == 1',
+        'Filter': '(ntightElectrons == 1 && nselectedBJets_nominal == 1)',
     },
+
+    # ttbar regions
+
+    # QCD region
 
 }
+
+regions = {}
+for category in bChargeCategories:
+    for region in templateRegions:
+        regions[region + '_' + category[0]] = {
+            'Name': templateRegions[region]['Name'] + ' ' + category[0],
+            'Filter': templateRegions[region]['Filter'] + ' && ' + category[1],
+        }
