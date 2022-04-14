@@ -70,15 +70,14 @@ def getGridpaths(isMC, year, filename):
 
 
 
-def histopath(isMC, year, filename, region, systematic, number=None):
+def histopath(year, region, dataset, systematic=None, number=None):
     """
     Generates path of the histogram file using the given parameters.
     If the path doesn't exist it is generated.
 
-    :param isMC: set to True if the requested histogram is from MC
     :param year: year of the histogram
-    :param filename: filename of the histogram
     :param region: filename of the histogram
+    :param dataset: dataset label of the histogram
     :param systematic: systematic of the histogram
     :param number: file number, `None` for merged file
     :returns: path to root file for the histograms
@@ -86,19 +85,20 @@ def histopath(isMC, year, filename, region, systematic, number=None):
     """
     histodir = ''
 
-    if isMC:
-        histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
-    else:
+    if systematic is None:
         raise Exception('histopath not defined for data yet!')
         #return general['DataPath'] + year + '/' + run + '/'
+    else:
+        histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
 
     if not os.path.exists(histodir):
         os.makedirs(histodir)
 
     if number is None:
-        return histodir + filename + '.root'
+        return histodir + dataset + '.root'
     else:
-        return histodir + filename + '_{}'.format(number) + '.root'
+        return histodir + dataset + '_{}'.format(number) + '.root'
+
 
 
 def getDatasetSize(inFileName):

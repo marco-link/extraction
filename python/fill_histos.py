@@ -53,7 +53,7 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     print('EventWeights: {}'.format(weights))
 
     inFileName = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])[number]
-    outFileName = histopath(isMC=datasets[dataset]['MC'], year=year, filename=dataset, region=region, systematic=systematic, number=number)
+    outFileName = histopath(year=year, region=region, dataset=dataset, systematic=systematic, number=number)
 
     # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
     dataset_size = getDatasetSize(inFileName)

@@ -55,12 +55,11 @@ class HistoTask(HTCondorBaseTask):
         """
         defines output path for task logs under the path from :func:`config.general.histopath`
         """
-        return histopath(isMC=datasets[self.dataset]['MC'],
-                         year=self.year,
-                         filename=self.dataset,
+        return histopath(year=self.year,
                          region=self.branch_data[0],
-                         systematic=self.branch_data[1],
-                         number=self.branch_data[2]).replace('.root', '.log')
+                         dataset=self.branch_data[1],
+                         systematic=self.branch_data[2],
+                         number=self.branch_data[3]).replace('.root', '.log')
 
     def output(self):
         """
@@ -78,20 +77,3 @@ class HistoTask(HTCondorBaseTask):
                                                                     --dataset {self.branch_data[1]} \
                                                                     --systematic {self.branch_data[2]} \
                                                                     --number {self.branch_data[3]}', log=self.log())
-
-
-
-class AllHistoTasks(law.WrapperTask):
-    """
-    A wrapper task task to produce all histograms of a year
-
-    :param year: year for which to produce the histograms
-    """
-    year = luigi.Parameter()
-
-    def requires(self):
-        """
-        defines required HistoTasks
-        """
-        for dataset in datasets.keys():
-            yield HistoTask(year=self.year)

@@ -41,7 +41,7 @@ def buildcard(outpath, year, region, shape):
 
     # fill with shapes
     def setShape(p):
-        f = ROOT.TFile(histopath(isMC=True, year=year, filename=p.process(), region=region, systematic='nominal'), 'read')
+        f = ROOT.TFile(histopath(year=year, region=region, dataset=p.process(), systematic='nominal'), 'read')
         s = f.Get(general['Histodir'] + '/' + shape)
 
         p.set_shape(s, True)
@@ -75,15 +75,15 @@ def buildcard(outpath, year, region, shape):
                 s.set_type('shape')
 
                 # fill shapes
-                f_nominal = ROOT.TFile(histopath(isMC=True, year=year, filename=process,
+                f_nominal = ROOT.TFile(histopath(year=year, dataset=process,
                                                  region=region, systematic='nominal'), 'read')
                 nominalinal = f_nominal.Get(general['Histodir'] + '/' + shape)
 
-                f_up = ROOT.TFile(histopath(isMC=True, year=year, filename=process,
+                f_up = ROOT.TFile(histopath(year=year, dataset=process,
                                             region=region, systematic=syst + 'UP'), 'read')
                 up = f_up.Get(general['Histodir'] + '/' + shape)
 
-                f_down = ROOT.TFile(histopath(isMC=True, year=year, filename=process,
+                f_down = ROOT.TFile(histopath(year=year, dataset=process,
                                               region=region, systematic=syst + 'DOWN'), 'read')
                 down = f_down.Get(general['Histodir'] + '/' + shape)
 

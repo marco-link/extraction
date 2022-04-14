@@ -45,9 +45,8 @@ def plot(year, region, systematic, histo):
             print('Skipping histogram plotting for "{}" (histogram not defined for "{}" dataset)'.format(histo, dataset))
             continue
 
-        with uproot.open(histopath(isMC=datasets[dataset]['MC'],
-                                   year=year,
-                                   filename=dataset,
+        with uproot.open(histopath(year=year,
+                                   dataset=dataset,
                                    region=region,
                                    systematic=systematic)) as infile:
 

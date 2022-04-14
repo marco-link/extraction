@@ -4,7 +4,7 @@ import law
 import luigi
 
 from workflow.BaseTask import BaseTask
-from workflow.HistoTask import AllHistoTasks
+from workflow.MergeHistoTask import AllMergeHistoTasks
 
 from config.general import general
 from config.histograms import histograms
@@ -36,7 +36,7 @@ class BranchPlotTask(BaseTask):
         """
         task requires all histograms to be produced
         """
-        return [AllHistoTasks(year=self.year)]
+        return [AllMergeHistoTasks(year=self.year)]
 
     def output(self):
         """
