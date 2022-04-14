@@ -60,9 +60,11 @@ class HTCondorBaseTask(law.htcondor.HTCondorWorkflow, law.LocalWorkflow, BaseTas
     :param transfer_logs: transfer job logs
     :param max_runtime: maximum job runtime
     """
+    parallel_jobs = 100
     transfer_logs = luigi.BoolParameter(default=False)
     max_runtime = law.DurationParameter(default=2.0, unit='h', significant=False,
                                         description='maximum job runtime, default unit is hours, default: 2')
+
 
     def htcondor_output_directory(self):
         # the directory where submission meta data should be stored
