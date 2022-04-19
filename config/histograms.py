@@ -24,6 +24,7 @@ background = list(background.keys())
 
 plotoptions = ['nostack', 'density', 'step']
 plotoptions = ['logY']
+plotoptions = []
 
 
 histograms = {
@@ -66,5 +67,6 @@ histograms = {
         'Histogram': {'nbins': 5, 'xmin': -2.5, 'xmax': 2.5},
         'Title': 'Fit categories',
         'Xlabel': 'category',
+        'Plot': plotoptions,
     },
 }

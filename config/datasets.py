@@ -51,9 +51,9 @@ for index in gen_json.keys():
     signal['WbWbX_{}'.format(index)] = {
         'MC': True,
         'Signal': True,
-        'Label': r'Wb x Wb $m_t = {}$ GeV, $\Gamma_t = {}$ GeV'.format(gen_json[index]['mass'], gen_json[index]['width']),
+        'Label': r'Wb x Wb',
         'FileName': 'WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8',
-        'Color': 'C0',
+        'Color': 'red',
         'XS': gen_json[index]['xsec'],
         'XSUncertainty': {
             'Up': 5, #TODO update
@@ -72,8 +72,8 @@ background = {
         'MC': True,
         'Signal': False,
         'FileName': 'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8',
-        'Label': 't$/bar{\text{t}}$ (dilep)',
-        'Color': 'C1',
+        'Label': r't$\bar{t}$ (dilep)',
+        'Color': 'darkorange',
         'XS': 831.76 * (1 - 0.6741)**2, # [1]*[5]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -89,8 +89,8 @@ background = {
         'MC': True,
         'Signal': False,
         'FileName': 'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8',
-        'Label': 't$/bar{\text{t}}$ (semilep)',
-        'Color': 'C1',
+        'Label': r't$\bar{t}$ (semilep)',
+        'Color': 'gold',
         'XS': 831.76 * (0.6741 * (1 - 0.6741) * 2), # [1]*[5]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -106,8 +106,8 @@ background = {
         'MC': True,
         'Signal': False,
         'FileName': 'TTToHadronic_TuneCP5_13TeV-powheg-pythia8',
-        'Label': 't$/bar{\text{t}}$ (had)',
-        'Color': 'C1',
+        'Label': r't$\bar{t}$ (had)',
+        'Color': 'yellow',
         'XS': 831.76 * 0.6741**2, # [1]*[5]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -123,8 +123,8 @@ background = {
         'MC': True,
         'Signal': False,
         'FileName': 'WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8',
-        'Label': 'WJets (0j)',
-        'Color': 'C1',
+        'Label': 'W+Jets (0j)',
+        'Color': 'limegreen',
         'XS': 50131.98259, #[2]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -140,8 +140,8 @@ background = {
         'MC': True,
         'Signal': False,
         'FileName': 'WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8',
-        'Label': 'WJets (1j)',
-        'Color': 'C1',
+        'Label': 'W+Jets (1j)',
+        'Color': 'forestgreen',
         'XS': 8875.0, #[2]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -157,8 +157,8 @@ background = {
         'MC': True,
         'Signal': False,
         'FileName': 'WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8',
-        'Label': 'WJets (2j)',
-        'Color': 'C1',
+        'Label': 'W+Jets (2j)',
+        'Color': 'green',
         'XS': 3172.958208, #[2]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -175,7 +175,7 @@ background = {
         'Signal': False,
         'FileName': 'DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8',
         'Label': 'Drell Yan',
-        'Color': 'C1',
+        'Color': 'aqua',
         'XS': 6529.0, #[0]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -192,7 +192,7 @@ background = {
         'Signal': False,
         'FileName': 'WW_TuneCP5_13TeV-pythia8',
         'Label': 'diboson (WW)',
-        'Color': 'C1',
+        'Color': 'cornflowerblue',
         'XS': 75.8, #[0]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -209,7 +209,7 @@ background = {
         'Signal': False,
         'Label': 'diboson (WZ)',
         'FileName': 'WZ_TuneCP5_13TeV-pythia8',
-        'Color': 'C1',
+        'Color': 'royalblue',
         'XS': 27.6, #[0]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -226,7 +226,7 @@ background = {
         'Signal': False,
         'Label': 'diboson (ZZ)',
         'FileName': 'ZZ_TuneCP5_13TeV-pythia8',
-        'Color': 'C1',
+        'Color': 'deepskyblue',
         'XS': 12.14, #[0]
         'XSUncertainty': {
             'Up': 50, #TODO update
@@ -244,7 +244,7 @@ background = {
         #'Signal': False,
         #'FileName': 'ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8',
         #'Label': 'WW',
-        #'Color': 'C1',
+        #'Color': 'indigo',
         #'XS': 136.02, #[4]
         #'XSUncertainty': {
             #'Up': 50, #TODO update
@@ -261,7 +261,7 @@ background = {
         #'Signal': False,
         #'FileName': 'ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8',
         #'Label': 'WW',
-        #'Color': 'C1',
+        #'Color': 'rebeccapurple',
         #'XS': 80.95, #[4]
         #'XSUncertainty': {
             #'Up': 50, #TODO update
@@ -278,7 +278,7 @@ background = {
         #'Signal': False,
         #'FileName': 'ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8',
         #'Label': 'WW',
-        #'Color': 'C1',
+        #'Color': 'darkorchid',
         #'XS': 71.7 * 0.5, #[4]
         #'XSUncertainty': {
             #'Up': 50, #TODO update
@@ -295,7 +295,7 @@ background = {
         #'Signal': False,
         #'FileName': 'ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8',
         #'Label': 'WW',
-        #'Color': 'C1',
+        #'Color': 'darkviolet',
         #'XS': 71.7 * 0.5, #[4]
         #'XSUncertainty': {
             #'Up': 50, #TODO update
@@ -312,7 +312,7 @@ background = {
         #'Signal': False,
         #'FileName': 'ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8',
         #'Label': 'single t (s channel)',
-        #'Color': 'C1',
+        #'Color': 'purple',
         #'XS': 10.32 , #[4]
         #'XSUncertainty': {
             #'Up': 50, #TODO update

@@ -13,14 +13,14 @@ import matplotlib.pyplot
 import mplhep
 
 from config.general import general, lumi, histopath
-from config.datasets import datasets
+from config.datasets import datasets, background
 from config.histograms import histograms
 
 matplotlib.use('Agg')
 matplotlib.pyplot.style.use(mplhep.style.CMS)
 
 
-def plot(year, region, systematic, histo):
+def plot(year, region, systematic, histo, signal):
     """
     plot a histogram for a specific year, region and systematic.
 
@@ -31,14 +31,14 @@ def plot(year, region, systematic, histo):
     """
     histogram = histograms[histo]
 
-    fig = matplotlib.pyplot.figure()
+    fig = matplotlib.pyplot.figure(figsize=(12, 12))
     plot = fig.add_subplot(111)
 
     histos = []
     labels = []
     colors = []
 
-    datasetlist = list(datasets.keys())
+    datasetlist = [signal] + list(background.keys())
     datasetlist.reverse()
     for dataset in datasetlist:
         if 'datasets' in histogram.keys() and dataset not in histogram['datasets']:
@@ -68,12 +68,7 @@ def plot(year, region, systematic, histo):
                     color=colors,
                     label=labels,
                     density='density' in histogram['Plot'])
-    mplhep.cms.label(ax=plot, data=False, paper=False, lumi=lumi[year])
-
-    if 'Title' in histogram.keys():
-        plot.set_title(histogram['Title'])
-    else:
-        plot.set_title(histo)
+    mplhep.cms.label(loc=1, ax=plot, data=False, paper=False, lumi=lumi[year])
 
     if 'Xlabel' in histogram.keys():
         plot.set_xlabel(histogram['Xlabel'], x=1.0, ha='right')
@@ -89,7 +84,7 @@ def plot(year, region, systematic, histo):
         plot.set_xlim(histogram['Histogram']['xmin'], histogram['Histogram']['xmax'])
 
     if 'nolegend' not in histogram['Plot']:
-        plot.legend()
+        plot.legend(frameon=True, framealpha=0.4, edgecolor='w', loc=4)
 
     if 'logX' in histogram['Plot']:
         plot.set_xscale('log')
@@ -122,10 +117,10 @@ if __name__ == '__main__':
     parser.add_argument('--histo', type=str, default='none',
                         help='trigger name')
 
-    #TODO logfile
-
+    parser.add_argument('--signal', type=str, default='WbWbX_19',
+                        help='signal variation')
 
     args = parser.parse_args()
     print(args)
 
-    plot(year=args.year, region=args.region, systematic=args.systematic, histo=args.histo)
+    plot(year=args.year, region=args.region, systematic=args.systematic, histo=args.histo, signal=args.signal)
