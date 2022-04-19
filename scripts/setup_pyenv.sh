@@ -17,7 +17,7 @@ else
 
     source ./env/${pynvname}/bin/activate
 
-    pip install --upgrade --no-cache-dir pip
+    pip install --upgrade --no-cache-dir pip setuptools
     pip install --no-cache-dir pre-commit sphinx sphinx-rtd-theme sphinx-autodoc-typehints \
                                numpy scipy matplotlib pandas mplhep uproot awkward \
                                luigi==2.8.13 law==0.1.6
