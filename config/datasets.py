@@ -32,7 +32,7 @@ import pandas
 #from config.data import data
 
 gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs.json')
-gen_weight = [] #TODO check width weight
+gen_weight = ['genweight/genEventSumw', 'MEweight_murNominal_mufNominal/LHEScaleSumw_4']
 
 weights_electron = []
 weights_muon = ['tightMuons_weight_id_nominal', 'tightMuons_weight_iso_nominal']
@@ -119,7 +119,7 @@ background = {
         },
     },
 
-    'Wjets_0j': {
+    'WJets_0j': {
         'MC': True,
         'Signal': False,
         'FileName': 'WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8',
@@ -238,7 +238,7 @@ background = {
         },
     },
 
-
+    #TODO check included in signal
     #'ST_t_top': {
         #'MC': True,
         #'Signal': False,

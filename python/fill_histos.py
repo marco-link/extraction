@@ -12,8 +12,8 @@ import argparse
 
 from ROOT import TH1, ROOT, TFile
 
-from helpers import getSystsplit, get_event_weigths
-from config.general import general, getGridpaths, histopath, lumi, getDatasetSize
+from helpers import getSystsplit, getDatasetInfo, get_event_weigths
+from config.general import general, getGridpaths, histopath, lumi
 from config.datasets import datasets
 from config.regions import regions
 from config.histograms import histograms
@@ -49,14 +49,17 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     print(f'Region: {region}')
     print(f'Systematic: {systematic}')
 
-    weights = get_event_weigths(year, dataset, systematic)
-    print('EventWeights: {}'.format(weights))
 
-    inFileName = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])[number]
+
+    gridpaths = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])
+    inFileName = gridpaths[number]
     outFileName = histopath(year=year, region=region, dataset=dataset, systematic=systematic, number=number)
 
     # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
-    dataset_size = getDatasetSize(inFileName)
+    datasetInfo = getDatasetInfo(gridpaths)
+
+    weights = get_event_weigths(year, dataset, systematic, datasetInfo)
+    print('EventWeights: {}'.format(weights))
 
     print('\nOPENING INPUT FILE AND CREATING DATAFRAME')
     df_in = RDF(general['Tree'], inFileName)
@@ -120,12 +123,13 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                                                   branchname, 'w')
 
             # apply global scale
-            efficiency = histos[histname].GetEntries() / dataset_size
-            scale = datasets[dataset]['XS'] * efficiency * datasets[dataset][year]['KFactor'] * lumi[year] / dataset_size
+            efficiency = histos[histname].GetEntries() / datasetInfo['genEventCount'] #TODO use weighted efficiency
+            scale = datasets[dataset]['XS'] * efficiency * datasets[dataset][year]['KFactor'] * lumi[year]
             histos[histname].Scale(scale)
 
+            print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
             print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) * {efficiency}(efficiency) \
-            * {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi) / {dataset_size}(Entries)")
+* {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi)")
 
         else:
             print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')

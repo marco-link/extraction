@@ -11,7 +11,6 @@ Contains global configuration options e.g. paths:
 
 
 import os
-import ROOT
 
 general = {
     'MCPath': './config/mc/',
@@ -98,25 +97,3 @@ def histopath(year, region, dataset, systematic=None, number=None):
         return histodir + dataset + '.root'
     else:
         return histodir + dataset + '_{}'.format(number) + '.root'
-
-
-
-def getDatasetSize(inFileName):
-    """
-    Reads the number of events before skim from given file.
-
-    :param inFileName: path of the file to read from
-    :returns: number of events before preskim
-    :raises: Exception: Userinfo cannot be processed! preskim efficiency not found
-    """
-    inFile = ROOT.TFile.Open(inFileName, 'READ')
-    tree = inFile.Get(general['Tree'])
-
-    if not (tree.GetUserInfo().At(0) and 'efficiency:' in tree.GetUserInfo().At(0).GetName()):
-        raise Exception('Userinfo cannot be processed! preskim efficiency not found')
-
-    preskim_efficiency = float(tree.GetUserInfo().At(0).GetName().replace('efficiency:', ''))
-    dataset_size = int(round(tree.GetEntries() / preskim_efficiency))
-    inFile.Close()
-
-    return dataset_size
