@@ -72,13 +72,13 @@ def getDatasetInfo(paths):
     # flatten lists in dictionary
     tmp = {}
     for label in globalInfo:
-        if isinstance(globalInfo[label], list()):
+        if isinstance(globalInfo[label], list):
             for i, val in enumerate(globalInfo[label]):
                 tmp[label + '_{}'.format(i)] = val
     globalInfo.update(tmp)
 
     # remove list items
-    globalInfo = {key: val for key, val in globalInfo.items() if not isinstance(val, list())}
+    globalInfo = {key: val for key, val in globalInfo.items() if not isinstance(val, list)}
 
     print('\n\n----- GlobalInfo -----')
     for label in globalInfo:
