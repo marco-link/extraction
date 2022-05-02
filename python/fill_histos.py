@@ -123,12 +123,11 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                                                   branchname, 'w')
 
             # apply global scale
-            efficiency = histos[histname].GetEntries() / datasetInfo['genEventCount'] #TODO use weighted efficiency
-            scale = datasets[dataset]['XS'] * efficiency * datasets[dataset][year]['KFactor'] * lumi[year]
+            scale = datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
             histos[histname].Scale(scale)
 
             print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
-            print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) * {efficiency}(efficiency) \
+            print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) \
 * {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi)")
 
         else:

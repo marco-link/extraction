@@ -32,7 +32,7 @@ import pandas
 #from config.data import data
 
 gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs.json')
-gen_weight = ['genweight/genEventSumw', 'MEweight_murNominal_mufNominal/LHEScaleSumw_4']
+gen_weight = ['genweight/genEventSumw', 'MEweight_murNominal_mufNominal', 'PDFweight_0']
 
 weights_electron = []
 weights_muon = ['tightMuons_weight_id_nominal', 'tightMuons_weight_iso_nominal']
