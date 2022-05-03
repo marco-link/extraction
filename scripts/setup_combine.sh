@@ -8,9 +8,11 @@ export CMSSW_BASE=CMSSW_10_2_13
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch/
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
-mkdir env
-cd env
+source scripts/setup_analysisenv.sh
+cd $ANALYSIS_PATH
 
+mkdir -p env
+cd env
 
 if [ -r "${CMSSW_BASE}" ];
 then
@@ -27,6 +29,9 @@ then
 else
     git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
     cd HiggsAnalysis/CombinedLimit; git fetch origin; git checkout v8.2.0; cd -
+
+    # link custom combine model
+    ln -s ../../../../../../python/WbWbXModel.py HiggsAnalysis/CombinedLimit/python/WbWbXModel.py
 fi
 
 

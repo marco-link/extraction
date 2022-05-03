@@ -1,126 +1,72 @@
 # -*- coding: utf-8 -*-
 
 """
-key = Branchname (or nonexistent Branch if 'Expression' is used)
 
-Title:      Title shown in plot
-Xlabel:     x axis label shown in plot
-Plot:       plotoptions (as list)
-            'logX', 'logY',
-            'nolegend'
-            'nostack'
-            'density'
-            'step' or 'errorbar'
-Branch:     TODO
-Histogram:  binning of histogram e.g. {'nbins': 50, 'xmin': -300, 'xmax': 300}
-Expression: (optional) expression to calculate values from other branches
-Samples:    (optional) list of samples to limit histogram calculation to
+Defines properties of histograms to produce in the ``histograms`` dict of dicts:
+
+* dict key:         histogram name
+* ``Branch``:       name of the branch (use ``Expression`` to definen non-existent branches)
+* ``Title``:        Title shown in plot
+* ``Xlabel``:       x axis label shown in plot
+* ``Plot``:         list of plotoptions (available options: 'logX', 'logY', 'nolegend' 'nostack' 'density' 'step'/'errorbar')
+* ``Histogram``:    binning of histogram e.g. {'nbins': 50, 'xmin': -300, 'xmax': 300}
+* ``Expression``:   (optional) expression to calculate values from other branches
+* ``datasets``:      (optional) list of datasets to limit histogram calculation to
 """
 
-#TODO test varbins
+# TODO test varbins
 
 
-from config.samples import background
+from config.datasets import signal, background
+signal = list(signal.keys())
 background = list(background.keys())
 
 
 plotoptions = ['nostack', 'density', 'step']
 plotoptions = ['logY']
+plotoptions = []
 
 
 histograms = {
-
-    #'Reco_Wb_on_offshell': {
-        #'Branch': 'Reco_Wb3_mass',
-        #'Histogram': {'nbins': 50, 'xmin': 0, 'xmax': 600},
-        #'Samples': ['WbWbX_onshell', 'WbWbX_offshell'],
+    #'parton_top_mass': {
+        #'Branch': 'partonLevel_top_mass',
+        #'Histogram': {'nbins': 35, 'xmin': 0, 'xmax': 350},
+        #'datasets': signal,
         #'Title': '',
-        #'Xlabel': 'Reco_Wb_mass',
+        #'Xlabel': 'partonLevel top mass',
     #},
 
-    #'Wb_diff': {
-        #'Branch': 'Wb_diff',
-        #'Expression': 'Reco_Wb_mass - Gen_Wb_mass',
-        #'Histogram': {'nbins': 50, 'xmin': -300, 'xmax': 300},
-        #'Samples': ['WbWbX_3'],
+    ##'Reco_Wb': {
+        ##'Title': '',
+        ##'Xlabel': 'Reco_Wb_mass',
+        ##'Plot': plotoptions,
+        ##'Branch': 'Reco_Wb_mass',
+        ##'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
+    ##},
+
+    #'top_mass': {
         #'Title': '',
-        #'Xlabel': 'Reco_Wb - Gen_Wb in GeV',
+        #'Xlabel': 'm_{t}',
+        #'Plot': plotoptions,
+        #'Branch': 'top_mass_nominal',
+        #'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
     #},
 
+    #'met': {
+        #'Title': '',
+        #'Xlabel': 'MET',
+        #'Plot': plotoptions,
+        #'Branch': 'met_nominal',
+        #'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
+    #},
 
-    'Reco_Wb': {
-        'Title': '',
-        'Xlabel': 'Reco_Wb_mass',
+    'fitcategories': {
+        'Branch': 'fit_category',
+        'Expression': 'int x = 1; if(std::fabs(top_mass_nominal-172.5)<25.) {x++;} \
+            if(ntightMuons==1) {return x * tightMuons_charge[0];} else {return x * tightElectrons_charge[0];}',
+        'Histogram': {'nbins': 5, 'xmin': -2.5, 'xmax': 2.5},
+        'Title': 'Fit categories',
+        'Xlabel': 'category',
         'Plot': plotoptions,
-        'Branch': 'Reco_Wb_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
     },
-
 }
-
-
-for i in range(9):
-    histograms[f'Reco_Wb_{i}'] = {
-        'Title': '',
-        'Xlabel': 'Reco_Wb_mass',
-        'Plot': plotoptions,
-        'Branch': f'Reco_Wb{i}_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-        'Samples': ['WbWbX_onshell', 'WbWbX_offshell'],
-    }
-
-    histograms[f'partonLevel_Wb_{i}'] = {
-        'Title': '',
-        'Xlabel': 'partonLevel_Wb_mass',
-        'Plot': plotoptions,
-        'Branch': f'partonLevel_Wb{i}_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-        'Samples': ['WbWbX_onshell', 'WbWbX_offshell'],
-    }
-
-    histograms[f'particleLevel_Wb_{i}'] = {
-        'Title': '',
-        'Xlabel': 'particleLevel_Wb_mass',
-        'Plot': plotoptions,
-        'Branch': f'particleLevel_Wb{i}_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-        'Samples': ['WbWbX_onshell', 'WbWbX_offshell'],
-
-    }
-
-    #histograms[f'particleLevel_MET_eta_{i}'] = {
-    #'Title': '',
-    #'Xlabel': 'particleLevel_MET_eta',
-    #'Plot': [],
-    #'Branch': f'particleLevel_MET_eta_{i}',
-    #'Expression': f'particleLevel_W_met_eta[particleLevel_Wb{i}_W_idx]',
-    #'Histogram': {'nbins': 100, 'xmin': -20, 'xmax': 20},
-    #'Samples':  ['WbWbX_onshell', 'WbWbX_offshell'],
-    #}
-
-    histograms[f'comp_partonLevel_Wb_{i}'] = {
-        'Title': '',
-        'Xlabel': 'partonLevel_Wb_mass',
-        'Plot': ['nostack', 'step', 'density'],
-        'Branch': f'partonLevel_Wb{i}_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-        'Samples': ['WbWbX_19', 'WbWbX_1'],
-    }
-
-    histograms[f'comp_particleLevel_Wb_{i}'] = {
-        'Title': '',
-        'Xlabel': 'particleLevel_Wb_mass',
-        'Plot': ['nostack', 'step', 'density'],
-        'Branch': f'particleLevel_Wb{i}_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-        'Samples': ['WbWbX_19', 'WbWbX_1'],
-    }
-
-    histograms[f'comp_RecoLevel_Wb_{i}'] = {
-        'Title': '',
-        'Xlabel': 'Reco_Wb_mass',
-        'Plot': ['nostack', 'step', 'density'],
-        'Branch': f'Reco_Wb{i}_mass',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-        'Samples': ['WbWbX_19', 'WbWbX_1'],
-    }

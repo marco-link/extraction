@@ -1,20 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+Script using :mod:`Root.RDataFrame` to produce histograms.
+View arguments with ``python python/fill_histos.py -h``.
+"""
+
 import datetime
 import numpy
 import argparse
 
 from ROOT import TH1, ROOT, TFile
 
-from helpers import get_event_weigths
-from config.general import general, samplepath, histopath
-from config.samples import samples
+from helpers import getSystsplit, getDatasetInfo, get_event_weigths
+from config.general import general, getGridpaths, histopath, lumi
+from config.datasets import datasets
+from config.regions import regions
 from config.histograms import histograms
-
-
-#TODO sample size and eff
-
+from config.systematics import systematics
 
 
 TH1.SetDefaultSumw2(True)
@@ -26,73 +29,109 @@ RDF = ROOT.RDataFrame
 TM1 = ROOT.RDF.TH1DModel
 
 
-def fillhistos(args):
+
+def fillhistos(year, region, dataset, systematic, number, cuts):
+    """
+    fill histograms
+
+    :param year: year
+    :param region: region name
+    :param dataset: dataset name
+    :param systematic: systematic name
+    :param number: file number
+    :param cuts: cuts to apply
+    """
     starttime = datetime.datetime.now()
-    print('\nSTARTING AT {}'.format(str(starttime)))
+    print(f'\nSTARTING AT {str(starttime)}')
 
-    year = args.year
-    sample = args.sample
-    region = args.region
-    systematic = args.systematic
-    trigger = args.trigger
-    print(trigger)
-    cuts = args.cuts
+    print(f'Year: {year}')
+    print(f'dataset: {dataset}')
+    print(f'Region: {region}')
+    print(f'Systematic: {systematic}')
 
-    print('Year: {}'.format(year))
-    print('Sample: {}'.format(sample))
-    print('Region: {}'.format(region))
-    print('Systematic: {}'.format(systematic))
 
-    weights = get_event_weigths(year, sample, systematic)
-    if not weights:
-        weights = '1'
+
+    gridpaths = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])
+    inFileName = gridpaths[number]
+    outFileName = histopath(year=year, region=region, dataset=dataset, systematic=systematic, number=number)
+
+    # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
+    datasetInfo = getDatasetInfo(gridpaths)
+
+    weights = get_event_weigths(year, dataset, systematic, datasetInfo)
     print('EventWeights: {}'.format(weights))
-
-    inFileName = samplepath(isMC=samples[sample]['MC'], year=year, filename=samples[sample][year]['FileName'])
-    outFileName = histopath(isMC=samples[sample]['MC'], year=year, filename=sample, region=region, systematic=systematic)
-
 
     print('\nOPENING INPUT FILE AND CREATING DATAFRAME')
     df_in = RDF(general['Tree'], inFileName)
-
     df_out = df_in
+
+
 
     for cut in cuts:
         if cut != 'none':
-            print('Applying additional cut: {}'.format(cut))
+            print(f'Applying additional cut: {cut}')
             df_out = df_out.Filter(cut, cut)
+
+    if 'Filter' in regions[region].keys():
+        mask = regions[region]['Filter'].replace('nominal', systematic)
+        print(f'Applying region filter: {mask}')
+        df_out = df_out.Filter(mask, region)
 
 
     df_out = df_out.Define('w', weights)
 
+
     print('\nLOOPING OVER HISTOGRAMS')
     histos = {}
     for histname in histograms.keys():
-        if 'Samples' in histograms[histname].keys() and sample not in histograms[histname]['Samples']:
-            print('Skipping histogram generation for "{}" (histogram not defined for this sample)'.format(histname))
+        systematic, direction = getSystsplit(systematic)
+        branchname = histograms[histname]['Branch'].replace('nominal', systematic)
+
+        if 'Branch' in systematics[systematic].keys():
+            branchname = branchname.replace('nominal', systematics[systematic]['Branch'][direction])
+
+        print(f'Reading from branch "{branchname}"...')
+
+
+        if 'datasets' in histograms[histname].keys() and dataset not in histograms[histname]['datasets']:
+            print(f'Skipping histogram generation for "{histname}" (histogram not defined for this dataset)')
             continue
 
         if 'Expression' in histograms[histname].keys():
-            print('\nAdding temporary branch "{}" from Expression: {}'.format(histname, histograms[histname]['Expression']))
-            df_out = df_out.Define(histograms[histname]['Branch'], histograms[histname]['Expression'])
+            expression = histograms[histname]['Expression'].replace('nominal', systematic)
+            print(f'\nAdding temporary branch "{histname}" from Expression: {expression}')
+            df_out = df_out.Define(branchname, expression)
 
-        if histograms[histname]['Branch'] in df_out.GetColumnNames():
+        if branchname in df_out.GetColumnNames():
             histogram = {}
             if 'Histogram' in histograms[histname].keys():
                 histogram = histograms[histname]['Histogram']
 
-            print('Adding histogram for {} with weights {}'.format(histname, weights))
+            print(f'Adding histogram for {histname} with weights {weights}')
             if 'varbins' in histogram.keys():
-                histos[histname] = df_out.Histo1D(TM1(histname, histname,
-                                                      histogram['nbins'], numpy.array(histogram['varbins'])),
-                                                  histograms[histname]['Branch'], 'w')
+                histos[histname] = df_out.Histo1D(TM1(histname,
+                                                      histname,
+                                                      histogram['nbins'],
+                                                      numpy.array(histogram['varbins'])),
+                                                  branchname, 'w')
             else:
-                histos[histname] = df_out.Histo1D(TM1(histname, histname,
-                                                      histogram['nbins'], histogram['xmin'], histogram['xmax']),
-                                                  histograms[histname]['Branch'], 'w')
+                histos[histname] = df_out.Histo1D(TM1(histname,
+                                                      histname,
+                                                      histogram['nbins'],
+                                                      histogram['xmin'],
+                                                      histogram['xmax']),
+                                                  branchname, 'w')
+
+            # apply global scale
+            scale = datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
+            histos[histname].Scale(scale)
+
+            print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
+            print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) \
+* {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi)")
 
         else:
-            print('\n\n\tERROR: Branch "{}" defined in config/histogram.py not found!\n'.format(histname))
+            print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
 
 
     print('\n\n==============Config Summary===============')
@@ -133,21 +172,26 @@ if __name__ == '__main__':
     parser.add_argument('--region', type=str, required=True,
                         help='region to process')
 
-    parser.add_argument('--sample', type=str, required=True,
-                        help='sample to process')
+    parser.add_argument('--dataset', type=str, required=True,
+                        help='dataset to process')
 
-    parser.add_argument('--systematic', type=str, default='nom',
+    parser.add_argument('--systematic', type=str, default='nominal',
                         help='systematic to process')
+
+    parser.add_argument('--number', type=int, required=True,
+                        help='number of input file')
 
     parser.add_argument('--cuts', action='store', default=[], nargs='+',
                         help='cuts to apply')
 
-    parser.add_argument('--trigger', type=str, default='none',
-                        help='trigger name')
-
 
     args = parser.parse_args()
 
-    print('Converting {}'.format(args.sample))
+    print(f'Converting {args.dataset}')
 
-    fillhistos(args)
+    fillhistos(year=args.year,
+               region=args.region,
+               dataset=args.dataset,
+               systematic=args.systematic,
+               number=args.number,
+               cuts=args.cuts)

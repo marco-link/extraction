@@ -1,10 +1,17 @@
 
 __pycache__
 
+*.root
 *.pdf
 *.pyc
 env
+stdall_*.txt
+htcondor_*
 
-logs
-cards
-plots
+.law/
+output
+
+combine_logger.out
+
+doc/source
+doc/_build
