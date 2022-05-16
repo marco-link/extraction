@@ -6,7 +6,7 @@
 GRIDPATH="root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/2017"
 SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/2017"
 
-OUTDIR="./config/mc/2017/"
+OUTDIR="./config/newfilelists"
 
 rm -r $OUTDIR
 mkdir -p $OUTDIR

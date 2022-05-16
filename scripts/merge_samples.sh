@@ -4,8 +4,10 @@
 # only works on ETP infrastructure (sorry \_O_/)
 
 
-SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/2022-04-01_v3"
-OUTDIR="/ceph/mlink/WbNanoAODTools/2022-04-01_v3/"
+SAMPLEVERSION="2022-04-20_v4"
+
+SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/$SAMPLEVERSION/2017"
+OUTDIR="/ceph/mlink/WbNanoAODTools/$SAMPLEVERSION/"
 
 
 mkdir -p $OUTDIR

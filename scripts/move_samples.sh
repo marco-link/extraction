@@ -7,7 +7,9 @@
 # gfal-rm -r "gsiftp://cmssrm-kit.gridka.de:2811//pnfs/gridka.de/cms/disk-only/store/user/mlink/WbNanoAODTools/2017/"
 
 
-SAMPLEPATH="/ceph/mlink/WbNanoAODTools/2022-04-01_v3"
+SAMPLEVERSION="2022-04-20_v4"
+
+SAMPLEPATH="/ceph/mlink/WbNanoAODTools/$SAMPLEVERSION"
 GRIDPATH="gsiftp://cmssrm-kit.gridka.de:2811//pnfs/gridka.de/cms/disk-only/store/user/mlink/WbNanoAODTools/2017/"
 
 gfal-mkdir $GRIDPATH
