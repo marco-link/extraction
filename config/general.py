@@ -14,8 +14,8 @@ import os
 
 general = {
     'MCPath': './config/mc/',
-    'DataPath': './config/mc/',
-    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/testing/',
+    'DataPath': './config/data/',
+    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/2022-05-17_v1/',
     'CardPath': './output/cards/',
     'FitPath': './output/fits/',
     'PlotPath': './output/plots/',
@@ -52,13 +52,12 @@ def getGridpaths(isMC, year, filename):
     :param year: year of the dataset
     :param filename: filename of the dataset
     :returns: paths to files as list
-    :raises: Exception: datasetpath not defined for data yet! (if isMC=False, data not implementded yet)
     """
     filepath = ''
     if isMC:
         filepath = general['MCPath'] + year + '/' + filename + '.txt'
     else:
-        raise Exception('datasetpath not defined for data yet!')
+        filepath = general['DataPath'] + year + '/' + filename + '.txt'
 
     filelist = []
     with open(filepath, 'r') as files:
@@ -80,13 +79,11 @@ def histopath(year, region, dataset, systematic=None, number=None):
     :param systematic: systematic of the histogram
     :param number: file number, `None` for merged file
     :returns: path to root file for the histograms
-    :raises: Exception: histopath not defined for data yet! (if isMC=False, data not implementded yet)
     """
     histodir = ''
 
-    if systematic is None:
-        raise Exception('histopath not defined for data yet!')
-        #return general['DataPath'] + year + '/' + run + '/'
+    if systematic is None or systematic == 'None':
+        histodir = general['HistoPath'] + '/data/{year}/{region}/'.format(year=year, region=region)
     else:
         histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
 

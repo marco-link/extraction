@@ -6,6 +6,7 @@ import luigi
 from workflow.BaseTask import HTCondorBaseTask
 
 from config.general import histopath, getGridpaths
+from config.data import data
 from config.datasets import datasets
 from config.regions import regions
 from config.systematics import systematics
@@ -27,6 +28,14 @@ class HistoTask(HTCondorBaseTask):
         """
         branches = []
         for region in regions.keys():
+            # data
+            for dataset in data.keys():
+                for i in range(len(getGridpaths(isMC=False,
+                                                year=self.year,
+                                                filename=data[dataset]['FileName']))):
+                    branches.append([region, dataset, None, i])
+
+            # MC
             for dataset in datasets.keys():
                 for systematic in systematics.keys():
                     # is shape systematic and applied in this year
@@ -34,7 +43,7 @@ class HistoTask(HTCondorBaseTask):
                         # systematic is applied for this dataset
                         if 'datasets' not in systematics[systematic].keys() or dataset in systematics[systematic]['datasets']:
                             # loop over single input files
-                            for i in range(len(getGridpaths(isMC=datasets[dataset]['MC'],
+                            for i in range(len(getGridpaths(isMC=True,
                                                             year=self.year,
                                                             filename=datasets[dataset]['FileName']))):
                                 if systematic == 'nominal':

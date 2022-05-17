@@ -8,6 +8,7 @@ from workflow.HistoTask import HistoTask
 
 from config.general import histopath
 from config.regions import regions
+from config.data import data
 from config.datasets import datasets
 from config.systematics import systematics
 
@@ -61,6 +62,11 @@ class AllMergeHistoTasks(law.WrapperTask):
         defines required BranchPlotTasks
         """
         for region in regions.keys():
+            # data merging
+            for dataset in data.keys():
+                yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic='')
+
+            # MC merging
             for dataset in datasets.keys():
                 for systematic in systematics.keys():
                     if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:

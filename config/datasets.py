@@ -29,7 +29,6 @@ Defines the names and properties of the MC datasets in signal, background and da
 import os
 import pandas
 
-#from config.data import data
 
 gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs.json')
 gen_weight = ['genweight/genEventSumw', 'MEweight_murNominal_mufNominal', 'PDFweight_0']

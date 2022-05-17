@@ -14,11 +14,13 @@ from ROOT import TH1, ROOT, TFile
 
 from helpers import getSystsplit, getDatasetInfo, get_event_weigths
 from config.general import general, getGridpaths, histopath, lumi
+from config.data import data
 from config.datasets import datasets
 from config.regions import regions
 from config.histograms import histograms
 from config.systematics import systematics
 
+datasets.update(data)
 
 TH1.SetDefaultSumw2(True)
 TH1.StatOverflows(True)
@@ -49,14 +51,13 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     print(f'Region: {region}')
     print(f'Systematic: {systematic}')
 
-
-
     gridpaths = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])
+
     inFileName = gridpaths[number]
     outFileName = histopath(year=year, region=region, dataset=dataset, systematic=systematic, number=number)
 
     # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
-    datasetInfo = getDatasetInfo(gridpaths)
+    datasetInfo = getDatasetInfo(gridpaths, MC=datasets[dataset]['MC'])
 
     weights = get_event_weigths(year, dataset, systematic, datasetInfo)
     print('EventWeights: {}'.format(weights))
@@ -73,7 +74,9 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
             df_out = df_out.Filter(cut, cut)
 
     if 'Filter' in regions[region].keys():
-        mask = regions[region]['Filter'].replace('nominal', systematic)
+        mask = regions[region]['Filter']
+        if datasets[dataset]['MC']:
+            mask = mask.replace('nominal', systematic)
         print(f'Applying region filter: {mask}')
         df_out = df_out.Filter(mask, region)
 
@@ -87,8 +90,9 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
         systematic, direction = getSystsplit(systematic)
         branchname = histograms[histname]['Branch'].replace('nominal', systematic)
 
-        if 'Branch' in systematics[systematic].keys():
-            branchname = branchname.replace('nominal', systematics[systematic]['Branch'][direction])
+        if datasets[dataset]['MC']:
+            if 'Branch' in systematics[systematic].keys():
+                branchname = branchname.replace('nominal', systematics[systematic]['Branch'][direction])
 
         print(f'Reading from branch "{branchname}"...')
 
@@ -98,7 +102,10 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
             continue
 
         if 'Expression' in histograms[histname].keys():
-            expression = histograms[histname]['Expression'].replace('nominal', systematic)
+            expression = histograms[histname]['Expression']
+            if datasets[dataset]['MC']:
+                expression = expression.replace('nominal', systematic)
+
             print(f'\nAdding temporary branch "{histname}" from Expression: {expression}')
             df_out = df_out.Define(branchname, expression)
 
@@ -122,13 +129,14 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                                                       histogram['xmax']),
                                                   branchname, 'w')
 
-            # apply global scale
-            scale = datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
-            histos[histname].Scale(scale)
+            # apply global scale for MC
+            if datasets[dataset]['MC']:
+                scale = datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
+                histos[histname].Scale(scale)
 
-            print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
-            print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) \
-* {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi)")
+                print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
+                print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) \
+    * {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi)")
 
         else:
             print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
