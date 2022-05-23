@@ -131,12 +131,12 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
 
             # apply global scale for MC
             if datasets[dataset]['MC']:
-                scale = datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
+                scale = 1000 * datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
                 histos[histname].Scale(scale)
 
                 print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
-                print(f"scaled with {scale:.3g} = {datasets[dataset]['XS']:.1f}(XS) \
-    * {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi)")
+                print(f"scaled with {scale:.3g} = {1000*datasets[dataset]['XS']:.1f}(XS in fb) \
+    * {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi in 1/fb)")
 
         else:
             print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
