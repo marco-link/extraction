@@ -6,6 +6,7 @@ View arguments with ``python python/plot_branch.py -h``.
 """
 
 import os
+import numpy
 import argparse
 import uproot
 import matplotlib
@@ -13,6 +14,7 @@ import matplotlib.pyplot
 import mplhep
 
 from config.general import general, lumi, histopath
+from config.data import data
 from config.datasets import datasets, background
 from config.histograms import histograms
 
@@ -34,12 +36,34 @@ def plot(year, region, systematic, histo, signal):
     fig = matplotlib.pyplot.figure(figsize=(12, 12))
     plot = fig.add_subplot(111)
 
+
+    # data
+    datahistos = []
+    for dataset in data:
+        with uproot.open(histopath(year=year,
+                                   dataset=dataset,
+                                   region=region,
+                                   systematic=None)) as infile:
+            datahistos.append(infile[general['Histodir']][histo].to_numpy())
+
+    datahistos = numpy.array(datahistos, dtype=object)
+
+    mplhep.histplot((numpy.sum(datahistos.T[0]), datahistos[0][1]),
+                    ax=plot,
+                    yerr=True,
+                    histtype='errorbar',
+                    color='k',
+                    label='data',
+                    density='density' in histogram['Plot'])
+
+    # MC
     histos = []
     labels = []
     colors = []
 
     datasetlist = [signal] + list(background.keys())
     datasetlist.reverse()
+
     for dataset in datasetlist:
         if 'datasets' in histogram.keys() and dataset not in histogram['datasets']:
             print('Skipping histogram plotting for "{}" (histogram not defined for "{}" dataset)'.format(histo, dataset))
@@ -68,6 +92,9 @@ def plot(year, region, systematic, histo, signal):
                     color=colors,
                     label=labels,
                     density='density' in histogram['Plot'])
+
+
+    # visuals
     mplhep.cms.label(loc=1, ax=plot, data=False, paper=False, lumi=lumi[year])
 
     if 'Xlabel' in histogram.keys():
@@ -84,7 +111,10 @@ def plot(year, region, systematic, histo, signal):
         plot.set_xlim(histogram['Histogram']['xmin'], histogram['Histogram']['xmax'])
 
     if 'nolegend' not in histogram['Plot']:
-        plot.legend(frameon=True, framealpha=0.4, edgecolor='w', loc=4)
+        handles, labels = plot.get_legend_handles_labels()
+        handles = [handles[-1]] + handles[:-1]
+        labels = [labels[-1]] + labels[:-1]
+        plot.legend(handles, labels, frameon=True, framealpha=0.4, edgecolor='w', loc=4)
 
     if 'logX' in histogram['Plot']:
         plot.set_xscale('log')
@@ -111,7 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('--region', type=str, required=True,
                         help='region to process')
 
-    parser.add_argument('--systematic', type=str, default='nom',
+    parser.add_argument('--systematic', type=str, default='nominal',
                         help='systematic to process')
 
     parser.add_argument('--histo', type=str, default='none',
