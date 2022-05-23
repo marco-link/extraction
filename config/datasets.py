@@ -31,7 +31,9 @@ import pandas
 
 
 gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs.json')
-gen_weight = ['genweight/genEventSumw', 'MEweight_murNominal_mufNominal', 'PDFweight_0']
+gen_weight = ['genweight/genEventSumw']
+me_weight = ['MEweight_murNominal_mufNominal']
+pdf_weight = ['PDFweight_0']
 
 weights_electron = []
 weights_muon = ['tightMuons_weight_id_nominal', 'tightMuons_weight_iso_nominal']
@@ -60,7 +62,7 @@ for index in gen_json.keys():
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017 + ['LHEWeights_width_{}'.format(index)],
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017 + ['LHEWeights_width_{}'.format(index)],
         },
     }
 # TODO cut option
@@ -80,7 +82,7 @@ background = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017,
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017,
         },
     },
 
@@ -97,7 +99,7 @@ background = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017,
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017,
         },
     },
 
@@ -114,7 +116,7 @@ background = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017,
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017,
         },
     },
 
@@ -131,7 +133,7 @@ background = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017,
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017,
         },
     },
 
@@ -148,7 +150,7 @@ background = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017,
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017,
         },
     },
 
@@ -165,7 +167,7 @@ background = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weight + weights + weights_2017,
+            'EventWeights': gen_weight + me_weight + pdf_weight + weights + weights_2017,
         },
     },
 
@@ -251,7 +253,7 @@ background = {
         #},
         #'2017': {
             #'KFactor': 1.,
-            #'EventWeights': gen_weight + weights + weights_2017,
+            #'EventWeights': gen_weight + me_weight + weights + weights_2017,
         #},
     #},
 
@@ -268,7 +270,7 @@ background = {
         #},
         #'2017': {
             #'KFactor': 1.,
-            #'EventWeights': gen_weight + weights + weights_2017,
+            #'EventWeights': gen_weight + me_weight + weights + weights_2017,
         #},
     #},
 
@@ -285,7 +287,7 @@ background = {
         #},
         #'2017': {
             #'KFactor': 1.,
-            #'EventWeights': gen_weight + weights + weights_2017,
+            #'EventWeights': gen_weight + me_weight + weights + weights_2017,
         #},
     #},
 
@@ -302,7 +304,7 @@ background = {
         #},
         #'2017': {
             #'KFactor': 1.,
-            #'EventWeights': gen_weight + weights + weights_2017,
+            #'EventWeights': gen_weight + me_weight + weights + weights_2017,
         #},
     #},
 
@@ -319,7 +321,7 @@ background = {
         #},
         #'2017': {
             #'KFactor': 1.,
-            #'EventWeights': gen_weight + weights + weights_2017,
+            #'EventWeights': gen_weight + me_weight + weights + weights_2017,
         #},
     #},
 
