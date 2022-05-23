@@ -21,6 +21,7 @@ class HistoTask(HTCondorBaseTask):
     """
     year = luigi.Parameter()
     max_runtime = 8 #hours
+    parallel_jobs = 400
 
     def create_branch_map(self):
         """

@@ -64,7 +64,7 @@ class AllMergeHistoTasks(law.WrapperTask):
         for region in regions.keys():
             # data merging
             for dataset in data.keys():
-                yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic='')
+                yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic='None')
 
             # MC merging
             for dataset in datasets.keys():
