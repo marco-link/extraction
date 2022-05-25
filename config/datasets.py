@@ -32,7 +32,7 @@ import pandas
 
 gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs.json')
 
-gen_weights = ['genweight/genEventSumw', 'fragCP5BLVsPt']
+gen_weights = ['genweight/genEventSumw', 'fragEventWeight_fragCP5BLVsPt']
 me_weight = ['MEweight_murNominal_mufNominal']
 pdf_weight = ['PDFweight_0']
 
