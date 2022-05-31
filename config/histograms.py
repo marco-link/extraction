@@ -39,7 +39,7 @@ histograms = {
 
     'top_mass': {
         'Title': '',
-        'Xlabel': 'm_{t}',
+        'Xlabel': '$m_{t}$',
         'Plot': plotoptions,
         'Branch': 'top_mass_nominal',
         'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 800},
@@ -63,7 +63,7 @@ histograms = {
 
     'mtw': {
         'Title': '',
-        'Xlabel': 'MET',
+        'Xlabel': 'MTW',
         'Plot': plotoptions,
         'Branch': 'mtw_nominal',
         'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 300},

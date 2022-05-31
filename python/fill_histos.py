@@ -88,11 +88,14 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     histos = {}
     for histname in histograms.keys():
         systematic, direction = getSystsplit(systematic)
-        branchname = histograms[histname]['Branch'].replace('nominal', systematic)
+        branchname = histograms[histname]['Branch']
 
         if datasets[dataset]['MC']:
+            branchname = histograms[histname]['Branch'].replace('nominal', systematic)
+
             if 'Branch' in systematics[systematic].keys():
                 branchname = branchname.replace('nominal', systematics[systematic]['Branch'][direction])
+
 
         print(f'Reading from branch "{branchname}"...')
 
