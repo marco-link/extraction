@@ -25,8 +25,6 @@ datasets.update(data)
 TH1.SetDefaultSumw2(True)
 TH1.StatOverflows(True)
 
-# enable multi-threading
-ROOT.EnableImplicitMT()
 RDF = ROOT.RDataFrame
 TM1 = ROOT.RDF.TH1DModel
 
@@ -63,25 +61,23 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     print('EventWeights: {}'.format(weights))
 
     print('\nOPENING INPUT FILE AND CREATING DATAFRAME')
-    df_in = RDF(general['Tree'], inFileName)
-    df_out = df_in
-
+    dataframe = RDF(general['Tree'], inFileName)
 
 
     for cut in cuts:
         if cut != 'none':
             print(f'Applying additional cut: {cut}')
-            df_out = df_out.Filter(cut, cut)
+            dataframe = dataframe.Filter(cut, cut)
 
     if 'Filter' in regions[region].keys():
         mask = regions[region]['Filter']
         if datasets[dataset]['MC']:
             mask = mask.replace('nominal', systematic)
         print(f'Applying region filter: {mask}')
-        df_out = df_out.Filter(mask, region)
+        dataframe = dataframe.Filter(mask, region)
 
 
-    df_out = df_out.Define('w', weights)
+    dataframe = dataframe.Define('w', weights)
 
 
     print('\nLOOPING OVER HISTOGRAMS')
@@ -110,27 +106,27 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                 expression = expression.replace('nominal', systematic)
 
             print(f'\nAdding temporary branch "{histname}" from Expression: {expression}')
-            df_out = df_out.Define(branchname, expression)
+            dataframe = dataframe.Define(branchname, expression)
 
-        if branchname in df_out.GetColumnNames():
+        if branchname in dataframe.GetColumnNames():
             histogram = {}
             if 'Histogram' in histograms[histname].keys():
                 histogram = histograms[histname]['Histogram']
 
             print(f'Adding histogram for {histname} with weights {weights}')
             if 'varbins' in histogram.keys():
-                histos[histname] = df_out.Histo1D(TM1(histname,
-                                                      histname,
-                                                      histogram['nbins'],
-                                                      numpy.array(histogram['varbins'])),
-                                                  branchname, 'w')
+                histos[histname] = dataframe.Histo1D(TM1(histname,
+                                                     histname,
+                                                     histogram['nbins'],
+                                                     numpy.array(histogram['varbins'])),
+                                                     branchname, 'w')
             else:
-                histos[histname] = df_out.Histo1D(TM1(histname,
-                                                      histname,
-                                                      histogram['nbins'],
-                                                      histogram['xmin'],
-                                                      histogram['xmax']),
-                                                  branchname, 'w')
+                histos[histname] = dataframe.Histo1D(TM1(histname,
+                                                     histname,
+                                                     histogram['nbins'],
+                                                     histogram['xmin'],
+                                                     histogram['xmax']),
+                                                     branchname, 'w')
 
             # apply global scale for MC
             if datasets[dataset]['MC']:
@@ -153,7 +149,7 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
 
     print('\nFILLING HISTOGRAMS')
 
-    report = df_out.Report()
+    report = dataframe.Report()
 
     outFile = TFile(outFileName, 'UPDATE')
     histoDir = outFile.Get(general['Histodir'])
