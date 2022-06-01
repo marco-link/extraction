@@ -22,6 +22,7 @@ matplotlib.use('Agg')
 matplotlib.pyplot.style.use(mplhep.style.CMS)
 
 
+
 def plot(year, region, systematic, histo, signal):
     """
     plot a histogram for a specific year, region and systematic.
@@ -33,8 +34,9 @@ def plot(year, region, systematic, histo, signal):
     """
     histogram = histograms[histo]
 
-    fig = matplotlib.pyplot.figure(figsize=(12, 12))
-    plot = fig.add_subplot(111)
+    fig = matplotlib.pyplot.figure(figsize=(12, 14))
+    gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 1])
+    plot = fig.add_subplot(gs[0])
 
 
     # data
@@ -121,6 +123,42 @@ def plot(year, region, systematic, histo, signal):
 
     if 'logY' in histogram['Plot']:
         plot.set_yscale('log')
+
+
+
+
+
+
+
+    # data/MC ratio plot
+    rplot = fig.add_subplot(gs[1], sharex=plot)
+
+    x = datahistos[0][1]
+    ratio = numpy.sum(datahistos.T[0])
+    simulation = numpy.zeros(shape=len(ratio))
+    for h in histos:
+        simulation += h.to_numpy()[0]
+
+    ratio = ratio / simulation
+
+
+    mplhep.histplot((ratio, datahistos[0][1]),
+                    ax=rplot,
+                    yerr=False,
+                    histtype='errorbar',
+                    color='k',
+                    label='ratio')
+
+    rplot.hlines(1, x[0], x[-1], colors='k', lw=0.5)
+
+    if 'Xlabel' in histogram.keys():
+        rplot.set_xlabel(histogram['Xlabel'], x=1.0, ha='right')
+    else:
+        rplot.set_xlabel(histo, x=1.0, ha='right')
+    rplot.set_ylabel('data/MC', verticalalignment='bottom', y=1.0)
+    rplot.set_ylim(0.8, 1.2)
+
+
 
     path = general['PlotPath'] + f'/{year}/{region}/{systematic}/'
     os.makedirs(path, exist_ok=True)
