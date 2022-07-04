@@ -4,7 +4,7 @@
 # only works on ETP infrastructure (sorry \_O_/)
 
 
-SAMPLEVERSION="2022-04-20_v4"
+SAMPLEVERSION="2022-07-01_v6"
 
 SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/$SAMPLEVERSION/2017"
 OUTDIR="/ceph/mlink/WbNanoAODTools/$SAMPLEVERSION/"

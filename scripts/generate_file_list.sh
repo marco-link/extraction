@@ -3,8 +3,8 @@
 # script to merge the datasets from NanoAODTools output
 # only works on ETP infrastructure (sorry \_O_/)
 
-GRIDPATH="root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/2017"
-SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/2017"
+GRIDPATH="root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017/"
+SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/mc/2017/"
 
 OUTDIR="./config/newfilelists"
 
