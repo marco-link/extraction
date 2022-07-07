@@ -28,44 +28,55 @@ plotoptions = []
 
 
 histograms = {
-    #'parton_top_mass': {
-        #'Branch': 'partonLevel_top_mass',
-        #'Histogram': {'nbins': 35, 'xmin': 0, 'xmax': 350},
-        #'datasets': signal,
-        #'Title': '',
-        #'Xlabel': 'partonLevel top mass',
-    #},
+    'lepton_pt': {
+        'Title': '',
+        'Xlabel': 'lepton pt',
+        'Plot': plotoptions,
+        'Branch': 'lepton_pt',
+        'Expression': 'if(ntightMuons==1) {return tightMuons_pt[0];} else {return tightElectrons_pt[0];}',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 400},
+    },
 
-    ##'Reco_Wb': {
-        ##'Title': '',
-        ##'Xlabel': 'Reco_Wb_mass',
-        ##'Plot': plotoptions,
-        ##'Branch': 'Reco_Wb_mass',
-        ##'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 500},
-    ##},
+    'top_mass': {
+        'Title': '',
+        'Xlabel': '$m_{t}$',
+        'Plot': plotoptions,
+        'Branch': 'top_mass_nominal',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 800},
+    },
 
-    #'top_mass': {
-        #'Title': '',
-        #'Xlabel': 'm_{t}',
-        #'Plot': plotoptions,
-        #'Branch': 'top_mass_nominal',
-        #'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
-    #},
+    'top_pt': {
+        'Title': '',
+        'Xlabel': 'top pt',
+        'Plot': plotoptions,
+        'Branch': 'top_pt_nominal',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 400},
+    },
 
-    #'met': {
-        #'Title': '',
-        #'Xlabel': 'MET',
-        #'Plot': plotoptions,
-        #'Branch': 'met_nominal',
-        #'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
-    #},
+    'met': {
+        'Title': '',
+        'Xlabel': 'MET',
+        'Plot': plotoptions,
+        'Branch': 'met_nominal',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
+    },
 
-    'fitcategories': {
-        'Branch': 'fit_category',
-        'Expression': 'int x = 1; if(std::fabs(top_mass_nominal-172.5)<25.) {x++;} \
-            if(ntightMuons==1) {return x * tightMuons_charge[0];} else {return x * tightElectrons_charge[0];}',
-        'Histogram': {'nbins': 5, 'xmin': -2.5, 'xmax': 2.5},
-        'Title': 'Fit categories',
+    'mtw': {
+        'Title': '',
+        'Xlabel': 'MTW',
+        'Plot': plotoptions,
+        'Branch': 'mtw_nominal',
+        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 300},
+    },
+
+    'fitbins': {
+        'Branch': 'fitBins',
+        'Expression': 'int x = 0; \
+            if(std::fabs(top_mass_nominal-172.5)<25.) x++; \
+            if(ntightMuons==1) { if(tightMuons_charge[0]>0) x += 2; } else {  if(tightElectrons_charge[0]>0) x += 2; } \
+            return x;',
+        'Histogram': {'nbins': 4, 'xmin': -0.5, 'xmax': 3.5},
+        'Title': 'Fit bins',
         'Xlabel': 'category',
         'Plot': plotoptions,
     },

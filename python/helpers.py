@@ -24,11 +24,12 @@ def getSystsplit(systematic):
     return sys_name, direction
 
 
-def getDatasetInfo(paths):
+def getDatasetInfo(paths, MC):
     """
     Reads dataset information from `Runs` Tree of all files in a dataset
 
     :param paths: full list of dataset file paths
+    :param MC: dataset is MC
     :returns: dict of entries
     """
     globalInfo = {
@@ -39,34 +40,34 @@ def getDatasetInfo(paths):
         'LHEPdfSumw': None,
     }
 
+    if MC:
+        for path in paths:
+            print('Reading dataset info from {}:'.format(path))
+            inFile = ROOT.TFile.Open(path, 'READ')
+            tree = inFile.Get('Runs')
 
-    for path in paths:
-        print('Reading dataset info from {}:'.format(path))
-        inFile = ROOT.TFile.Open(path, 'READ')
-        tree = inFile.Get('Runs')
+            # loop over entries
+            for entry in tree:
+                for label in globalInfo:
+                    val = getattr(entry, label)
+                    if hasattr(val, '__add__'):
+                        if globalInfo[label] is None:
+                            globalInfo[label] = 0
 
-        # loop over entries
-        for entry in tree:
-            for label in globalInfo:
-                val = getattr(entry, label)
-                if hasattr(val, '__add__'):
-                    if globalInfo[label] is None:
-                        globalInfo[label] = 0
-
-                    globalInfo[label] += val
-                else:
-                    # fill list with zeros
-                    if globalInfo[label] is None:
-                        globalInfo[label] = [0] * len(val)
-
-                    # sum up over list
-                    if len(globalInfo[label]) == len(val):
-                        for i in range(len(val)):
-                            globalInfo[label][i] += val[i]
+                        globalInfo[label] += val
                     else:
-                        raise(Exception('array length mismatch!'))
+                        # fill list with zeros
+                        if globalInfo[label] is None:
+                            globalInfo[label] = [0] * len(val)
 
-        inFile.Close()
+                        # sum up over list
+                        if len(globalInfo[label]) == len(val):
+                            for i in range(len(val)):
+                                globalInfo[label][i] += val[i]
+                        else:
+                            raise(Exception('array length mismatch!'))
+
+            inFile.Close()
 
 
     # flatten lists in dictionary
@@ -100,27 +101,26 @@ def get_event_weigths(year, dataset, systematic, constants={}):
     """
     weightstring = '1'
 
-    if 'EventWeights' in datasets[dataset][year].keys():
-        for weight in datasets[dataset][year]['EventWeights']:
-            if not weight:
-                continue
-            else:
-                weightstring += '*({})'.format(weight)
-
-
-
-    sys_name, direction = getSystsplit(systematic)
-    if sys_name in systematics.keys():
-        if 'EventWeights' in systematics[sys_name].keys():
-            for weight in systematics[sys_name]['EventWeights'][direction]:
+    if datasets[dataset]['MC']:
+        if 'EventWeights' in datasets[dataset][year].keys():
+            for weight in datasets[dataset][year]['EventWeights']:
                 if not weight:
                     continue
                 else:
                     weightstring += '*({})'.format(weight)
 
-    for c in constants.keys():
-        weightstring = weightstring.replace(c, '{:.6f}'.format(constants[c]))
 
-    print(weightstring)
+
+        sys_name, direction = getSystsplit(systematic)
+        if sys_name in systematics.keys():
+            if 'EventWeights' in systematics[sys_name].keys():
+                for weight in systematics[sys_name]['EventWeights'][direction]:
+                    if not weight:
+                        continue
+                    else:
+                        weightstring += '*({})'.format(weight)
+
+        for c in constants.keys():
+            weightstring = weightstring.replace(c, '{:.6f}'.format(constants[c]))
 
     return weightstring
