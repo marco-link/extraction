@@ -63,7 +63,8 @@ for index in gen_json.keys():
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + me_weight + pdf_weight + weights + weights_2017 + ['LHEWeights_width_{}'.format(index)],
+            'EventWeights': gen_weights + me_weight + pdf_weight + weights + weights_2017
+                            + ['LHEWeight_width_{i}/LHESumw_width_{i}'.format(i=index)],
         },
     }
 # TODO cut option

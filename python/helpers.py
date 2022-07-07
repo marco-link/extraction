@@ -40,6 +40,11 @@ def getDatasetInfo(paths, MC):
         'LHEPdfSumw': None,
     }
 
+    if 'WbjToLNu' in paths[0]:
+        for i in range(105):
+            globalInfo['LHESumw_width_{}'.format(i + 1)] = 0
+
+
     if MC:
         for path in paths:
             print('Reading dataset info from {}:'.format(path))
@@ -120,7 +125,11 @@ def get_event_weigths(year, dataset, systematic, constants={}):
                     else:
                         weightstring += '*({})'.format(weight)
 
-        for c in constants.keys():
-            weightstring = weightstring.replace(c, '{:.6f}'.format(constants[c]))
+
+        # replace sum over all samples with actual value
+        weightkeys = sorted(constants.keys(), key=lambda l: (len(l), l))
+        weightkeys.reverse()
+        for key in weightkeys:
+            weightstring = weightstring.replace(key, '{:.6f}'.format(constants[key]))
 
     return weightstring
