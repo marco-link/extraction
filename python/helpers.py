@@ -7,6 +7,7 @@ Defines some general helper functions
 
 
 import ROOT
+import numpy
 from config.datasets import datasets
 from config.systematics import systematics
 
@@ -53,41 +54,50 @@ def getDatasetInfo(paths, MC):
 
             # loop over entries
             for entry in tree:
+                gensum = getattr(entry, 'genEventSumw')
+
                 for label in globalInfo:
                     val = getattr(entry, label)
+
+                    # sum up absolute weight sums
                     if hasattr(val, '__add__'):
                         if globalInfo[label] is None:
                             globalInfo[label] = 0
 
-                        globalInfo[label] += val
+                        if 'genEvent' in label:
+                            globalInfo[label] += val
+                        else:
+                            globalInfo[label] += val * gensum
                     else:
-                        # fill list with zeros
                         if globalInfo[label] is None:
-                            globalInfo[label] = [0] * len(val)
+                            globalInfo[label] = numpy.zeros(len(val))
 
                         # sum up over list
                         if len(globalInfo[label]) == len(val):
-                            for i in range(len(val)):
-                                globalInfo[label][i] += val[i]
+                            globalInfo[label] += numpy.array(val) * gensum
                         else:
                             raise(Exception('array length mismatch!'))
 
             inFile.Close()
 
 
-    # flatten lists in dictionary
+    # flatten arrays in dictionary
     tmp = {}
     for label in globalInfo:
-        if isinstance(globalInfo[label], list):
+        if isinstance(globalInfo[label], numpy.ndarray):
             for i, val in enumerate(globalInfo[label]):
                 tmp[label + '_{}'.format(i)] = val
     globalInfo.update(tmp)
 
-    # remove list items
-    globalInfo = {key: val for key, val in globalInfo.items() if not isinstance(val, list)}
+    # remove arrays items
+    globalInfo = {key: val for key, val in globalInfo.items() if not isinstance(val, numpy.ndarray)}
 
     print('\n\n----- GlobalInfo -----')
     for label in globalInfo:
+        # convert to relative weight
+        if 'genEvent' not in label:
+            globalInfo[label] = globalInfo[label] / globalInfo['genEventSumw']
+
         print(f'{label}: {globalInfo[label]}')
     print('----------------------')
 
