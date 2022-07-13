@@ -130,9 +130,10 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                                                      branchname, 'w')
 
             # apply global scale for MC
+            scale = 1.
             if datasets[dataset]['MC']:
                 scale = 1000 * datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
-                scales[histname] = scale
+            scales[histname] = scale
 
         else:
             print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
