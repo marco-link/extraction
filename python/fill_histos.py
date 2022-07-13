@@ -129,7 +129,9 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                                                      histogram['xmax']),
                                                      branchname, 'w')
 
-            # apply global scale for MC
+            # determine scales
+            # do not ask for the histogram entries or anything that requires processing
+            # the ntuple at this step!!!
             scale = 1.
             if datasets[dataset]['MC']:
                 scale = 1000 * datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
