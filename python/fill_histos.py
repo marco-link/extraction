@@ -82,7 +82,7 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
 
     print('\nLOOPING OVER HISTOGRAMS')
     histos = {}
-    scales = {}
+
     for histname in histograms.keys():
         systematic, direction = getSystsplit(systematic)
         branchname = histograms[histname]['Branch']
@@ -129,14 +129,9 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
                                                      histogram['xmax']),
                                                      branchname, 'w')
 
-            # determine scales
+
             # do not ask for the histogram entries or anything that requires processing
             # the ntuple at this step!!!
-            scale = 1.
-            if datasets[dataset]['MC']:
-                scale = 1000 * datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
-            scales[histname] = scale
-
         else:
             print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
 
@@ -149,10 +144,20 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
 
     print('\nFILLING HISTOGRAMS')
 
+    scale = 1.
+    if datasets[dataset]['MC']:
+        scale = 1000 * datasets[dataset]['XS'] * datasets[dataset][year]['KFactor'] * lumi[year]
+
+    #this will trigger the event loop
+
     for histname in histograms.keys():
-        histos[histname].Scale(scales[histname])
+        print(histname)
+        histos[histname].Scale(scale)
+        print(f'selected {histos[histname].GetEntries()} events out of {datasetInfo["genEventCount"]} (genEventCount)')
+        print(f"scaled with {scale:.3g} = {1000*datasets[dataset]['XS']:.1f}(XS in fb) \
+* {datasets[dataset][year]['KFactor']}(K-factor) * {lumi[year]}(lumi in 1/fb)")
 
-
+    print('\nREPORT')
     report = dataframe.Report()
 
     outFile = TFile(outFileName, 'UPDATE')
