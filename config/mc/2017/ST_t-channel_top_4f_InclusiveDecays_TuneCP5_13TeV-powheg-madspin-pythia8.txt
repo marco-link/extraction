@@ -1,2 +1,0 @@
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_0000.root
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_0001.root

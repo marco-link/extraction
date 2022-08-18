@@ -1,1 +1,0 @@
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_0000.root

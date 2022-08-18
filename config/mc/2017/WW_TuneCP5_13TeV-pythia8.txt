@@ -1,1 +1,0 @@
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//WW_TuneCP5_13TeV-pythia8_0000.root

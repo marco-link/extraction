@@ -31,9 +31,8 @@ class HistoTask(HTCondorBaseTask):
         for region in regions.keys():
             # data
             for dataset in data.keys():
-                for i in range(len(getGridpaths(isMC=False,
-                                                year=self.year,
-                                                filename=data[dataset]['FileName']))):
+                for i in range(len(getGridpaths(year=self.year,
+                                                setname=data[dataset]['FileName']))):
                     branches.append([region, dataset, None, i])
 
             # MC
@@ -44,9 +43,8 @@ class HistoTask(HTCondorBaseTask):
                         # systematic is applied for this dataset
                         if 'datasets' not in systematics[systematic].keys() or dataset in systematics[systematic]['datasets']:
                             # loop over single input files
-                            for i in range(len(getGridpaths(isMC=True,
-                                                            year=self.year,
-                                                            filename=datasets[dataset]['FileName']))):
+                            for i in range(len(getGridpaths(year=self.year,
+                                                            setname=datasets[dataset]['FileName']))):
                                 if systematic == 'nominal':
                                     branches.append([region, dataset, systematic, i])
                                 else:

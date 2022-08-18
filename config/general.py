@@ -11,11 +11,11 @@ Contains global configuration options e.g. paths:
 
 
 import os
+import json
 
 general = {
-    'MCPath': './config/mc/',
-    'DataPath': './config/data/',
-    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/2022-05-17_v1/',
+    'DataSetsPath': '/eos/cms/store/cmst3/group/top/WbWb/nano/2022-07-12_v7',
+    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/2022-07-12_v7/' + os.getenv('USER') + '/',
     'CardPath': './output/cards/',
     'FitPath': './output/fits/',
     'PlotPath': './output/plots/',
@@ -44,27 +44,31 @@ lumi = {
 }
 
 
-def getGridpaths(isMC, year, filename):
+# some general path globals
+
+fnames = {
+    'sample_merge_rules': 'sample_merges.json',
+    'merge_success_tag': 'succ',
+    'sample_merged_file_list': 'merged_files.json'
+}
+
+
+
+def getGridpaths(year, setname):
     """
     Reads paths to NanoAOD files on the grid from the config files.
 
     :param isMC: set to True if the requested dataset is MC
     :param year: year of the dataset
-    :param filename: filename of the dataset
+    :param setname: long name of the dataset
     :returns: paths to files as list
     """
-    filepath = ''
-    if isMC:
-        filepath = general['MCPath'] + year + '/' + filename + '.txt'
-    else:
-        filepath = general['DataPath'] + year + '/' + filename + '.txt'
+    datasetdir = general['DataSetsPath'] + '/' + year + '/' + setname
 
-    filelist = []
-    with open(filepath, 'r') as files:
-        for f in files:
-            filelist.append(f.strip())
+    with open(datasetdir + '/' + fnames['sample_merged_file_list'], 'r') as f:
+        files = json.load(f)
+        return [datasetdir + '/' + r for r in files]
 
-    return filelist
 
 
 

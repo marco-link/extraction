@@ -49,13 +49,13 @@ def fillhistos(year, region, dataset, systematic, number, cuts):
     print(f'Region: {region}')
     print(f'Systematic: {systematic}')
 
-    gridpaths = getGridpaths(isMC=datasets[dataset]['MC'], year=year, filename=datasets[dataset]['FileName'])
+    gridpaths = getGridpaths(year=year, setname=datasets[dataset]['FileName'])
 
     inFileName = gridpaths[number]
     outFileName = histopath(year=year, region=region, dataset=dataset, systematic=systematic, number=number)
 
     # get original dataset size from number of entries (before cuts/filters) and preskim efficiency
-    datasetInfo = getDatasetInfo(gridpaths, MC=datasets[dataset]['MC'])
+    datasetInfo = getDatasetInfo(gridpaths, datasets[dataset])
 
     weights = get_event_weigths(year, dataset, systematic, datasetInfo)
     print('EventWeights: {}'.format(weights))

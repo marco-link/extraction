@@ -1,31 +1,66 @@
 #!/bin/bash
 
-# script to merge the datasets from NanoAODTools output
-# only works on ETP infrastructure (sorry \_O_/)
+
+VERSION="2022-07-12_v7"
+YEAR=2017
 
 
-SAMPLEVERSION="2022-07-01_v6"
+#prepare for more years and versions
+if [ $1 ]
+then
+    VERSION=$1
+fi
 
-SAMPLEPATH="/storage/gridka-nrg/mlink/WbNanoAODTools/$SAMPLEVERSION/2017"
-OUTDIR="/ceph/mlink/WbNanoAODTools/$SAMPLEVERSION/"
+if [ $2 ]
+then
+    YEAR=$2
+fi
+
+#BASEPATH="root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools"
+BASEPATH="/eos/cms/store/cmst3/group/top/WbWb/WbNanoAODTools/"
 
 
-mkdir -p $OUTDIR
-for sample in $SAMPLEPATH/*
+OUTDIR="/eos/cms/store/cmst3/group/top/WbWb/nano/"
+
+ALLSAMPLES=`list_samples.py $VERSION $YEAR --base_path $BASEPATH`
+
+DOIT="y"
+if [ -d ${OUTDIR}/${VERSION}/${YEAR} ]
+then
+    echo "output dir already exists. Are you sure you want to continue merging unmerged files? (y/n)"
+    read DOIT
+fi
+
+if [ ! $DOIT ] || [ $DOIT != 'y' ]
+then
+    echo "cancel"
+    exit
+fi
+
+rm -f "${OUTDIR}/${VERSION}/${YEAR}/sample_list.txt"
+rm -f "${OUTDIR}/${VERSION}/${YEAR}/merge_failed.txt"
+
+
+for sample in $ALLSAMPLES
 do
-    sample=${sample//$SAMPLEPATH/}
-    echo $sample
 
-    for shard in $SAMPLEPATH/$sample/*/*/*
-    do
-        echo $(basename $shard)
-        logfile=$OUTDIR/${sample}_$(basename $shard).txt
+    FULLPATH="${BASEPATH}/${VERSION}/${YEAR}/${sample}/WbNanoAODTools_${VERSION}"
+    OUTPATH="${OUTDIR}/${VERSION}/${YEAR}/${sample}"
 
-        if [ ! -f $logfile ];
-        then
-            python2 -u python/merge.py ${sample} $shard $OUTDIR/${sample}_$(basename $shard).root &> $logfile
-        else
-            echo "Already processed!"
-        fi
-    done
+    mkdir -p $OUTPATH
+    echo merging $FULLPATH to $OUTPATH ... "(${OUTPATH}/merge.log)"
+    #continue
+    merge.py $FULLPATH $OUTPATH > $OUTPATH/merge.log 2>&1
+
+    if [ $? != 0 ];
+    then
+       echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/merge_failed.txt
+    else
+       echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/sample_list.txt
+    fi
+
+    #exit
+
 done
+
+exit

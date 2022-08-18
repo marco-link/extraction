@@ -10,6 +10,7 @@ import ROOT
 import numpy
 from config.datasets import datasets
 from config.systematics import systematics
+from config.data import data as realdatadict
 
 
 def getSystsplit(systematic):
@@ -25,12 +26,38 @@ def getSystsplit(systematic):
     return sys_name, direction
 
 
-def getDatasetInfo(paths, MC):
+def datasetRegistered(setfilename: str):
+    """
+    Returns True if a dataset is registered
+    """
+    alldsets = datasets.copy()
+    alldsets.update(realdatadict)
+    for k in alldsets.keys():
+        if datasets[k]['FileName'] == setfilename:
+            return True
+    return False
+
+
+def datasetIsMC(setdirname: str):
+    """
+
+    returns isMC for a dataset that is registered, raises exception otherwise
+    """
+    alldsets = datasets.copy()
+    alldsets.update(realdatadict)
+    for k in alldsets.keys():
+        if datasets[k]['FileName'] == setdirname:
+            return datasets[k]['MC']
+
+    raise ValueError('dataset ' + setdirname + 'not registered')
+
+
+def getDatasetInfo(paths, dset):
     """
     Reads dataset information from `Runs` Tree of all files in a dataset
 
-    :param paths: full list of dataset file paths
-    :param MC: dataset is MC
+    :param paths: a list of files associated to dataset
+    :param dset: an entry of the dataset dictionary
     :returns: dict of entries
     """
     globalInfo = {
@@ -40,6 +67,8 @@ def getDatasetInfo(paths, MC):
         'LHEScaleSumw': None,
         'LHEPdfSumw': None,
     }
+
+    MC = dset['MC']
 
     if 'WbjToLNu' in paths[0]:
         for i in range(105):
