@@ -12,7 +12,8 @@ import ROOT
 import CombineHarvester.CombineTools.ch as ch
 # see https://cms-analysis.github.io/CombineHarvester/python-interface.html
 
-from config.general import general, histopath
+from config.general import general
+from helpers import histopath
 from config.datasets import signal, background
 from config.systematics import systematics
 

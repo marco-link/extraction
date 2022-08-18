@@ -5,7 +5,7 @@ import luigi
 
 from workflow.BaseTask import HTCondorBaseTask
 
-from config.general import histopath, getGridpaths
+from helpers import histopath, getGridpaths
 from config.data import data
 from config.datasets import datasets
 from config.regions import regions

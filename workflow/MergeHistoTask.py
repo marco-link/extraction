@@ -6,7 +6,7 @@ import luigi
 from workflow.BaseTask import BaseTask
 from workflow.HistoTask import HistoTask
 
-from config.general import histopath
+from helpers import histopath
 from config.regions import regions
 from config.data import data
 from config.datasets import datasets

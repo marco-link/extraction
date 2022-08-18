@@ -13,7 +13,8 @@ import matplotlib
 import matplotlib.pyplot
 import mplhep
 
-from config.general import general, lumi, histopath
+from config.general import general, lumi
+from helper import histopath
 from config.data import data
 from config.datasets import datasets, background
 from config.histograms import histograms

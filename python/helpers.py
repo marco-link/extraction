@@ -11,6 +11,25 @@ import numpy
 from config.datasets import datasets
 from config.systematics import systematics
 from config.data import data as realdatadict
+from config.general import general, fnames
+import json
+import os
+
+
+def getGridpaths(year, setname):
+    """
+    Reads paths to NanoAOD files on the grid from the config files.
+
+    :param isMC: set to True if the requested dataset is MC
+    :param year: year of the dataset
+    :param setname: long name of the dataset
+    :returns: paths to files as list
+    """
+    datasetdir = general['DataSetsPath'] + '/' + year + '/' + setname
+
+    with open(datasetdir + '/' + fnames['sample_merged_file_list'], 'r') as f:
+        files = json.load(f)
+        return [datasetdir + '/' + r for r in files]
 
 
 def getSystsplit(systematic):
@@ -74,6 +93,8 @@ def getDatasetInfo(paths, dset):
         for i in range(105):
             globalInfo['LHESumw_width_{}'.format(i + 1)] = 0
 
+    #this is slow in MT mode
+    ROOT.DisableImplicitMT()
 
     if MC:
         for path in paths:
@@ -130,6 +151,10 @@ def getDatasetInfo(paths, dset):
         print(f'{label}: {globalInfo[label]}')
     print('----------------------')
 
+    # get back to previous configuration
+    if general['EnableImplicitMT']:
+        ROOT.EnableImplicitMT()
+
     return globalInfo
 
 
@@ -172,3 +197,31 @@ def get_event_weigths(year, dataset, systematic, constants={}):
             weightstring = weightstring.replace(key, '{:.6f}'.format(constants[key]))
 
     return weightstring
+
+
+def histopath(year, region, dataset, systematic=None, number=None):
+    """
+    Generates path of the histogram file using the given parameters.
+    If the path doesn't exist it is generated.
+
+    :param year: year of the histogram
+    :param region: filename of the histogram
+    :param dataset: dataset label of the histogram
+    :param systematic: systematic of the histogram
+    :param number: file number, `None` for merged file
+    :returns: path to root file for the histograms
+    """
+    histodir = ''
+
+    if systematic is None or systematic == 'None':
+        histodir = general['HistoPath'] + '/data/{year}/{region}/'.format(year=year, region=region)
+    else:
+        histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
+
+    if not os.path.exists(histodir):
+        os.makedirs(histodir)
+
+    if number is None:
+        return histodir + dataset + '.root'
+    else:
+        return histodir + dataset + '_{}'.format(number) + '.root'

@@ -12,8 +12,8 @@ import argparse
 
 from ROOT import TH1, ROOT, TFile
 
-from helpers import getSystsplit, getDatasetInfo, get_event_weigths
-from config.general import general, getGridpaths, histopath, lumi
+from helpers import getSystsplit, getDatasetInfo, getGridpaths, histopath, get_event_weigths
+from config.general import general, lumi
 from config.data import data
 from config.datasets import datasets
 from config.regions import regions
@@ -28,6 +28,8 @@ TH1.StatOverflows(True)
 RDF = ROOT.RDataFrame
 TM1 = ROOT.RDF.TH1DModel
 
+if general['EnableImplicitMT']:
+    ROOT.EnableImplicitMT()
 
 
 def fillhistos(year, region, dataset, systematic, number, cuts):
