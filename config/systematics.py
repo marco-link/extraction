@@ -40,13 +40,13 @@ systematics = {
 
     #FIXME only test systematics!
 
-    #'CMS_JEC': {
-        #'type': 'shape',
+    'jesAbsolute_2017': {
+        'type': 'shape',
 
-        #'Branch': {'UP': 'jerUp',
-                   #'DOWN': 'jerDown'},
-        #'years': allyears,
-    #},
+        'Branch': {'UP': 'jesAbsolute_2017Up',
+                   'DOWN': 'jesAbsolute_2017Down'},
+        'years': '2017',
+    },
 
     #'CMS_Muon_id': {
         #'type': 'shape',

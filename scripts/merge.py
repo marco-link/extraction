@@ -11,8 +11,8 @@ import datetime
 import ROOT
 from grid_tools import get_all_sample_files
 import json
-from helpers import datasetRegistered, datasetIsMC
-from config.general import fnames
+from helpers import datasetRegistered, datasetIsMC, writeDatasetInfo, datasetKeysFromFileName
+from config.general import fnames, allyears
 from grid_tools import _syscall
 from multiprocessing import Pool
 from argparse import ArgumentParser
@@ -42,8 +42,8 @@ def read_entries_local(filepath):
 
     except Exception as e:
         print(filepath, 'has encountered issue', e, 'will skip.')
-        n_i_total = 0
-        n_i_selected = 0
+        n_i_total = -1
+        n_i_selected = -1
 
     return n_i_selected, n_i_total
 
@@ -78,7 +78,7 @@ def read_entries_xrootd(filepath):
 
     except Exception as e:
         print(filepath, 'has encountered issue', e, 'will skip.')
-        postskim, preskim = 0, 0
+        postskim, preskim = -1, -1
 
     # print('done')
     return postskim, preskim
@@ -131,7 +131,7 @@ def mergeFiles(args):
     if skip_existing:
         if os.path.isfile(summaryfile):
             print('+++ ALREADY EXISTS! Skipping', index, opath, ' +++')
-            return
+            return opath
 
     merger = ROOT.TFileMerger(False)
     merger.SetFastMethod(True)
@@ -183,8 +183,8 @@ def eventsPerFiles(allfiles):
 
 
 def cleanBrokenFiles(allfiles, evpf):
-    oevpf = [e for e in evpf if e[0] > 0]
-    oallf = [allfiles[i] for i in range(len(allfiles)) if evpf[i][0] > 0]
+    oevpf = [e for e in evpf if e[0] >= 0]
+    oallf = [allfiles[i] for i in range(len(allfiles)) if evpf[i][0] >= 0]
     return oallf, oevpf
 
 
@@ -264,8 +264,12 @@ def createOrLoadMergeRules(ipath, opath, eventsperfile, maxfiles=-1, recreate=Fa
               (1. - len(evpfn) / len(evpf)) * 100., '% of files')
         evpf = evpfn
     elif evpf != evpfn:
+        broken = []
+        for f in evpf:
+            if not f in evpfn:
+                broken.append(f)
         raise RuntimeError(
-            'Dataset is real data, and some files are broken. exiting')
+            'Dataset is real data, and some files are broken. exiting. Broken: ' + str(broken))
 
     if verbose:
         print('creating splits...')
@@ -277,7 +281,7 @@ def createOrLoadMergeRules(ipath, opath, eventsperfile, maxfiles=-1, recreate=Fa
     return m
 
 
-def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, verbose=True):
+def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True):
 
     # check if it needs to run
 
@@ -295,11 +299,12 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, verbose=True):
     datasetname = os.path.basename(os.path.normpath(opath))
 
     if not datasetRegistered(datasetname):
-        raise ValueError('dataset ' + datasetname + 'not registered. Choose an output path (last directory)\
-         compatible with dataset names in configs/datasets.py or configs/data.py')
+        raise ValueError(datasetname + ' error.\nDataset ' + datasetname + ' not registered. Choose an output path (last directory)\
+ compatible with dataset names in configs/datasets.py or configs/data.py')
 
     # defines if broken files may be skipped or not
     isMC = datasetIsMC(datasetname)
+    
 
     if isMC and verbose:
         print('dataset is MC')
@@ -330,14 +335,25 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, verbose=True):
     with Pool() as p:
         mfiles = p.map(mergeFiles, pool_inputs)
 
+    print(mfiles)
     with open(opath + '/' + fnames['sample_merged_file_list'], 'w') as f:
         json.dump([os.path.basename(e) for e in mfiles], f)
 
     # if everything worked up to here, without exceptions,
     # tag the merge as successful
+    
+    
+    datasetkeys = datasetKeysFromFileName(datasetname)
+    #add dataset info
+    for datasetkey in datasetkeys:
+        print(datasetkey)
+        writeDatasetInfo(year, datasetkey)
+    
     add_success_tag(opath)
     if verbose:
         print('done merging.')
+        
+        
 
 ############ call the script ###########
 
@@ -348,6 +364,8 @@ parser.add_argument(
     'inputPath', help='root path of the sample, e.g. .../WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8/WbNanoAODTools_2022-07-12_v7')
 parser.add_argument(
     'outputPath', help='output path where the merged files will be stored. This needs to be a directoy that may or may not already exist.')
+parser.add_argument(
+    'year', help='Year')
 
 # leave these hard coded, just for testing
 # parser.add_argument('--eventsperfile', default=300000, help = 'maximum events per merged output file.', type=int)
@@ -357,4 +375,7 @@ parser.add_argument('--overwrite', default=False,
                     help='Overwrite even if the merge has already been successful', action='store_true')
 args = parser.parse_args()
 
-doMerge(args.inputPath, args.outputPath, 300000, -1, args.overwrite)
+if not args.year in allyears:
+    raise ValueError(args.year + " unavailable as year. Available are "+str(allyears))
+
+doMerge(args.inputPath, args.outputPath, 3000000, -1, args.overwrite, year=args.year)

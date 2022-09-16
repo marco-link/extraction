@@ -10,11 +10,16 @@ Contains global configuration options e.g. paths:
 
 import os
 
+version='2022-07-12_v7'
+storagepath='/eos/cms/store/cmst3/group/top/WbWb/'
+
+if os.getenv("HOSTNAME", None) == 'lxplus8s10.cern.ch':
+    storagepath='/scratch/jkiesele/WbWb/'
 
 general = {
     'EnableImplicitMT': False, #this can be picked up wherever it makes sense
-    'DataSetsPath': '/eos/cms/store/cmst3/group/top/WbWb/nano/2022-07-12_v7',
-    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/2022-07-12_v7/' + os.getenv('USER') + '/',
+    'DataSetsPath': storagepath+'/nano/'+version,
+    'HistoPath': storagepath+'/histos/' + version + '/' + os.getenv('USER') + '/',
     'CardPath': './output/cards/',
     'FitPath': './output/fits/',
     'PlotPath': './output/plots/',

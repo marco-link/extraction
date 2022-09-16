@@ -6,10 +6,12 @@ import luigi
 from workflow.BaseTask import HTCondorBaseTask
 
 from helpers import histopath, getGridpaths
+from job_definition import createHistoFillJobBranches
 from config.data import data
 from config.datasets import datasets
 from config.regions import regions
 from config.systematics import systematics
+
 
 
 class HistoTask(HTCondorBaseTask):
@@ -26,32 +28,12 @@ class HistoTask(HTCondorBaseTask):
     def create_branch_map(self):
         """
         creates branchmap with an entry for input file
+        
+        FIXME: this needs a check of consistency with getGridpaths and data and datasets
         """
-        branches = []
-        for region in regions.keys():
-            # data
-            for dataset in data.keys():
-                for i in range(len(getGridpaths(year=self.year,
-                                                setname=data[dataset]['FileName']))):
-                    branches.append([region, dataset, None, i])
-
-            # MC
-            for dataset in datasets.keys():
-                for systematic in systematics.keys():
-                    # is shape systematic and applied in this year
-                    if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
-                        # systematic is applied for this dataset
-                        if 'datasets' not in systematics[systematic].keys() or dataset in systematics[systematic]['datasets']:
-                            # loop over single input files
-                            for i in range(len(getGridpaths(year=self.year,
-                                                            setname=datasets[dataset]['FileName']))):
-                                if systematic == 'nominal':
-                                    branches.append([region, dataset, systematic, i])
-                                else:
-                                    branches.append([region, dataset, systematic + 'UP', i])
-                                    branches.append([region, dataset, systematic + 'DOWN', i])
-
-        return dict(enumerate(branches))
+        
+        
+        return createHistoFillJobBranches(self.year)
 
     def htcondor_bootstrap_file(self):
         """
@@ -66,7 +48,7 @@ class HistoTask(HTCondorBaseTask):
         return histopath(year=self.year,
                          region=self.branch_data[0],
                          dataset=self.branch_data[1],
-                         systematic=self.branch_data[2],
+                         systematic='',
                          number=self.branch_data[3]).replace('.root', '.log')
 
     def output(self):

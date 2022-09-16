@@ -8,13 +8,17 @@ Defines some general helper functions
 
 import ROOT
 import numpy
-from config.datasets import datasets
+from config.datasets import datasets, all_samples
 from config.systematics import systematics
 from config.data import data as realdatadict
 from config.general import general, fnames
+from config.regions import regions
 import json
 import os
 
+
+def getDataSetDir(year, setname):
+    return general['DataSetsPath'] + '/' + year + '/' + setname
 
 def getGridpaths(year, setname):
     """
@@ -25,12 +29,17 @@ def getGridpaths(year, setname):
     :param setname: long name of the dataset
     :returns: paths to files as list
     """
-    datasetdir = general['DataSetsPath'] + '/' + year + '/' + setname
-
-    with open(datasetdir + '/' + fnames['sample_merged_file_list'], 'r') as f:
-        files = json.load(f)
-        return [datasetdir + '/' + r for r in files]
-
+    datasetdir = getDataSetDir(year, setname)
+    fname = datasetdir + '/' + fnames['sample_merged_file_list']
+    
+    try:
+        with open(datasetdir + '/' + fnames['sample_merged_file_list'], 'r') as f:
+            files = json.load(f)
+            return [datasetdir + '/' + r for r in files]
+        
+    except Exception as e:
+        print('issue with '+datasetdir + '/' + fnames['sample_merged_file_list'])
+        raise e
 
 def getSystsplit(systematic):
     """
@@ -40,21 +49,26 @@ def getSystsplit(systematic):
     :returns: systematic name, variation direction
     """
     sys_name = systematic.replace('UP', '').replace('DOWN', '')
+    sys_name = sys_name.replace('Up', '').replace('Down', '')
     direction = systematic.replace(sys_name, '')
-
+    direction=direction.upper()
     return sys_name, direction
 
+def datasetKeysFromFileName(setfilename: str):
+    """
+    One file name can have multiple keys
+    """
+    out=[]
+    for k in all_samples.keys():
+        if all_samples[k]['FileName'] == setfilename:
+            out.append(k)
+    return out
 
 def datasetRegistered(setfilename: str):
     """
     Returns True if a dataset is registered
     """
-    alldsets = datasets.copy()
-    alldsets.update(realdatadict)
-    for k in alldsets.keys():
-        if datasets[k]['FileName'] == setfilename:
-            return True
-    return False
+    return len(datasetKeysFromFileName(setfilename)) > 0
 
 
 def datasetIsMC(setdirname: str):
@@ -62,23 +76,24 @@ def datasetIsMC(setdirname: str):
 
     returns isMC for a dataset that is registered, raises exception otherwise
     """
-    alldsets = datasets.copy()
-    alldsets.update(realdatadict)
-    for k in alldsets.keys():
-        if datasets[k]['FileName'] == setdirname:
-            return datasets[k]['MC']
+    for k in all_samples.keys():
+        if all_samples[k]['FileName'] == setdirname:
+            return all_samples[k]['MC']
 
     raise ValueError('dataset ' + setdirname + 'not registered')
 
 
-def getDatasetInfo(paths, dset):
+
+def _getDatasetInfo(paths, dset_key, verbose=False):
     """
     Reads dataset information from `Runs` Tree of all files in a dataset
 
     :param paths: a list of files associated to dataset
-    :param dset: an entry of the dataset dictionary
+    :param dset_key: a key of the all_samples dictionary
     :returns: dict of entries
     """
+    
+    
     globalInfo = {
         'genEventCount': 0,
         'genEventSumw': 0,
@@ -87,18 +102,20 @@ def getDatasetInfo(paths, dset):
         'LHEPdfSumw': None,
     }
 
-    MC = dset['MC']
+    MC = all_samples[dset_key]['MC']
 
     if 'WbjToLNu' in paths[0]:
         for i in range(105):
             globalInfo['LHESumw_width_{}'.format(i + 1)] = 0
 
     #this is slow in MT mode
-    ROOT.DisableImplicitMT()
+    if ROOT.IsImplicitMTEnabled():
+        ROOT.DisableImplicitMT()
 
     if MC:
         for path in paths:
-            print('Reading dataset info from {}:'.format(path))
+            if verbose:
+                print('Reading dataset info from {}:'.format(path))
             inFile = ROOT.TFile.Open(path, 'READ')
             tree = inFile.Get('Runs')
 
@@ -142,20 +159,50 @@ def getDatasetInfo(paths, dset):
     # remove arrays items
     globalInfo = {key: val for key, val in globalInfo.items() if not isinstance(val, numpy.ndarray)}
 
-    print('\n\n----- GlobalInfo -----')
+    if verbose:
+        print('\n\n----- GlobalInfo -----')
     for label in globalInfo:
         # convert to relative weight
-        if 'genEvent' not in label:
+        if MC and 'genEvent' not in label:
             globalInfo[label] = globalInfo[label] / globalInfo['genEventSumw']
 
-        print(f'{label}: {globalInfo[label]}')
-    print('----------------------')
+        if verbose:
+            print(f'{label}: {globalInfo[label]}')
+    if verbose:
+        print('----------------------')
 
     # get back to previous configuration
-    if general['EnableImplicitMT']:
+    if general['EnableImplicitMT'] and not ROOT.IsImplicitMTEnabled():
         ROOT.EnableImplicitMT()
 
     return globalInfo
+
+
+
+def writeDatasetInfo(year, dsetkey, verbose=False):
+    dset = all_samples[dsetkey]
+    setname = dset['FileName']
+    gridpaths = getGridpaths(year=year, setname=setname)
+    d = _getDatasetInfo(gridpaths, dsetkey, verbose)
+    path = getDataSetDir(year, dset['FileName']) + '/' + dsetkey + '_preskimInfo.json'
+
+    with open(path, 'w') as f:
+        return json.dump(d,f)
+    
+def getDatasetInfo(year, dsetkey, verbose=False):
+    """
+    Reads dataset information from cached file
+
+    :param paths: a list of files associated to dataset
+    :param dset: an entry of the dataset dictionary
+    :returns: dict of entries
+    """
+    dset = all_samples[dsetkey]
+    # see if there is a cached dataset info already
+    path = getDataSetDir(year, dset['FileName']) + '/' + dsetkey + '_preskimInfo.json'
+    with open(path, 'r') as f:
+        return json.load(f)
+    
 
 
 def get_event_weigths(year, dataset, systematic, constants={}):
@@ -169,10 +216,12 @@ def get_event_weigths(year, dataset, systematic, constants={}):
     :returns: weightstring
     """
     weightstring = '1'
+    if systematic is None or systematic == 'None':
+        return weightstring
 
-    if datasets[dataset]['MC']:
-        if 'EventWeights' in datasets[dataset][year].keys():
-            for weight in datasets[dataset][year]['EventWeights']:
+    if all_samples[dataset]['MC']:
+        if 'EventWeights' in all_samples[dataset][year].keys():
+            for weight in all_samples[dataset][year]['EventWeights']:
                 if not weight:
                     continue
                 else:
@@ -199,7 +248,7 @@ def get_event_weigths(year, dataset, systematic, constants={}):
     return weightstring
 
 
-def histopath(year, region, dataset, systematic=None, number=None):
+def histopath(year, region, dataset, systematic=None, number=None, create_dir=True):
     """
     Generates path of the histogram file using the given parameters.
     If the path doesn't exist it is generated.
@@ -218,8 +267,11 @@ def histopath(year, region, dataset, systematic=None, number=None):
     else:
         histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
 
-    if not os.path.exists(histodir):
-        os.makedirs(histodir)
+    #not thread safe just go with sys call
+    if create_dir:
+        os.system('mkdir -p '+histodir)
+    #if not os.path.exists(histodir):
+    #    os.makedirs(histodir)
 
     if number is None:
         return histodir + dataset + '.root'

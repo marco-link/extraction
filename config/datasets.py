@@ -332,3 +332,9 @@ background = {
 
 datasets = signal.copy()
 datasets.update(background)
+
+from config.data import data
+all_samples = datasets.copy()
+all_samples.update(data)
+
+

@@ -24,6 +24,9 @@ OUTDIR="/eos/cms/store/cmst3/group/top/WbWb/nano/"
 
 ALLSAMPLES=`list_samples.py $VERSION $YEAR --base_path $BASEPATH`
 
+echo "merging ${ALLSAMPLES}"
+echo 
+
 DOIT="y"
 if [ -d ${OUTDIR}/${VERSION}/${YEAR} ]
 then
@@ -37,8 +40,8 @@ then
     exit
 fi
 
-rm -f "${OUTDIR}/${VERSION}/${YEAR}/sample_list.txt"
-rm -f "${OUTDIR}/${VERSION}/${YEAR}/merge_failed.txt"
+#rm -f "${OUTDIR}/${VERSION}/${YEAR}/sample_list.txt"
+#rm -f "${OUTDIR}/${VERSION}/${YEAR}/merge_failed.txt"
 
 
 for sample in $ALLSAMPLES
@@ -48,10 +51,10 @@ do
     OUTPATH="${OUTDIR}/${VERSION}/${YEAR}/${sample}"
 
     mkdir -p $OUTPATH
-    echo merging $FULLPATH to $OUTPATH ... "(${OUTPATH}/merge.log)"
+    # echo merging $FULLPATH to $OUTPATH ... "(${OUTPATH}/merge.log)"
     #continue
-    merge.py $FULLPATH $OUTPATH > $OUTPATH/merge.log 2>&1
-
+    echo merge.py $FULLPATH $OUTPATH $YEAR # > $OUTPATH/merge.log 2>&1
+    continue
     if [ $? != 0 ];
     then
        echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/merge_failed.txt
@@ -60,7 +63,7 @@ do
     fi
 
     #exit
-
+    
 done
 
 exit
