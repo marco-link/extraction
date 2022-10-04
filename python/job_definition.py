@@ -4,6 +4,7 @@ from config.datasets import datasets, all_samples
 from config.systematics import systematics
 from config.data import data as realdatadict
 from config.regions import regions
+from config.histograms import histograms
 
 from helpers import histopath, getGridpaths
     
@@ -63,3 +64,25 @@ def createHistoMergeJobBranches(year, create_dirs=False):
                         out.append(_entry(year, region, dataset, systematic+'Down'))
              
     return dict(enumerate(out))
+
+
+def createHistoPlotJobBranches(year, signal, only_nominal=True):
+    out=[]
+    for region in regions.keys():
+        for histo in histograms.keys():
+            if not only_nominal:
+                for systematic in systematics.keys():
+                    out.append({'year': year, 'region': region, 'syst': systematic, 'histo': histo, 'signal': signal})
+            else:
+                out.append({'year': year, 'region': region, 'syst': 'nominal', 'histo': histo, 'signal': signal})
+    
+    return out
+    
+    
+    
+    
+    
+    
+    
+    
+    

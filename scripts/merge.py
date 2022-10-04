@@ -51,7 +51,9 @@ def read_entries_local(filepath):
 # this is quite specitic now
 def read_entries_xrootd(filepath):
     '''
-    Returns entries in skimmed tree and entries before skim using xrootd
+    Returns entries in skimmed tree and entries before skim using xrootd.
+    The workaround using system calls is needed on machines that use CC8,
+    and does not hurt on CC7 machines, so I stuck to it.
     '''
 
     postskim, preskim = 0, 0
@@ -121,6 +123,17 @@ def fill_userinfo(eff, filepath):
 
 
 def mergeFiles(args):
+    '''
+    This function is the actual function to merge a set of files to one output file.
+    This could possibly also be run on the batch system.
+    Inputs:
+    - file list: which files to merge (absolute)
+    - entries list: how many pre skim, post skim entries these files have (for later bookkeeping)
+                    (one element of the output of events_per_file)
+    - output path: full absolute output path including .root
+    - index: the number of the file merge (only used for printouts)
+    - skip_existing: skips existing merged files and returns immediately
+    '''
     # opath with extension
 
     file_list, entries_list, opath, index, skip_existing = args
@@ -324,7 +337,7 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True
 
     # this part can also be run on batch with small modifications
     # since the merge rules have already been defined and saved above
-
+    
     if verbose:
         print('perform merging...')
 
@@ -332,22 +345,19 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True
     for i, descr in enumerate(m):
         pool_inputs.append((descr[1], descr[2], descr[0], i, not overwrite))
 
-    with Pool() as p:
+    # this could be sent to batch
+    with Pool(10) as p:
         mfiles = p.map(mergeFiles, pool_inputs)
 
-    print(mfiles)
+    #then wait and continue here
+    local_mfiles_paths = [os.path.basename(e) for e in mfiles]
     with open(opath + '/' + fnames['sample_merged_file_list'], 'w') as f:
-        json.dump([os.path.basename(e) for e in mfiles], f)
+        json.dump(local_mfiles_paths, f)
 
-    # if everything worked up to here, without exceptions,
-    # tag the merge as successful
-    
-    
     datasetkeys = datasetKeysFromFileName(datasetname)
     #add dataset info
     for datasetkey in datasetkeys:
-        print(datasetkey)
-        writeDatasetInfo(year, datasetkey)
+        writeDatasetInfo(year, datasetkey, inpaths=mfiles, outdir=opath)
     
     add_success_tag(opath)
     if verbose:
@@ -378,4 +388,4 @@ args = parser.parse_args()
 if not args.year in allyears:
     raise ValueError(args.year + " unavailable as year. Available are "+str(allyears))
 
-doMerge(args.inputPath, args.outputPath, 3000000, -1, args.overwrite, year=args.year)
+doMerge(args.inputPath, args.outputPath, 6000000, -1, args.overwrite, year=args.year)

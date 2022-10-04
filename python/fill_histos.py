@@ -59,6 +59,8 @@ def create_input_info(year, region, dataset_key, process_systematics: list, numb
                          'region': region,
                          'outputFile': outfile}
         
+        print(systematic, 'weight_sel_string', w[systematic]['weight_sel_string'])
+        
     inFileName = gridpaths[number]
     return inFileName, w
     
@@ -124,6 +126,7 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
             print('\nLOOPING OVER HISTOGRAMS FOR',systematic, datetime.datetime.now())
         
         for histname in histograms.keys():
+            
             base_systematic, direction = getSystsplit(systematic)
             branchname = histograms[histname]['Branch']
             if verbose:
@@ -153,7 +156,7 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
                 if verbose:
                     print(f'\nAdding temporary branch "{histname}" from Expression: {expression}')
                 dataframe = dataframe.Define(branchname, expression)
-        
+                
             if branchname in dataframe.GetColumnNames():
                 histogram = {}
                 if 'Histogram' in histograms[histname].keys():

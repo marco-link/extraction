@@ -179,14 +179,21 @@ def _getDatasetInfo(paths, dset_key, verbose=False):
 
 
 
-def writeDatasetInfo(year, dsetkey, verbose=False):
+def writeDatasetInfo(year, dsetkey, verbose=False, inpaths=None, outdir=None):
     dset = all_samples[dsetkey]
     setname = dset['FileName']
-    gridpaths = getGridpaths(year=year, setname=setname)
-    d = _getDatasetInfo(gridpaths, dsetkey, verbose)
-    path = getDataSetDir(year, dset['FileName']) + '/' + dsetkey + '_preskimInfo.json'
+    if inpaths is None:
+        inpaths = getGridpaths(year=year, setname=setname)
+    
+    print('>>>>',inpaths, dsetkey)
+    
+    d = _getDatasetInfo(inpaths, dsetkey, verbose)
+    if outdir is None:
+        outdir = getDataSetDir(year, dset['FileName'])
+        
+    opath = outdir + '/' + dsetkey + '_preskimInfo.json'
 
-    with open(path, 'w') as f:
+    with open(opath, 'w') as f:
         return json.dump(d,f)
     
 def getDatasetInfo(year, dsetkey, verbose=False):

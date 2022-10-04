@@ -60,10 +60,38 @@ templateRegions = {
     },
 }
 
-regions = {}
-for category in bChargeCategories:
-    for region in templateRegions:
-        regions[region + '_' + category[0]] = {
-            'Name': templateRegions[region]['Name'] + ' ' + category[0],
-            'Filter': templateRegions[region]['Filter'] + ' && ' + category[1],
-        }
+regions = {
+    
+    'ttbar_muon': {
+        'Name': 'ttbar muon+jets',
+        'Filter': '(ntightMuons == 1  && nselectedJets_nominal >= 4 && nselectedBJets_nominal == 2)',
+    },
+    #
+    #'inclusive_electron': {
+    #    'Name': 'inclusive one electron',
+    #    'Filter': '(ntightElectrons == 1)',
+    #},
+    # 2j1t
+    'signal_muonBpos': {
+        'Name': 'signal region (muon) Bpos',
+        'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightMuons == 1 && top_bjet_bChargeTag_highestScoreIndex_nominal == 3)',
+    },
+    'signal_muon': {
+        'Name': 'signal region (muon)',
+        'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightMuons == 1)',
+    },
+    
+    #'signal_electron': {
+    #    'Name': 'signal region (electron)',
+    #    'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightElectrons == 1)',
+    #},
+    
+    
+}
+#for category in bChargeCategories:
+#    for region in templateRegions:
+#        regions[region + '_' + category[0]] = {
+#            'Name': templateRegions[region]['Name'] + ' ' + category[0],
+#            'Filter': templateRegions[region]['Filter'] + ' && ' + category[1],
+#        }
+#

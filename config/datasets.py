@@ -242,39 +242,39 @@ background = {
     },
 
     #TODO check included in signal
-    #'ST_t_top': {
-        #'MC': True,
-        #'Signal': False,
-        #'FileName': 'ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8',
-        #'Label': 'WW',
-        #'Color': 'indigo',
-        #'XS': 136.02, #[4]
-        #'XSUncertainty': {
-            #'Up': 50, #TODO update
-            #'Down': 50, #TODO update
-        #},
-        #'2017': {
-            #'KFactor': 1.,
-            #'EventWeights': gen_weights + me_weight + weights + weights_2017,
-        #},
-    #},
-
-    #'ST_t_anti': {
-        #'MC': True,
-        #'Signal': False,
-        #'FileName': 'ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8',
-        #'Label': 'WW',
-        #'Color': 'rebeccapurple',
-        #'XS': 80.95, #[4]
-        #'XSUncertainty': {
-            #'Up': 50, #TODO update
-            #'Down': 50, #TODO update
-        #},
-        #'2017': {
-            #'KFactor': 1.,
-            #'EventWeights': gen_weights + me_weight + weights + weights_2017,
-        #},
-    #},
+  #  'ST_t_top': {
+  #      'MC': True,
+  #      'Signal': False,
+  #      'FileName': 'ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8',
+  #      'Label': 't t-ch',
+  #      'Color': 'indigo',
+  #      'XS': 136.02, #[4]
+  #      'XSUncertainty': {
+  #          'Up': 50, #TODO update
+  #          'Down': 50, #TODO update
+  #      },
+  #      '2017': {
+  #          'KFactor': 1.,
+  #          'EventWeights': gen_weights + me_weight + weights + weights_2017,
+  #      },
+  #  },
+  #
+  #  'ST_t_anti': {
+  #      'MC': True,
+  #      'Signal': False,
+  #      'FileName': 'ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8',
+  #      'Label': '#bar{t} t-ch',
+  #      'Color': 'rebeccapurple',
+  #      'XS': 80.95, #[4]
+  #      'XSUncertainty': {
+  #          'Up': 50, #TODO update
+  #          'Down': 50, #TODO update
+  #      },
+  #      '2017': {
+  #          'KFactor': 1.,
+  #          'EventWeights': gen_weights + me_weight + weights + weights_2017,
+  #      },
+  #  },
 
     #'ST_tW_top': {
         #'MC': True,

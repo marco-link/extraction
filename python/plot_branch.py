@@ -43,11 +43,15 @@ def plot(year, region, systematic, histo, signal):
     # data
     datahistos = []
     for dataset in data:
-        with uproot.open(histopath(year=year,
+        path = histopath(year=year,
                                    dataset=dataset,
                                    region=region,
                                    systematic=None,
-                                   create_dir=False)) as infile:
+                                   create_dir=False)
+        
+        print('dataset',dataset,path,year, region, systematic, histo)
+        
+        with uproot.open(path) as infile:
             datahistos.append(infile[general['Histodir']][histo].to_numpy())
 
     datahistos = numpy.array(datahistos, dtype=object)
@@ -74,12 +78,13 @@ def plot(year, region, systematic, histo, signal):
         if 'datasets' in histogram.keys() and dataset not in histogram['datasets']:
             print('Skipping histogram plotting for "{}" (histogram not defined for "{}" dataset)'.format(histo, dataset))
             continue
-
-        with uproot.open(histopath(year=year,
-                                   dataset=dataset,
+        
+        path = histopath(year=year,dataset=dataset,
                                    region=region,
                                    systematic=systematic,
-                                   create_dir=False)) as infile:
+                                   create_dir=False)
+        
+        with uproot.open(path) as infile:
 
             histos.append(infile[general['Histodir']][histo])
             labels.append(datasets[dataset]['Label'])
@@ -171,6 +176,7 @@ def plot(year, region, systematic, histo, signal):
 
     fig.tight_layout()
     fig.savefig(path + f'{histo}.pdf', dpi=300)
+    print('saved',path + f'{histo}.pdf')
     #matplotlib.pyplot.show()
     matplotlib.pyplot.close()
 
