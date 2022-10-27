@@ -8,14 +8,18 @@ Contains global configuration options e.g. paths:
 * lumi: dict with luminosities for different epochs, keys are included in allyears and 'total'
 """
 
-
-
 import os
 
+version='2022-07-12_v7'
+storagepath='/eos/cms/store/cmst3/group/top/WbWb/'
+
+if os.getenv("HOSTNAME", None) == 'lxplus8s10.cern.ch':
+    storagepath='/scratch/jkiesele/WbWb/'
+
 general = {
-    'MCPath': './config/mc/',
-    'DataPath': './config/data/',
-    'HistoPath': '/eos/cms/store/cmst3/group/top/WbWb/histos/2022-05-17_v1/',
+    'EnableImplicitMT': False, #this can be picked up wherever it makes sense
+    'DataSetsPath': storagepath+'/nano/'+version,
+    'HistoPath': storagepath+'/histos/' + version + '/' + os.getenv('USER') + '/',
     'CardPath': './output/cards/',
     'FitPath': './output/fits/',
     'PlotPath': './output/plots/',
@@ -44,53 +48,10 @@ lumi = {
 }
 
 
-def getGridpaths(isMC, year, filename):
-    """
-    Reads paths to NanoAOD files on the grid from the config files.
+# some general path globals
 
-    :param isMC: set to True if the requested dataset is MC
-    :param year: year of the dataset
-    :param filename: filename of the dataset
-    :returns: paths to files as list
-    """
-    filepath = ''
-    if isMC:
-        filepath = general['MCPath'] + year + '/' + filename + '.txt'
-    else:
-        filepath = general['DataPath'] + year + '/' + filename + '.txt'
-
-    filelist = []
-    with open(filepath, 'r') as files:
-        for f in files:
-            filelist.append(f.strip())
-
-    return filelist
-
-
-
-def histopath(year, region, dataset, systematic=None, number=None):
-    """
-    Generates path of the histogram file using the given parameters.
-    If the path doesn't exist it is generated.
-
-    :param year: year of the histogram
-    :param region: filename of the histogram
-    :param dataset: dataset label of the histogram
-    :param systematic: systematic of the histogram
-    :param number: file number, `None` for merged file
-    :returns: path to root file for the histograms
-    """
-    histodir = ''
-
-    if systematic is None or systematic == 'None':
-        histodir = general['HistoPath'] + '/data/{year}/{region}/'.format(year=year, region=region)
-    else:
-        histodir = general['HistoPath'] + '/mc/{year}/{region}/{systematic}/'.format(year=year, region=region, systematic=systematic)
-
-    if not os.path.exists(histodir):
-        os.makedirs(histodir)
-
-    if number is None:
-        return histodir + dataset + '.root'
-    else:
-        return histodir + dataset + '_{}'.format(number) + '.root'
+fnames = {
+    'sample_merge_rules': 'sample_merges.json',
+    'merge_success_tag': 'succ',
+    'sample_merged_file_list': 'merged_files.json'
+}

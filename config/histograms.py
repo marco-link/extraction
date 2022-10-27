@@ -30,12 +30,50 @@ plotoptions = []
 histograms = {
     'lepton_pt': {
         'Title': '',
-        'Xlabel': 'lepton pt',
+        'Xlabel': 'Lepton pt',
         'Plot': plotoptions,
         'Branch': 'lepton_pt',
         'Expression': 'if(ntightMuons==1) {return tightMuons_pt[0];} else {return tightElectrons_pt[0];}',
         'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 400},
     },
+    
+    'n_jets': {
+        'Title': '',
+        'Xlabel': 'N_{jets}',
+        'Plot': plotoptions,
+        'Branch': 'nselectedJets_nominal',
+        #'Expression': 'if(ntightMuons==1) {return tightMuons_pt[0];} else {return tightElectrons_pt[0];}',
+        'Histogram': {'nbins': 7, 'xmin': 0, 'xmax': 7},
+    },
+    
+     'n_bjets': {
+        'Title': '',
+        'Xlabel': 'N_{b-jets}',
+        'Plot': plotoptions,
+        'Branch': 'nselectedBJets_nominal',
+        #'Expression': 'if(ntightMuons==1) {return tightMuons_pt[0];} else {return tightElectrons_pt[0];}',
+        'Histogram': {'nbins': 4, 'xmin': 0, 'xmax': 4},
+    },
+     
+    # 'n_muons': {
+    #    'Title': '',
+    #    'Xlabel': 'N_{b-jets}',
+    #    'Plot': plotoptions,
+    #    'Branch': 'ntightMuons',
+    #    #'Expression': 'if(ntightMuons==1) {return tightMuons_pt[0];} else {return tightElectrons_pt[0];}',
+    #    'Histogram': {'nbins': 4, 'xmin': 0, 'xmax': 4},
+    #},
+     
+    # 'n_bjets_ttbar': {
+    #    'Title': '',
+    #    'Xlabel': 'N_{b-jets}',
+    #    'Plot': plotoptions,
+    #    'Branch': 'nselectedBJets_nominal',
+    #    'Filter': '(nselectedBJets_nominal == 2 && nselectedJets_nominal >= 3 && ntightMuons == 1)',
+    #    'Histogram': {'nbins': 4, 'xmin': 0, 'xmax': 4},
+    #},
+
+
 
     'top_mass': {
         'Title': '',
@@ -44,23 +82,23 @@ histograms = {
         'Branch': 'top_mass_nominal',
         'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 800},
     },
-
-    'top_pt': {
-        'Title': '',
-        'Xlabel': 'top pt',
-        'Plot': plotoptions,
-        'Branch': 'top_pt_nominal',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 400},
-    },
-
-    'met': {
-        'Title': '',
-        'Xlabel': 'MET',
-        'Plot': plotoptions,
-        'Branch': 'met_nominal',
-        'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
-    },
-
+    #
+    #'top_pt': {
+    #    'Title': '',
+    #    'Xlabel': 'top pt',
+    #    'Plot': plotoptions,
+    #    'Branch': 'top_pt_nominal',
+    #    'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 400},
+    #},
+    #
+    #'met': {
+    #    'Title': '',
+    #    'Xlabel': 'MET',
+    #    'Plot': plotoptions,
+    #    'Branch': 'met_nominal',
+    #    'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 1000},
+    #},
+    #
     'mtw': {
         'Title': '',
         'Xlabel': 'MTW',
@@ -68,16 +106,16 @@ histograms = {
         'Branch': 'mtw_nominal',
         'Histogram': {'nbins': 100, 'xmin': 0, 'xmax': 300},
     },
-
-    'fitbins': {
-        'Branch': 'fitBins',
-        'Expression': 'int x = 0; \
-            if(std::fabs(top_mass_nominal-172.5)<25.) x++; \
-            if(ntightMuons==1) { if(tightMuons_charge[0]>0) x += 2; } else {  if(tightElectrons_charge[0]>0) x += 2; } \
-            return x;',
-        'Histogram': {'nbins': 4, 'xmin': -0.5, 'xmax': 3.5},
-        'Title': 'Fit bins',
-        'Xlabel': 'category',
-        'Plot': plotoptions,
-    },
+    #
+    #'fitbins': {
+    #    'Branch': 'fitBins',
+    #    'Expression': 'int x = 0; \
+    #        if(std::fabs(top_mass_nominal-172.5)<25.) x++; \
+    #        if(ntightMuons==1) { if(tightMuons_charge[0]>0) x += 2; } else {  if(tightElectrons_charge[0]>0) x += 2; } \
+    #        return x;',
+    #    'Histogram': {'nbins': 4, 'xmin': -0.5, 'xmax': 3.5},
+    #    'Title': 'Fit bins',
+    #    'Xlabel': 'category',
+    #    'Plot': plotoptions,
+    #},
 }

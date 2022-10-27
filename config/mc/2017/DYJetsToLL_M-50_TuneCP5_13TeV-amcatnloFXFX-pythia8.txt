@@ -1,4 +1,0 @@
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_0000.root
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_0001.root
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_0002.root
-root://cmsxrootd-kit.gridka.de//store/user/mlink/WbNanoAODTools/mc/2017//DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_0003.root

@@ -13,7 +13,8 @@ import matplotlib
 import matplotlib.pyplot
 import mplhep
 
-from config.general import general, lumi, histopath
+from config.general import general, lumi
+from helpers import histopath
 from config.data import data
 from config.datasets import datasets, background
 from config.histograms import histograms
@@ -38,14 +39,19 @@ def plot(year, region, systematic, histo, signal):
     gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 1])
     plot = fig.add_subplot(gs[0])
 
-
+    print('data loop')
     # data
     datahistos = []
     for dataset in data:
-        with uproot.open(histopath(year=year,
+        path = histopath(year=year,
                                    dataset=dataset,
                                    region=region,
-                                   systematic=None)) as infile:
+                                   systematic=None,
+                                   create_dir=False)
+        
+        print('dataset',dataset,path,year, region, systematic, histo)
+        
+        with uproot.open(path) as infile:
             datahistos.append(infile[general['Histodir']][histo].to_numpy())
 
     datahistos = numpy.array(datahistos, dtype=object)
@@ -66,21 +72,26 @@ def plot(year, region, systematic, histo, signal):
     datasetlist = [signal] + list(background.keys())
     datasetlist.reverse()
 
+    print('MC loop')
+    
     for dataset in datasetlist:
         if 'datasets' in histogram.keys() and dataset not in histogram['datasets']:
             print('Skipping histogram plotting for "{}" (histogram not defined for "{}" dataset)'.format(histo, dataset))
             continue
-
-        with uproot.open(histopath(year=year,
-                                   dataset=dataset,
+        
+        path = histopath(year=year,dataset=dataset,
                                    region=region,
-                                   systematic=systematic)) as infile:
+                                   systematic=systematic,
+                                   create_dir=False)
+        
+        with uproot.open(path) as infile:
 
             histos.append(infile[general['Histodir']][histo])
             labels.append(datasets[dataset]['Label'])
             colors.append(datasets[dataset]['Color'])
 
-
+    
+    print('filling')
     histtype = 'fill'
     if 'step' in histogram['Plot']:
         histtype = 'step'
@@ -165,6 +176,7 @@ def plot(year, region, systematic, histo, signal):
 
     fig.tight_layout()
     fig.savefig(path + f'{histo}.pdf', dpi=300)
+    print('saved',path + f'{histo}.pdf')
     #matplotlib.pyplot.show()
     matplotlib.pyplot.close()
 
