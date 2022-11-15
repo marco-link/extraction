@@ -18,9 +18,9 @@ data = {
         'Label': r'data (muon)',
     },
 
-  #  'SingleElectron': {
-  #      'MC': False,
-  #      'FileName': 'SingleElectron',
-  #      'Label': r'data (electron)',
-  #  },
+    'SingleElectron': {
+        'MC': False,
+        'FileName': 'SingleElectron',
+        'Label': r'data (electron)',
+    },
 }
