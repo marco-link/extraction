@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-VERSION="2022-07-12_v7"
+VERSION="2022-11-09_v10"
 YEAR=2017
 
 
@@ -25,7 +25,7 @@ OUTDIR="/eos/cms/store/cmst3/group/top/WbWb/nano/"
 ALLSAMPLES=`list_samples.py $VERSION $YEAR --base_path $BASEPATH`
 
 echo "merging ${ALLSAMPLES}"
-echo 
+echo
 
 echo "merging to ${OUTDIR}/${VERSION}/${YEAR}"
 
@@ -55,17 +55,18 @@ do
     mkdir -p $OUTPATH
     # echo merging $FULLPATH to $OUTPATH ... "(${OUTPATH}/merge.log)"
     #continue
-    {  merge.py $FULLPATH $OUTPATH $YEAR  #> $OUTPATH/merge.log 2>&1 
-    
-    if [ $? != 0 ];
-    then
-       echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/merge_failed.txt
-    else
-       echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/sample_list.txt
-    fi
-    } 
+    {
+        merge.py $FULLPATH $OUTPATH $YEAR  #> $OUTPATH/merge.log 2>&1
+
+        if [ $? != 0 ];
+        then
+        echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/merge_failed.txt
+        else
+        echo $sample >> "${OUTDIR}/${VERSION}/${YEAR}"/sample_list.txt
+        fi
+    }
     #exit
-    
+
 done
 #wait
-exit
+# exit

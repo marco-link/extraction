@@ -23,7 +23,6 @@ def read_entries_local(filepath):
     n_i_total = 0
 
     try:
-
         ifile = ROOT.TFile(filepath, 'READ')
 
         itree_evt = ifile.Get('Events')
@@ -89,7 +88,7 @@ def read_entries_xrootd(filepath):
 def read_entries(filepath):
 
     post, pre = None, None
-    if filepath[:5] == 'xroot':
+    if 'root' in filepath[:5]:
         post, pre = read_entries_xrootd(filepath)
     else:
         post, pre = read_entries_local(filepath)
@@ -158,7 +157,7 @@ def mergeFiles(args):
 
     for i, F in enumerate(file_list):
         # F = F.replace('/storage/gridka-nrg/','root://cmsxrootd-redirectors.gridka.de//store/user/')
-        # print('Adding ->' + F, i, '/', len(file_list))
+        #print('Adding ->' + F, i, '/', len(file_list))
         merger.AddFile(F)
 
         n_i_selected = 0
@@ -173,11 +172,13 @@ def mergeFiles(args):
     merger.OutputFile(opath, 'RECREATE', 209)
     merger.Merge()
 
-    if n_selected != n_total:
+    if n_selected != n_total and n_total > 0:
         eff = n_selected / n_total
         print('\npreskim summary, filling userinfo with efficiency in output file:')
         print('--- selected events: {}, initial events: {} ---> preskim efficiency: {:.3f}'.format(n_selected, n_total, eff))
         fill_userinfo(eff, opath)
+    elif n_total <= 0:
+        print('ERROR: invalid n_total ({:.3f}), skipping fill_userinfo!'.format(n_total))
 
     # add bookkeeping into
     with open(summaryfile, 'w') as f:
@@ -248,7 +249,6 @@ def check_success_tag(opath):
 
 
 def createOrLoadMergeRules(ipath, opath, eventsperfile, maxfiles=-1, recreate=False, isMC=True, verbose=True):
-
     # if there is an issue, just redo
     try:
         if os.path.isfile(opath + '/' + fnames['sample_merge_rules']) and not recreate:
@@ -256,6 +256,8 @@ def createOrLoadMergeRules(ipath, opath, eventsperfile, maxfiles=-1, recreate=Fa
                 return json.load(f)
     finally:
         pass
+
+
 
     if verbose:
         print('getting files...')
@@ -279,7 +281,7 @@ def createOrLoadMergeRules(ipath, opath, eventsperfile, maxfiles=-1, recreate=Fa
     elif evpf != evpfn:
         broken = []
         for f in evpf:
-            if not f in evpfn:
+            if f not in evpfn:
                 broken.append(f)
         raise RuntimeError(
             'Dataset is real data, and some files are broken. exiting. Broken: ' + str(broken))
@@ -295,7 +297,6 @@ def createOrLoadMergeRules(ipath, opath, eventsperfile, maxfiles=-1, recreate=Fa
 
 
 def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True):
-
     # check if it needs to run
 
     if not overwrite and check_success_tag(opath):
@@ -317,7 +318,7 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True
 
     # defines if broken files may be skipped or not
     isMC = datasetIsMC(datasetname)
-    
+
 
     if isMC and verbose:
         print('dataset is MC')
@@ -337,7 +338,7 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True
 
     # this part can also be run on batch with small modifications
     # since the merge rules have already been defined and saved above
-    
+
     if verbose:
         print('perform merging...')
 
@@ -358,12 +359,12 @@ def doMerge(ipath, opath, eventsperfile, maxfiles, overwrite, year, verbose=True
     #add dataset info
     for datasetkey in datasetkeys:
         writeDatasetInfo(year, datasetkey, inpaths=mfiles, outdir=opath)
-    
+
     add_success_tag(opath)
     if verbose:
         print('done merging.')
-        
-        
+
+
 
 ############ call the script ###########
 
@@ -385,7 +386,8 @@ parser.add_argument('--overwrite', default=False,
                     help='Overwrite even if the merge has already been successful', action='store_true')
 args = parser.parse_args()
 
-if not args.year in allyears:
-    raise ValueError(args.year + " unavailable as year. Available are "+str(allyears))
+
+if args.year not in allyears:
+    raise ValueError(args.year + ' unavailable as year. Available are ' + str(allyears))
 
 doMerge(args.inputPath, args.outputPath, 6000000, -1, args.overwrite, year=args.year)
