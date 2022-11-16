@@ -37,6 +37,7 @@ gen_json = pandas.read_json(os.path.abspath(os.path.dirname(__file__)) + '/xsecs
 gen_weights = ['genweight/genEventSumw']
 me_weight = ['fragEventWeight_fragCP5BLVsPt'] #['MEweight_murNominal_mufNominal']
 pdf_weight = [] #['PDFweight_0']
+qcdweight = ['0.6'] # scale QCD by eye to match data
 
 weights_electron = ['tightElectrons_weight_reco_nominal', 'tightElectrons_weight_id_nominal']
 weights_muon = ['tightMuons_weight_reco_nominal', 'tightMuons_weight_id_nominal', 'tightMuons_weight_iso_nominal']
@@ -359,7 +360,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -377,7 +378,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -395,7 +396,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -413,7 +414,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -431,7 +432,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -449,7 +450,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -467,7 +468,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -485,7 +486,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -503,7 +504,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -521,7 +522,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -539,7 +540,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -557,7 +558,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -576,7 +577,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -594,7 +595,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -612,7 +613,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -630,7 +631,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -648,7 +649,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -666,7 +667,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -684,7 +685,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 
@@ -702,7 +703,7 @@ qcd = {
         },
         '2017': {
             'KFactor': 1.,
-            'EventWeights': gen_weights + weights + weights_2017,
+            'EventWeights': gen_weights + weights + weights_2017 + qcdweight,
         },
     },
 }
