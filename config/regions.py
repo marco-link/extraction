@@ -19,75 +19,51 @@ bChargeCategories = [
 templateRegions = {
     # 2j0t
     'WJets_muon': {
-        'Name': 'WJets control region (muon)',
+        'Name': r'$1\mu$ WJets CR (2j0t)',
         'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 0 && ntightMuons == 1)',
     },
     'WJets_electron': {
-        'Name': 'WJets control region (electron)',
+        'Name': r'$1e$ WJets CR (2j0t)',
         'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 0 && ntightElectrons == 1)',
     },
 
-
     # 2j1t
     'signal_muon': {
-        'Name': 'signal region (muon)',
+        'Name': r'$1\mu$ signal region (2j1t)',
         'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightMuons == 1)',
     },
     'signal_electron': {
-        'Name': 'signal region (electron)',
+        'Name': r'$1e$ signal region (2j1t)',
         'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightElectrons == 1)',
     },
 
 
     # 3j1t
     'ttbar_3j1t_muon': {
-        'Name': 'ttbar 1 tag control region (muon)',
+        'Name': r'$1\mu$ ttbar CR (3j1t)',
         'Filter': '(nselectedJets_nominal == 3 && nselectedBJets_nominal == 1 && ntightMuons == 1)',
     },
     'ttbar_3j1t_electron': {
-        'Name': 'ttbar 1 tag control region (electron)',
+        'Name': r'$1e$ ttbar CR (3j1t)',
         'Filter': '(nselectedJets_nominal == 3 && nselectedBJets_nominal == 1 && ntightElectrons == 1)',
     },
 
     # 3j2t
     'ttbar_3j2t_muon': {
-        'Name': 'ttbar 2 tag control region (muon)',
+        'Name': r'$1\mu$ ttbar CR (3j2t)',
         'Filter': '(nselectedJets_nominal == 3 && nselectedBJets_nominal == 2 && ntightMuons == 1)',
     },
     'ttbar_3j2t_electron': {
-        'Name': 'ttbar 2 tag control region (electron)',
+        'Name': r'$1e$ ttbar CR (3j2t)',
         'Filter': '(nselectedJets_nominal == 3 && nselectedBJets_nominal == 2 && ntightElectrons == 1 )',
     },
 }
 
-regions = {
-    
-    'ttbar_muon': {
-        'Name': 'ttbar muon+jets',
-        'Filter': '(ntightMuons == 1  && nselectedJets_nominal >= 4 && nselectedBJets_nominal == 2)',
-    },
-    #
-    #'inclusive_electron': {
-    #    'Name': 'inclusive one electron',
-    #    'Filter': '(ntightElectrons == 1)',
-    #},
-    # 2j1t
-    'signal_muonBpos': {
-        'Name': 'signal region (muon) Bpos',
-        'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightMuons == 1 && top_bjet_bChargeTag_highestScoreIndex_nominal == 3)',
-    },
-    'signal_muon': {
-        'Name': 'signal region (muon)',
-        'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightMuons == 1)',
-    },
-    
-    #'signal_electron': {
-    #    'Name': 'signal region (electron)',
-    #    'Filter': '(nselectedJets_nominal == 2 && nselectedBJets_nominal == 1 && ntightElectrons == 1)',
-    #},
-    
-    
-}
+
+regions = templateRegions
+
+
+
 #for category in bChargeCategories:
 #    for region in templateRegions:
 #        regions[region + '_' + category[0]] = {

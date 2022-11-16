@@ -17,6 +17,7 @@ from config.general import general, lumi
 from helpers import histopath
 from config.data import data
 from config.datasets import datasets, background
+from config.regions import regions
 from config.histograms import histograms
 
 matplotlib.use('Agg')
@@ -131,7 +132,12 @@ def plot(year, region, systematic, histo, signal, splitGroups=False):
 
 
     # visuals
-    mplhep.cms.label(loc=0, ax=plot, data=False, paper=False, lumi=lumi[year])
+    mplhep.cms.label(loc=0, ax=plot, data=True, paper=False, lumi=lumi[year])
+    plot.text(0.03, 0.97, regions[region]['Name'], fontsize=20, transform=plot.transAxes, va='top')
+
+
+    datamax = numpy.max(numpy.sum(datahistos.T[0]))
+    plot.set_ylim(top=1.15 * datamax)
 
 
     if 'density' in histogram['Plot']:
