@@ -2,6 +2,7 @@
 
 import law
 import luigi
+import glob
 
 from workflow.BaseTask import BaseTask
 from workflow.HistoTask import HistoTask
@@ -10,7 +11,6 @@ from helpers import histopath
 from config.regions import regions
 from config.data import data
 from config.datasets import datasets
-from config.systematics import systematics
 
 
 class MergeHistoTask(BaseTask):
@@ -19,12 +19,10 @@ class MergeHistoTask(BaseTask):
 
     :param year: year for which to produce the plots
     :param region: region for which to produce the plots
-    :param systematic: systematic for which to produce the plots
     """
     year = luigi.Parameter()
     region = luigi.Parameter()
     dataset = luigi.Parameter()
-    systematic = luigi.Parameter()
 
     def requires(self):
         """
@@ -36,16 +34,23 @@ class MergeHistoTask(BaseTask):
         """
         tasks outputs a logfile and the merged root file
         """
-        return [law.LocalFileTarget(histopath(self.year, self.region, self.dataset, self.systematic))]
+        return [law.LocalFileTarget(histopath(self.year, self.region, self.dataset))]
 
     def run(self):
         """
         tasks runs `hadd` and produces a logfile
         """
-        target = histopath(self.year, self.region, self.dataset, self.systematic)
+
+        target = histopath(self.year, self.region, self.dataset)
         src = target.replace('.root', '_*.root')
 
-        self.execute(command=f'hadd -f {target} {src}')
+        files = glob.glob(src)
+        print(files)
+
+        if len(files) > 1:
+            self.execute(command=f'hadd -f {target} {src}')
+        else:
+            self.execute(command=f'ln -s {files[0]} {target}')
 
 
 
@@ -64,14 +69,7 @@ class AllMergeHistoTasks(law.WrapperTask):
         for region in regions.keys():
             # data merging
             for dataset in data.keys():
-                yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic='None')
+                yield MergeHistoTask(year=self.year, region=region, dataset=dataset)
 
-            # MC merging
             for dataset in datasets.keys():
-                for systematic in systematics.keys():
-                    if systematics[systematic]['type'] == 'shape' and self.year in systematics[systematic]['years']:
-                        if systematic == 'nominal':
-                            yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic=systematic)
-                        else:
-                            yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic=systematic + 'UP')
-                            yield MergeHistoTask(year=self.year, region=region, dataset=dataset, systematic=systematic + 'DOWN')
+                yield MergeHistoTask(year=self.year, region=region, dataset=dataset)

@@ -11,7 +11,7 @@ import argparse
 
 from ROOT import TH1, ROOT, TFile
 
-from helpers import getSystsplit, getDatasetInfo, getGridpaths, histopath, get_event_weigths
+from helpers import getSystsplit, getDatasetInfo, getGridpaths, histopath, get_event_weigths, useSystematicBranch
 from config.general import general, lumi
 from config.data import data as datasamples
 from config.datasets import datasets as mcsamples
@@ -41,23 +41,16 @@ def create_input_info(year, region, dataset_key, process_systematics: list, numb
 
     w = {}
     for systematic in process_systematics:
-        outfile = histopath(year=year,
-                            region=region,
-                            dataset=dataset_key,
-                            systematic=systematic,
-                            number=number)
-
         filter = None
         if 'Filter' in regions[region].keys():
             filter = regions[region]['Filter']
             if allsamples[dataset_key]['MC']:
-                filter = filter.replace('nominal', systematic)
+                filter = useSystematicBranch(filter, systematic)
 
         w[systematic] = {'weight_sel_string': get_event_weigths(year, dataset_key, systematic, preskimInfo),
                          'temp_branch_name': 'w_' + systematic,
                          'region_filter': filter,
-                         'region': region,
-                         'outputFile': outfile}
+                         'region': region}
 
         print(systematic, 'weight_sel_string', w[systematic]['weight_sel_string'])
 
@@ -114,7 +107,7 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
     ### global dataframe prepared, can eneter process_systematics and histogram definition loop
 
     #just a list of: ( outfile,  dict of { histname: df_histo })
-    histos_and_outfiles = []
+    histos_and_outfolder = []
     for systematic in process_systematics:
         sc = systematics_config[systematic]
 
@@ -132,7 +125,7 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
                 print('original branch name', branchname)
 
             if allsamples[dataset_key]['MC']:
-                branchname = histograms[histname]['Branch'].replace('nominal', systematic)
+                branchname = useSystematicBranch(branchname, systematic)
                 if verbose:
                     print('adapted branch name', branchname)
                 # WHY??
@@ -149,7 +142,7 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
             if 'Expression' in histograms[histname].keys():
                 expression = histograms[histname]['Expression']
                 if allsamples[dataset_key]['MC']:
-                    expression = expression.replace('nominal', systematic)
+                    expression = useSystematicBranch(expression, systematic)
                 if verbose:
                     print(f'\nAdding temporary branch "{histname}" from Expression: {expression}')
                 dataframe = dataframe.Define(branchname, expression)
@@ -183,11 +176,11 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
             else:
                 print(f'\n\n\tERROR: Branch "{branchname}" defined in config/histogram.py not found!\n')
 
-        histos_and_outfiles.append((sc['outputFile'], histos))
+        histos_and_outfolder.append((systematic, histos))
         if verbose:
             print('\n\n==============Config Summary===============')
             print('Systematic: {}'.format(systematic))
-            print('Output: {}'.format(sc['outputFile']))
+            print('Outputfolder: {}'.format(systematic))
             print('Region: {}'.format(region))
             print('===========================================\n\n')
 
@@ -200,11 +193,18 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
         scale = 1000 * allsamples[dataset_key]['XS'] * allsamples[dataset_key][year]['KFactor'] * lumi[year]
 
 
-    for hao in histos_and_outfiles:
-        outFileName = hao[0]
+    outFileName = histopath(year=year,
+                            region=region,
+                            dataset=dataset_key,
+                            number=number,
+                            create_dir=True)
+
+    outFile = TFile(outFileName, 'RECREATE')
+    for hao in histos_and_outfolder:
+        outfolder = hao[0]
         processed_histograms = hao[1]
         if verbose:
-            print('starting', outFileName, 'at', datetime.datetime.now())
+            print('starting', outfolder, 'at', datetime.datetime.now())
 
         for histname in processed_histograms.keys():
             processed_histograms[histname].Scale(scale)
@@ -216,17 +216,18 @@ def fillhistos(year, region, dataset_key, process_systematics, number, cuts=[], 
         #report = dataframe.Report()
 
         #overwrite
-        outFile = TFile(outFileName, 'RECREATE')
-        histoDir = outFile.Get(general['Histodir'])
+
+        histoDir = outFile.Get(outfolder)
         if not histoDir:
-            histoDir = outFile.mkdir(general['Histodir'])
+            histoDir = outFile.mkdir(outfolder)
         histoDir.cd()
         for histogram in sorted(processed_histograms.keys()):
             histoDir.Append(processed_histograms[histogram].GetPtr(), True)
         histoDir.Write('', TFile.kOverwrite)
-        outFile.Close()
-        if verbose:
-            print('OUTPUT WRITTEN TO {}'.format(outFileName))
+
+    outFile.Close()
+    if verbose:
+        print('OUTPUT WRITTEN TO {}'.format(outFileName))
 
     #print('\n\n==============Selection Efficiencies===============')
     #report.Print()
@@ -249,7 +250,7 @@ if __name__ == '__main__':
                         help='dataset to process')
 
     parser.add_argument('--systematic', type=str, default='nominal',
-                        help='systematic to process')
+                        help='systematics to process')
 
     parser.add_argument('--number', type=int, required=True,
                         help='number of input file')

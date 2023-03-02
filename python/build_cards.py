@@ -12,7 +12,6 @@ import ROOT
 import CombineHarvester.CombineTools.ch as ch
 # see https://cms-analysis.github.io/CombineHarvester/python-interface.html
 
-from config.general import general
 from helpers import histopath
 from config.datasets import signal, background
 from config.systematics import systematics
@@ -29,6 +28,9 @@ def buildcard(outpath, year, region, shape):
     :param region: region to build card for
     :param shape: shape to build card for
     """
+    print('building card "{}" for {}, {}, {}...'.format(outpath, year, region, shape))
+
+
     bins = [(0, region + '_' + year)]
 
     parser = ch.CombineHarvester()
@@ -42,27 +44,29 @@ def buildcard(outpath, year, region, shape):
 
     # fill with shapes
     def setShape(p):
-        f = ROOT.TFile(histopath(year=year, region=region, dataset=p.process(), systematic='nominal'), 'read')
-        s = f.Get(general['Histodir'] + '/' + shape)
-
+        inroot = ROOT.TFile(histopath(year=year, region=region, dataset=p.process()), 'read')
+        s = inroot.Get('nominal/' + shape)
         p.set_shape(s, True)
+        inroot.Close()
 
     parser.ForEachProc(setShape)
 
 
     # add systematics
-    for syst in systematics:
-        systematic = systematics[syst]
+    processes = parser.process_set()
+    for process in processes:
+        print(process)
+        inroot = ROOT.TFile(histopath(year=year, region=region, dataset=process), 'read')
+        for syst in systematics:
+            systematic = systematics[syst]
 
-        if syst == 'nominal' or year not in systematic['years']:
-            continue
+            if syst == 'nominal' or year not in systematic['years']:
+                continue
 
-        processes = parser.process_set()
-        if 'datasets' in systematic.keys():
-            processes = systematic['datasets']
+            if 'datasets' in systematic.keys():
+                processes = systematic['datasets']
 
-        if systematic['type'] == 'shape':
-            for process in processes:
+            if systematic['type'] == 'shape':
                 print('adding systematic: ', process, syst)
 
                 s = ch.Systematic()
@@ -76,26 +80,18 @@ def buildcard(outpath, year, region, shape):
                 s.set_type('shape')
 
                 # fill shapes
-                f_nominal = ROOT.TFile(histopath(year=year, dataset=process,
-                                                 region=region, systematic='nominal'), 'read')
-                nominalinal = f_nominal.Get(general['Histodir'] + '/' + shape)
-
-                f_up = ROOT.TFile(histopath(year=year, dataset=process,
-                                            region=region, systematic=syst + 'UP'), 'read')
-                up = f_up.Get(general['Histodir'] + '/' + shape)
-
-                f_down = ROOT.TFile(histopath(year=year, dataset=process,
-                                              region=region, systematic=syst + 'DOWN'), 'read')
-                down = f_down.Get(general['Histodir'] + '/' + shape)
+                nominalinal = inroot.Get('nominal/' + shape)
+                up = inroot.Get(syst + 'Up/' + shape)
+                down = inroot.Get(syst + 'Down/' + shape)
 
                 s.set_shapes(up, down, nominalinal)
                 parser.InsertSystematic(s)
-        elif systematic['type'] == 'lnN':
-            parser.cp().process(processes).AddSyst(parser, syst, 'lnN', ch.SystMap()(systematic['value']))
-        else:
-            raise Exception('Unkown systematics type "{}"'.format(syst['type']))
+            elif systematic['type'] == 'lnN':
+                parser.cp().process(processes).AddSyst(parser, syst, 'lnN', ch.SystMap()(systematic['value']))
+            else:
+                raise Exception('Unkown systematics type "{}"'.format(syst['type']))
 
-
+        inroot.Close()
 
     # AutoMCStats
     parser.SetAutoMCStats(parser, 10, False, 1)

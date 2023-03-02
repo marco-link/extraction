@@ -10,22 +10,21 @@ Contains global configuration options e.g. paths:
 
 import os
 
-version='2022-07-12_v7'
-storagepath='/eos/cms/store/cmst3/group/top/WbWb/'
+version = '2022-11-09_v10'
+storagepath = '/ceph/mlink/WbWbX/'
 
-if os.getenv("HOSTNAME", None) == 'lxplus8s10.cern.ch':
-    storagepath='/scratch/jkiesele/WbWb/'
+if os.getenv('HOSTNAME', None) == 'lxplus8s10.cern.ch':
+    storagepath = '/scratch/jkiesele/WbWb/'
 
 general = {
     'EnableImplicitMT': False, #this can be picked up wherever it makes sense
-    'DataSetsPath': storagepath+'/nano/'+version,
-    'HistoPath': storagepath+'/histos/' + version + '/' + os.getenv('USER') + '/',
+    'DataSetsPath': storagepath + version,
+    'HistoPath': '/work/mlink/wb_scattering/extraction/output/Wbhistos/' + version + '/',
     'CardPath': './output/cards/',
     'FitPath': './output/fits/',
     'PlotPath': './output/plots/',
     'LogPath': './output/logs/',
     'Tree': 'Events',
-    'Histodir': 'Histograms',
     'GlobalDefaultValue': -999,
     'DeltaR': 0.4,
 }

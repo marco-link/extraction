@@ -43,7 +43,6 @@ class HistoTask(HTCondorBaseTask):
         return histopath(year=self.year,
                          region=self.branch_data[0],
                          dataset=self.branch_data[1],
-                         systematic='',
                          number=self.branch_data[3]).replace('.root', '.log')
 
     def output(self):
@@ -59,5 +58,5 @@ class HistoTask(HTCondorBaseTask):
         self.save_execute(command=f'python -u python/fill_histos.py --year {self.year} \
                                                                     --region {self.branch_data[0]} \
                                                                     --dataset {self.branch_data[1]} \
-                                                                    --systematic "{", ".join(self.branch_data[2])}" \
+                                                                    --systematic "{",".join(self.branch_data[2])}" \
                                                                     --number {self.branch_data[3]}', log=self.log())
