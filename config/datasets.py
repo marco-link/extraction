@@ -59,7 +59,8 @@ for index in gen_json.keys():
         'Label': r'Wb x Wb',
         'FileName': 'WbjToLNu_4f_TuneCP5_13TeV-madgraph-pythia8',
         'Color': 'red',
-        'XS': gen_json[index]['xsec'],
+        #'XS': gen_json[index]['xsec'],
+        'XS': gen_json[19]['xsec'], # use same cross section over all datasets
         'XSUncertainty': {
             'Up': 5, #TODO update
             'Down': 5, #TODO update
