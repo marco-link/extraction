@@ -13,7 +13,7 @@ import CombineHarvester.CombineTools.ch as ch
 # see https://cms-analysis.github.io/CombineHarvester/python-interface.html
 
 from helpers import histopath
-from config.datasets import signal, background
+from config.datasets import signal, datasetgroups
 from config.systematics import systematics
 
 era = '13TeV'
@@ -35,12 +35,12 @@ def buildcard(outpath, year, region, shape):
 
     parser = ch.CombineHarvester()
 
-    # add observation
-    #parser.AddObservations(era=[era], bin=bins) FIXME uncomment when obs shape is added
-
     # add MC
     parser.AddProcesses(procs=signal.keys(), era=[era], bin=bins, signal=True)
-    parser.AddProcesses(procs=background.keys(), era=[era], bin=bins, signal=False)
+
+    for process in datasetgroups.keys():
+        if process not in signal.keys() and process != 'data':
+            parser.AddProcesses(procs=[process], era=[era], bin=bins, signal=False)
 
     # fill with shapes
     def setShape(p):
@@ -55,7 +55,6 @@ def buildcard(outpath, year, region, shape):
     # add systematics
     processes = parser.process_set()
     for process in processes:
-        print(process)
         inroot = ROOT.TFile(histopath(year=year, region=region, dataset=process), 'read')
         for syst in systematics:
             systematic = systematics[syst]
@@ -80,11 +79,11 @@ def buildcard(outpath, year, region, shape):
                 s.set_type('shape')
 
                 # fill shapes
-                nominalinal = inroot.Get('nominal/' + shape)
+                nominal = inroot.Get('nominal/' + shape)
                 up = inroot.Get(syst + 'Up/' + shape)
                 down = inroot.Get(syst + 'Down/' + shape)
 
-                s.set_shapes(up, down, nominalinal)
+                s.set_shapes(up, down, nominal)
                 parser.InsertSystematic(s)
             elif systematic['type'] == 'lnN':
                 parser.cp().process(processes).AddSyst(parser, syst, 'lnN', ch.SystMap()(systematic['value']))
@@ -97,8 +96,20 @@ def buildcard(outpath, year, region, shape):
     parser.SetAutoMCStats(parser, 10, False, 1)
 
 
+    # add observation
+    print('adding observation...')
+    inroot = ROOT.TFile(histopath(year=year, region=region, dataset='data'), 'read')
 
-    # TODO fill observation
+    obs = ch.Observation()
+    obs.set_bin(region + '_' + year)
+    #obs.set_process(process)
+    obs.set_era(era)
+    obs.set_shape(inroot.Get('None/' + shape), True)
+
+    parser.InsertObservation(obs)
+    inroot.Close()
+
+
 
     parser.PrintAll()
     ch.CardWriter(outpath, outpath.replace('.txt', '.root')).CreateDirectories(True).WriteCards('none', parser)
