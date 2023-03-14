@@ -117,7 +117,7 @@ background = {
         'Signal': False,
         'FileName': 'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8',
         'Label': r't$\bar{t}$ (dilep)',
-        'Group': r't$\bar{t}$',
+        'Group': 'ttbar',
         'Color': 'orange',
         'XS': 831.76 * (1 - 0.6741)**2, # [1]*[5]
         'XSUncertainty': {
@@ -135,7 +135,7 @@ background = {
         'Signal': False,
         'FileName': 'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8',
         'Label': r't$\bar{t}$ (semilep)',
-        'Group': r't$\bar{t}$',
+        'Group': 'ttbar',
         'Color': 'tomato',
         'XS': 831.76 * (0.6741 * (1 - 0.6741) * 2), # [1]*[5]
         'XSUncertainty': {
@@ -153,7 +153,7 @@ background = {
         'Signal': False,
         'FileName': 'TTToHadronic_TuneCP5_13TeV-powheg-pythia8',
         'Label': r't$\bar{t}$ (had)',
-        'Group': r't$\bar{t}$',
+        'Group': 'ttbar',
         'Color': 'chocolate',
         'XS': 831.76 * 0.6741**2, # [1]*[5]
         'XSUncertainty': {
@@ -720,3 +720,15 @@ datasets.update(background)
 
 all_samples = datasets.copy()
 all_samples.update(data)
+
+
+
+datasetgroups = {}
+for key in all_samples.keys():
+    if 'Group' in all_samples[key].keys():
+        if all_samples[key]['Group'] in datasetgroups.keys():
+            datasetgroups[all_samples[key]['Group']].append(key)
+        else:
+            datasetgroups[all_samples[key]['Group']] = [key]
+    else:
+        datasetgroups[key] = [key]

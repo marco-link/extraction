@@ -16,11 +16,13 @@ data = {
         'MC': False,
         'FileName': 'SingleMuon',
         'Label': r'data (muon)',
+        'Group': 'data',
     },
 
     'SingleElectron': {
         'MC': False,
         'FileName': 'SingleElectron',
         'Label': r'data (electron)',
+        'Group': 'data',
     },
 }

@@ -9,20 +9,20 @@ from workflow.HistoTask import HistoTask
 
 from helpers import histopath
 from config.regions import regions
-from config.data import data
-from config.datasets import datasets
+from config.datasets import datasetgroups
 
 
 class MergeHistoTask(BaseTask):
     """
     A task merge histograms
 
-    :param year: year for which to produce the plots
-    :param region: region for which to produce the plots
+    :param year: year to merge
+    :param region: region to merge
+    :param group: group of the dataset to merge
     """
     year = luigi.Parameter()
     region = luigi.Parameter()
-    dataset = luigi.Parameter()
+    group = luigi.Parameter()
 
     def requires(self):
         """
@@ -34,23 +34,23 @@ class MergeHistoTask(BaseTask):
         """
         tasks outputs a logfile and the merged root file
         """
-        return [law.LocalFileTarget(histopath(self.year, self.region, self.dataset))]
+        return [law.LocalFileTarget(histopath(self.year, self.region, self.group))]
 
     def run(self):
         """
         tasks runs `hadd` and produces a logfile
         """
 
-        target = histopath(self.year, self.region, self.dataset)
-        src = target.replace('.root', '_*.root')
+        target = histopath(self.year, self.region, self.group)
+        srcfiles = []
+        for dataset in datasetgroups[self.group]:
+            src = histopath(self.year, self.region, dataset).replace('.root', '_*.root')
+            srcfiles += glob.glob(src)
 
-        files = glob.glob(src)
-        print(files)
-
-        if len(files) > 1:
-            self.execute(command=f'hadd -f {target} {src}')
+        if len(srcfiles) > 1:
+            self.execute(command=f'hadd -f {target} {" ".join(srcfiles)}')
         else:
-            self.execute(command=f'ln -s {files[0]} {target}')
+            self.execute(command=f'ln -s {srcfiles[0]} {target}')
 
 
 
@@ -67,9 +67,5 @@ class AllMergeHistoTasks(law.WrapperTask):
         defines required BranchPlotTasks
         """
         for region in regions.keys():
-            # data merging
-            for dataset in data.keys():
-                yield MergeHistoTask(year=self.year, region=region, dataset=dataset)
-
-            for dataset in datasets.keys():
-                yield MergeHistoTask(year=self.year, region=region, dataset=dataset)
+            for group in datasetgroups:
+                yield MergeHistoTask(year=self.year, region=region, group=group)
