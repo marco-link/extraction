@@ -40,7 +40,7 @@ class NLLPlotTask(BaseTask):
         """
         task requires all fits to be completed before plotting
         """
-        return AllFitTasks(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask)
+        return AllFitTasks(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask, blind=self.blind)
 
     def output(self):
         """

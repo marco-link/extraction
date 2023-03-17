@@ -118,33 +118,43 @@ class FitTask(BaseTask):
     blind = luigi.BoolParameter(default=True)
     points = luigi.IntParameter(default=400)
 
+    def blindlabel(self):
+        if self.blind:
+            return 'exp'
+        else:
+            return 'obs'
+
 
     def log(self):
         """
         defines output path for task logs in gthe fit folder named ``fit.log``
         """
         if self.profiled:
-            return f'{general["FitPath"]}/{self.fitname}/fit_profiled.log'
+            return f'{general["FitPath"]}/{self.fitname}/fit_profiled_{self.blindlabel()}.log'
         else:
-            return f'{general["FitPath"]}/{self.fitname}/fit.log'
+            return f'{general["FitPath"]}/{self.fitname}/fit_{self.blindlabel()}.log'
+
 
     def requires(self):
         """
         task requires the workspace and the SM toy to be produced
         """
-        return [WorkspaceTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask),
-                ToyTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask)]
+        tasks = [WorkspaceTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask)]
+
+        if self.blind:
+            tasks.append(ToyTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask))
+
+        return tasks
+
 
     def output(self):
         """
         tasks outputs a logfile and the NLL fit inside the fit folder named ``fit.root`` or ``fit_profiled.root``
         """
-        if self.profiled:
-            return [law.LocalFileTarget(f'{general["FitPath"]}/{self.fitname}/fit_profiled.root'),
-                    law.LocalFileTarget(self.log())]
-        else:
-            return [law.LocalFileTarget(f'{general["FitPath"]}/{self.fitname}/fit.root'),
-                    law.LocalFileTarget(self.log())]
+
+        return [law.LocalFileTarget(self.log().replace('.log', '.root')),
+                law.LocalFileTarget(self.log())]
+
 
     def run(self):
         """
@@ -167,12 +177,8 @@ class FitTask(BaseTask):
                                     --setParameters r=1,m_top=175.2,gamma_t=1.322 \
                                     --floatOtherPOIs 1 --setParameterRanges {ranges} \
                                     {general["FitPath"]}/{self.fitname}/workspace.root', log=self.log())
-        if self.profiled:
-            self.execute(f'mv -v higgsCombine_fit_{self.fitname}_{self.profiled}.MultiDimFit.*.root \
-                        {general["FitPath"]}/{self.fitname}/fit_profiled.root')
-        else:
-            self.execute(f'mv -v higgsCombine_fit_{self.fitname}_{self.profiled}.MultiDimFit.*.root \
-                        {general["FitPath"]}/{self.fitname}/fit.root')
+
+        self.execute(f'mv -v higgsCombine_fit_{self.fitname}_{self.profiled}.MultiDimFit.*.root {self.log().replace(".log", ".root")}')
 
 
 
@@ -187,10 +193,12 @@ class AllFitTasks(law.WrapperTask):
     fitname = luigi.Parameter()
     histogram = luigi.Parameter()
     cardmask = luigi.Parameter()
+    blind = luigi.BoolParameter()
 
     def requires(self):
         """
         defines required FitTasks
         """
-        yield FitTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask, profiled=False)
-        yield FitTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask, profiled=True)
+        yield FitTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask, profiled=False, blind=self.blind)
+        #TODO uncomment for profiled fit
+        #yield FitTask(fitname=self.fitname, histogram=self.histogram, cardmask=self.cardmask, profiled=True, blind=self.blind)
