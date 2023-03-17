@@ -93,7 +93,7 @@ class ToyTask(BaseTask):
         self.save_execute(command=f'env -i sh scripts/execute_combine.sh \
                                     combine -M GenerateOnly -v 3 -n _toy_{self.fitname} \
                                     --redefineSignalPOIs r,m_top,gamma_t --setParameters {self.parameters} \
-                                    --freezeParameters r,m_top,gamma_t \
+                                    --freezeParameters r,m_top,gamma_t,cTagger_insitu_A,cTagger_insitu_B,cTagger_insitu_C \
                                     --saveToys -t -1 \
                                     {general["FitPath"]}/{self.fitname}/workspace.root', log=self.log())
         self.execute(f'mv -v higgsCombine_toy_{self.fitname}.GenerateOnly.*.root \
@@ -115,7 +115,8 @@ class FitTask(BaseTask):
     histogram = luigi.Parameter()
     cardmask = luigi.Parameter()
     profiled = luigi.BoolParameter(default=False)
-    points = luigi.IntParameter(default=1000)
+    blind = luigi.BoolParameter(default=True)
+    points = luigi.IntParameter(default=400)
 
 
     def log(self):
@@ -155,14 +156,16 @@ class FitTask(BaseTask):
             ranges += ':m_top=171.5,173.5'
             pois += ',m_top'
 
+        toy = ''
+        if self.blind:
+            toy = f'--toysFile {general["FitPath"]}/{self.fitname}/toy.root -t -1'
+
         self.save_execute(command=f'env -i sh scripts/execute_combine.sh \
                                     combineTool.py -M MultiDimFit -v 3 -n _fit_{self.fitname}_{self.profiled} \
-                                    --algo grid --alignEdges 1 --points {self.points} \
-                                    --toysFile {general["FitPath"]}/{self.fitname}/toy.root  -t -1 \
+                                    --algo grid --alignEdges 1 --points {self.points} --X-rtd MINIMIZER_analytic {toy} \
                                     --redefineSignalPOIs {pois} \
                                     --setParameters r=1,m_top=175.2,gamma_t=1.322 \
-                                    --freezeParameters r --floatOtherPOIs 1 \
-                                    --setParameterRanges {ranges} \
+                                    --floatOtherPOIs 1 --setParameterRanges {ranges} \
                                     {general["FitPath"]}/{self.fitname}/workspace.root', log=self.log())
         if self.profiled:
             self.execute(f'mv -v higgsCombine_fit_{self.fitname}_{self.profiled}.MultiDimFit.*.root \

@@ -26,6 +26,7 @@ class NLLPlotTask(BaseTask):
     fitname = luigi.Parameter()
     histogram = luigi.Parameter()
     cardmask = luigi.Parameter()
+    blind = luigi.BoolParameter(default=True)
     options = luigi.Parameter(default='')
 
 
